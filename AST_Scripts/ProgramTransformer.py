@@ -10,7 +10,7 @@ from .XMLExpLexer import *
 from .XMLExpVisitor import *
 from .XMLTypeSearch import *
 from .XMLProgrammer import *
-from AST_Scripts import XMLExpParser
+from .XMLExpParser import *
 
 class ProgramTransformer(XMLExpVisitor):
 
