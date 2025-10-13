@@ -1,7 +1,6 @@
-import XMLProgrammer
-from XMLProgrammer import *
+from AST_Scripts import XMLProgrammer
 
-from AbstractProgramVisitor import AbstractProgramVisitor
+from .AbstractProgramVisitor import AbstractProgramVisitor
 
 
 class ProgramVisitor(AbstractProgramVisitor):

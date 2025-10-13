@@ -6,10 +6,11 @@ from types import NoneType
 
 from antlr4 import ParserRuleContext
 
-from Source.quantumCode.AST_Scripts.XMLExpLexer import *
-from Source.quantumCode.AST_Scripts.XMLExpVisitor import *
-from Source.quantumCode.AST_Scripts.XMLTypeSearch import *
-from Source.quantumCode.AST_Scripts.XMLProgrammer import *
+from .XMLExpLexer import *
+from .XMLExpVisitor import *
+from .XMLTypeSearch import *
+from .XMLProgrammer import *
+from AST_Scripts import XMLExpParser
 
 class ProgramTransformer(XMLExpVisitor):
 

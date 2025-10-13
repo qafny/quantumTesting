@@ -6,10 +6,10 @@ from types import NoneType
 
 from antlr4 import ParserRuleContext
 
-import ProgramVisitor
+from .ProgramVisitor import *
 
-import XMLProgrammer
-from XMLProgrammer import Nat, Qty
+from .XMLProgrammer import *
+from .XMLProgrammer import Nat, Qty
 
 
 class TypeSearch(ProgramVisitor):
