@@ -26,18 +26,39 @@ os.environ["PATH"] += os.pathsep + r"C:\Program Files\Graphviz\bin"
 
 # ------------------------- DAG TO XMLPROGRAMMER -------------------------------
 
-supportedGates = ['h','x','y','z','s','sdg','t','tdg','rx','ry','rz','u','cx','cz']
+supportedGates = ['h','x','y','z','s','sdg','t','tdg','ry','rz','u','cx','cz']
 ignoredGates = ['measure']
 
-def decomposeToGates(qc):
-    return transpile(qc, basis_gates=supportedGates + ignoredGates)
+def decomposeToGates(qc, optimiseCircuit):
+    # Unoptimised circuits are more readable.
+    if optimiseCircuit:
+        return transpile(qc, basis_gates=supportedGates + ignoredGates)
+    return transpile(qc, basis_gates=supportedGates + ignoredGates, optimization_level=0)
    
 class QCtoXMLProgrammer:
     def __init__(self):
         self.dag = None
 
-    def startVisit(self, qc):
-        qc = decomposeToGates(qc)
+    def startVisit(self, qc, circuitName=None, optimiseCircuit=False, showDecomposedCircuit=False, showInputCircuit=True):
+        print()
+        if circuitName is not None:
+            print("------------------- COMPILING CIRCUIT: " + str(circuitName) + " -------------------")
+        else:
+            print("------------------- COMPILING CIRCUIT: " + "[Name Unknown]" + " -------------------")
+
+        
+        if showInputCircuit:
+            print("Input Circuit:")
+            print(qc.draw())
+            print()
+
+
+        qc = decomposeToGates(qc, optimiseCircuit)
+
+        if showDecomposedCircuit:
+            print("Decomposed Circuit:")
+            print(qc.draw())
+
         self.dag = circuit_to_dag(qc)
 
         # Dictionary mapping Qiskit qubits to XMLProgrammer qubits
@@ -52,8 +73,7 @@ class QCtoXMLProgrammer:
             self.visitNode(startingNode)
 
         self.program = QXProgram(self.expList)
-        print("Extracted program in XMLProgrammer format:")
-
+        print("Extracted QXProgram:")
         print(self.program)
 
         
@@ -113,6 +133,9 @@ class QCtoXMLProgrammer:
             elif node.name == "cz":
                 exps.append(QXCU("cz", inputBits[0], QXProgram([QXRZ("z", inputBits[1], 180)])))
             
+            elif node.name in ignoredGates:
+                pass
+
             else:
                 print("Warning: Unrecognized operation ", node.name)
 

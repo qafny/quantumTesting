@@ -34,8 +34,6 @@ os.environ["PATH"] += os.pathsep + r"C:\Program Files\Graphviz\bin"
 # 1, 2 are inputs qubits, 3 is carry-in, 4 is the output (a+b+carry-in)
 qc = QuantumCircuit(4)  # 4 qubits for a single 1-bit full adder
 qc.append(FullAdderGate(num_state_qubits=1), [0, 1, 2, 3])  # no argument, just 1-bit adder
-print('---circuit 1---')
-print(qc.draw())
 qcEx1 = qc.copy()
 
 # 2: linear pauli rotations
@@ -63,17 +61,12 @@ for i, q_i in enumerate(qr_state):
 #         circuit.cry(self.slope * pow(2, i), q_i, qr_target)
 #     else:  # 'Z'
 #         circuit.crz(self.slope * pow(2, i), q_i, qr_target)
-print('---circuit 2---')
-print(circuit.draw())
 qcEx2 = circuit.copy()
 
 
 # -------------------------- COMPILE TO XMLPROGRAMMER --------------------------
 
 visitor = QCtoXMLProgrammer()
-
-print("----- Example 1 -----")
-visitor.startVisit(qcEx1)
-print("----- Example 2 -----")
-visitor.startVisit(qcEx2)
+visitor.startVisit(qcEx1, circuitName="Example 1")
+visitor.startVisit(qcEx2, circuitName="Example 2")
 
