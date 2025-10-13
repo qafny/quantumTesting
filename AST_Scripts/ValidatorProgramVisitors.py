@@ -16,7 +16,7 @@ def calBinNoLength(v):
     return val
 
 
-class SimulatorValidator(ProgramVisitor):
+class SimulatorValidator(ProgramVisitor.ProgramVisitor):
 
     def visitLet(self, ctx: XMLProgrammer.QXLet):
         ctx.program().accept(self)
