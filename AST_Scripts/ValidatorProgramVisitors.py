@@ -1,10 +1,10 @@
 import random
 
-from Source.quantumCode.AST_Scripts import XMLProgrammer
-from Source.quantumCode.AST_Scripts.ProgramVisitor import ProgramVisitor
-from Source.quantumCode.AST_Scripts.Retrievers import RPFRetriever
-from Source.quantumCode.AST_Scripts.XMLProgrammer import QXApp, QXMatch, QXNum, QXIf
-from Source.quantumCode.AST_Scripts.simulator import Simulator
+from AST_Scripts import XMLProgrammer
+from AST_Scripts import ProgramVisitor
+# from AST_Scripts import RPFRetriever
+from AST_Scripts.XMLProgrammer import QXApp, QXMatch, QXNum, QXIf
+from AST_Scripts.simulator import Simulator
 
 
 def calBinNoLength(v):

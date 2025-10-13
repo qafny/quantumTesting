@@ -2,8 +2,8 @@ import traceback
 from collections import ChainMap
 # from types import NoneType
 
-from XMLProgrammer import *
-from ProgramVisitor import *
+from .XMLProgrammer import *
+from .ProgramVisitor import *
 
 NoneType = type(None)
 
