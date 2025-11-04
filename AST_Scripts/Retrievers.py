@@ -1,6 +1,6 @@
-from Source.quantumCode.AST_Scripts import XMLProgrammer
-from Source.quantumCode.AST_Scripts.ProgramVisitor import ProgramVisitor
-from Source.quantumCode.AST_Scripts.XMLProgrammer import QXMatch, QXApp, QXIf
+from AST_Scripts import XMLProgrammer
+from AST_Scripts.ProgramVisitor import ProgramVisitor
+from AST_Scripts.XMLProgrammer import QXMatch, QXApp, QXIf
 
 
 class RPFRetriever(ProgramVisitor):

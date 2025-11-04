@@ -9,8 +9,8 @@ sys.path.insert(0,parent_dir)
 from AST_Scripts.XMLExpLexer import XMLExpLexer
 from AST_Scripts.XMLExpParser import XMLExpParser
 from AST_Scripts.ProgramTransformer import ProgramTransformer
-from AST_Scripts.ValidatorProgramVisitors import SimulatorValidator, AppRPFValidator
-from AST_Scripts.Retrievers import RPFRetriever, MatchCounterRetriever
+from AST_Scripts.ValidatorProgramVisitors import SimulatorValidator
+from AST_Scripts.Retrievers import MatchCounterRetriever
 from AST_Scripts.simulator import CoqNVal, Simulator, bit_array_to_int, to_binary_arr
 
 

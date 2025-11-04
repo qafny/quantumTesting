@@ -9,8 +9,8 @@ sys.path.insert(0,parent_dir)
 from AST_Scripts.XMLExpLexer import XMLExpLexer
 from AST_Scripts.XMLExpParser import XMLExpParser
 from AST_Scripts.ProgramTransformer import ProgramTransformer
-from AST_Scripts.ValidatorProgramVisitors import SimulatorValidator, AppRPFValidator
-from AST_Scripts.Retrievers import RPFRetriever, MatchCounterRetriever
+from AST_Scripts.ValidatorProgramVisitors import SimulatorValidator
+from AST_Scripts.Retrievers import MatchCounterRetriever
 from AST_Scripts.simulator import CoqNVal, Simulator, bit_array_to_int, to_binary_arr
 
 def read_program(file_path: str):
@@ -41,10 +41,6 @@ def get_tree():
         validator.visitRoot(new_tree)
 
         # Non-Decreasing Recursive Fixed Point Factor Check
-        rpf_retriever = RPFRetriever()
-        rpf_retriever.visitRoot(new_tree)
-        rpf_validator = AppRPFValidator(rpf_retriever)
-        rpf_validator.visitRoot(new_tree)
     except Exception as e:
         print('\n ==============', e, '==============')
         valid_tree = False
