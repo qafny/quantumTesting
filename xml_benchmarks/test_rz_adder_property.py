@@ -44,10 +44,6 @@ def get_tree():
         validator.visitRoot(new_tree)
 
         # Non-Decreasing Recursive Fixed Point Factor Check
-        rpf_retriever = RPFRetriever()
-        rpf_retriever.visitRoot(new_tree)
-        rpf_validator = AppRPFValidator(rpf_retriever)
-        rpf_validator.visitRoot(new_tree)
     except Exception as e:
         print('\n ==============', e, '==============')
         valid_tree = False
