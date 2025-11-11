@@ -1,7 +1,7 @@
 #from collections import ChainMap
 from types import NoneType
-from Source.quantumCode.AST_Scripts.XMLProgrammer import *
-from Source.quantumCode.AST_Scripts.ProgramVisitor import *
+from AST_Scripts.XMLProgrammer import *
+from AST_Scripts.ProgramVisitor import *
 
 class XMLPrinter(ProgramVisitor):
 

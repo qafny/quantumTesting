@@ -159,4 +159,5 @@ class ProgramVisitor(AbstractProgramVisitor):
         pass
 
     def visitNum(self, ctx: XMLProgrammer.QXNum):
-        return ctx.num()
+        pass
+        # return ctx.num()

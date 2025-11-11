@@ -20,6 +20,7 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 # sys.path.append(os.path.join(current_dir, "PQASM"))
 
 from AST_Scripts.XMLProgrammer import QXProgram, QXQID, QXCU, QXX, QXH, QXRZ, QXRY
+from AST_Scripts.XMLPrinter import XMLPrinter
 
 # Ensure graphviz is in the PATH (for dag drawing)
 os.environ["PATH"] += os.pathsep + r"C:\Program Files\Graphviz\bin"
@@ -75,8 +76,12 @@ class QCtoXMLProgrammer:
         self.program = QXProgram(self.expList)
         print("Extracted QXProgram:")
         print(self.program)
+        xml = XMLPrinter()
+        xml.visitProgram(self.program)
+        print("XML Representation:")
+        print(xml.xml_output)
+        print("------------------------------------------------------------")
 
-        
     def visitNode(self, node):
         if node in self.visitedNodes:
             return
