@@ -101,7 +101,7 @@ class QXQID(QXElem, QXVexp):
         return visitor.visitIDExp(self)
 
     def ID(self):
-        return self._id if self._id is str else self._id.getText()
+        return self._id if self._id is str else str(self._id)
 
     def type(self):
         return self._type

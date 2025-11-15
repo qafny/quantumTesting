@@ -19,7 +19,7 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 # current_dir = os.path.dirname(os.path.abspath(__file__))
 # sys.path.append(os.path.join(current_dir, "PQASM"))
 
-from AST_Scripts.XMLProgrammer import QXProgram, QXQID, QXCU, QXX, QXH, QXRZ, QXRY
+from AST_Scripts.XMLProgrammer import QXProgram, QXQID, QXCU, QXX, QXH, QXRZ, QXRY, QXVexp, QXNum
 from AST_Scripts.XMLPrinter import XMLPrinter
 
 # Ensure graphviz is in the PATH (for dag drawing)
@@ -103,19 +103,19 @@ class QCtoXMLProgrammer:
             elif node.name == "x":
                 exps.append(QXX("x", inputBits[0]))
             elif node.name == "y":
-                exps.append(QXRY("y", inputBits[0], 90))
+                exps.append(QXRY("y", inputBits[0], QXNum(90)))
             elif node.name == "z":
-                exps.append(QXRZ("z", inputBits[0], 180))
+                exps.append(QXRZ("z", inputBits[0], QXNum(180)))
 
             # Fractional phase shifts (S, SDG, T, TDG):
             elif node.name == "s":
-                exps.append(QXRZ("s", inputBits[0], 90))
+                exps.append(QXRZ("s", inputBits[0], QXNum(90)))
             elif node.name == "sdg":
-                exps.append(QXRZ("sdg", inputBits[0], -90))
+                exps.append(QXRZ("sdg", inputBits[0], QXNum(-90)))
             elif node.name == "t":
-                exps.append(QXRZ("t", inputBits[0], 45))
+                exps.append(QXRZ("t", inputBits[0], QXNum(45)))
             elif node.name == "tdg":
-                exps.append(QXRZ("tdg", inputBits[0], -45))
+                exps.append(QXRZ("tdg", inputBits[0], QXNum(-45)))
 
             # General rotations (RX, RY, RZ):
             # elif node.name == "rx":
@@ -123,14 +123,14 @@ class QCtoXMLProgrammer:
             elif node.name == "ry":
                 exps.append(QXRY("ry", inputBits[0], node.params[0]*180/math.pi))
             elif node.name == "rz":
-                exps.append(QXRZ("rz", inputBits[0], node.params[0]*180/math.pi))
+                exps.append(QXRZ("rz", inputBits[0], QXNum(node.params[0]*180/math.pi)))
 
             # Universal single-qubit gate (U):
             elif node.name == "u":
                 # U(a, b, c) = RZ(a) RY(b) RZ(c)
-                exps.append(QXRZ("rz", inputBits[0], node.params[0]*180/math.pi))
-                exps.append(QXRY("ry", inputBits[0], node.params[1]*180/math.pi))
-                exps.append(QXRZ("rz", inputBits[0], node.params[2]*180/math.pi))
+                exps.append(QXRZ("rz", inputBits[0], QXNum(node.params[0]*180/math.pi)))
+                exps.append(QXRY("ry", inputBits[0], QXNum(node.params[1]*180/math.pi)))
+                exps.append(QXRZ("rz", inputBits[0], QXNum(node.params[2]*180/math.pi)))
 
             # Controlled operations (CX, CZ):
             elif node.name == "cx":
