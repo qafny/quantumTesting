@@ -136,7 +136,7 @@ class QCtoXMLProgrammer:
             elif node.name == "cx":
                 exps.append(QXCU("cx", inputBits[0], QXProgram([QXX("x", inputBits[1])])))
             elif node.name == "cz":
-                exps.append(QXCU("cz", inputBits[0], QXProgram([QXRZ("z", inputBits[1], 180)])))
+                exps.append(QXCU("cz", inputBits[0], QXProgram([QXRZ("z", inputBits[1], QXNum(180))])))
             
             elif node.name in ignoredGates:
                 pass
