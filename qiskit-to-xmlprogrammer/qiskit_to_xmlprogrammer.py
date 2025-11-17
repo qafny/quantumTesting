@@ -40,7 +40,15 @@ class QCtoXMLProgrammer:
     def __init__(self):
         self.dag = None
 
-    def startVisit(self, qc, circuitName=None, optimiseCircuit=False, showDecomposedCircuit=False, showInputCircuit=True):
+    def startVisit(
+        self,
+        qc,
+        circuitName=None,
+        optimiseCircuit=False,
+        showDecomposedCircuit=False,
+        showInputCircuit=True,
+        emit_xml=True,
+    ):
         print()
         if circuitName is not None:
             print("------------------- COMPILING CIRCUIT: " + str(circuitName) + " -------------------")
@@ -74,13 +82,19 @@ class QCtoXMLProgrammer:
             self.visitNode(startingNode)
 
         self.program = QXProgram(self.expList)
-        print("Extracted QXProgram:")
+        print("Extracted QXProgram (AST):")
         print(self.program)
-        xml = XMLPrinter()
-        xml.visitProgram(self.program)
-        print("XML Representation:")
-        print(xml.xml_output)
+
+        if emit_xml:
+            xml = XMLPrinter()
+            xml.visitProgram(self.program)
+            print("XML Representation:")
+            print(xml.xml_output)
+        else:
+            print("XML emission skipped; AST is available via return value.")
+
         print("------------------------------------------------------------")
+        return self.program
 
     def visitNode(self, node):
         if node in self.visitedNodes:
