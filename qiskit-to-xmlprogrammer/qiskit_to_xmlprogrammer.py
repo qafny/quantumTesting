@@ -133,9 +133,9 @@ class QCtoXMLProgrammer:
 
             # General rotations (RX, RY, RZ):
             # elif node.name == "rx":
-            #     exps.append(QXRX("rx", inputBits[0], node.params[0]*180/math.pi))
+            #     exps.append(QXRX("rx", inputBits[0], QXNum(node.params[0]*180/math.pi)))
             elif node.name == "ry":
-                exps.append(QXRY("ry", inputBits[0], node.params[0]*180/math.pi))
+                exps.append(QXRY("ry", inputBits[0], QXNum(node.params[0]*180/math.pi)))
             elif node.name == "rz":
                 exps.append(QXRZ("rz", inputBits[0], QXNum(node.params[0]*180/math.pi)))
 
@@ -161,7 +161,22 @@ class QCtoXMLProgrammer:
             # Turn the extracted operation into an expression, and add it to
             # the list of expressions
             for exp in exps:
+                
+
+                # Check if the QXNum is actually a number. This is important for
+                # parameterised circuits, sunce otherwise we get compiled cases such as
+                # QXRY(id=ry, v=QXQID(id=None), angle=57.29577951308232*θ[0]).
+                # if there is an error, we raise it here
+
+   
+                if type(exp) in [QXRY, QXRZ]:
+                    try:
+                        float(exp.num().num())
+                    except Exception as e:
+                        raise TypeError("Error: An unset external parameter in a parameterised circuit was found. From gate: " + str(node.name) + " with angle: " + str(exp.angle) + ". Please bind all parameters before compiling to XMLProgrammer.")
+
                 self.expList.append(exp)
+
             
             
 

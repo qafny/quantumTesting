@@ -72,6 +72,6 @@ qcEx3 = qc.copy()
 
 visitor = QCtoXMLProgrammer()
 
-visitor.startVisit(qcEx1, circuitName="Example Circuit 1")
-visitor.startVisit(qcEx2, circuitName="Example Circuit 2")
-visitor.startVisit(qcEx3, circuitName="Example Circuit 3")
+visitor.startVisit(qcEx1, circuitName="Example Circuit 1", optimiseCircuit=True, showDecomposedCircuit=True)
+visitor.startVisit(qcEx2, circuitName="Example Circuit 2", optimiseCircuit=True)
+visitor.startVisit(qcEx3, circuitName="Example Circuit 3", optimiseCircuit=True)
