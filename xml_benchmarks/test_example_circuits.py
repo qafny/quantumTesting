@@ -7,7 +7,6 @@ import os
 # sys.path.insert(0,parent_dir)
 # sys.path.append('/Users/anshugsharma/VSCodeRepos/quantumTesting/qiskit-to-xmlprogrammer')
 sys.path.append('/Users/anshugsharma/VSCodeRepos/quantumTesting')
-print(sys.path)
 from AST_Scripts.XMLExpLexer import XMLExpLexer
 from AST_Scripts.XMLExpParser import XMLExpParser
 from AST_Scripts.ProgramTransformer import ProgramTransformer
@@ -32,7 +31,7 @@ from qiskit.circuit.library.arithmetic import FullAdderGate
 # current_dir = os.path.dirname(os.path.abspath(__file__))
 # sys.path.append(os.path.join(current_dir, "PQASM"))
 
-from AST_Scripts.XMLProgrammer import QXProgram, QXQID, QXCU, QXX, QXH, QXRZ, QXRY
+from AST_Scripts.XMLProgrammer import QXProgram, QXQID, QXCU, QXX, QXH, QXRZ, QXRY, QXRoot
 
 # Ensure graphviz is in the PATH (for dag drawing)
 os.environ["PATH"] += os.pathsep + r"C:\Program Files\Graphviz\bin"
@@ -99,14 +98,18 @@ def read_program(file_path: str):
     # parser = XMLExpParser(t_stream)
     # tree = parser.root()
     transform = ProgramTransformer()
-    new_tree = transform.visitRoot(visitor.startVisit(qcEx1, circuitName="Example Circuit 1", optimiseCircuit=True, showDecomposedCircuit=True))
+    output = visitor.startVisit(qcEx1, circuitName="Example Circuit 1", optimiseCircuit=True, showDecomposedCircuit=False)
+    print(output)
+    print(type(output))
+    # type needs to be QXRoot
+    new_tree = transform.visitProgram((output))
 
     return new_tree
 
 
 def get_tree():
     #new_tree = read_program(f"{os.path.dirname(os.path.realpath(__file__))}/mutants/mutant_38.xml")
-    new_tree = read_program(f"{os.path.dirname(os.path.realpath(__file__))}/rz_adder_good.xml")
+    new_tree = visitor.startVisit(qcEx1, circuitName="Example Circuit 1", optimiseCircuit=True, showDecomposedCircuit=False)
 
     valid_tree = True
 
@@ -115,7 +118,7 @@ def get_tree():
         # Added per Dr. Li's suggestion on 11/16 to scoop out the validator behaviour out of the simulator as there can be
         # programs which does not always need to follow constraints like only having 1 app tag.
         validator = SimulatorValidator()
-        validator.visitRoot(new_tree)
+        validator.visitProgram((new_tree))
 
         # Non-Decreasing Recursive Fixed Point Factor Check
     except Exception as e:
@@ -123,7 +126,7 @@ def get_tree():
         valid_tree = False
 
     retriever = MatchCounterRetriever()
-    retriever.visitRoot(new_tree)
+    retriever.visitProgram(new_tree)
     return new_tree, retriever, valid_tree
 
 
@@ -137,7 +140,7 @@ def run_simulator(n, i, X, M, parseTree):
 
     # Run the Simulator
     y = Simulator(state, environment)
-    y.visitRoot(parseTree)
+    y.visitProgram(parseTree)
     new_state = y.get_state()
     return bit_array_to_int(new_state.get('x')[0].getBits(), n)
  
