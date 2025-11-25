@@ -12,3 +12,7 @@ def test_answer():
 def test_qxexp():
     test = QXProgram([QXExp()])
     assert type(test.exp(0)) == QXExp
+
+def test_not_qxexp():
+    test = QXProgram([])
+    assert not type(test.exp(0)) == QXExp
