@@ -2,11 +2,10 @@ from antlr4 import InputStream, CommonTokenStream
 import sys
 import os
 
-# current_dir = os.path.dirname(os.path.realpath(__file__))
-# parent_dir = os.path.dirname(current_dir)
-# sys.path.insert(0,parent_dir)
-# sys.path.append('/Users/anshugsharma/VSCodeRepos/quantumTesting/qiskit-to-xmlprogrammer')
-sys.path.append('/Users/anshugsharma/VSCodeRepos/quantumTesting')
+current_dir = os.path.dirname(os.path.realpath(__file__))
+parent_dir = os.path.dirname(current_dir)
+sys.path.insert(0,parent_dir)
+
 from AST_Scripts.XMLExpLexer import XMLExpLexer
 from AST_Scripts.XMLExpParser import XMLExpParser
 from AST_Scripts.ProgramTransformer import ProgramTransformer
@@ -26,10 +25,6 @@ import graphviz
 import os
 import sys
 from qiskit.circuit.library.arithmetic import FullAdderGate
-
-# sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-# current_dir = os.path.dirname(os.path.abspath(__file__))
-# sys.path.append(os.path.join(current_dir, "PQASM"))
 
 from AST_Scripts.XMLProgrammer import QXProgram, QXQID, QXCU, QXX, QXH, QXRZ, QXRY, QXRoot
 

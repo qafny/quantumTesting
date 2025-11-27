@@ -1,7 +1,14 @@
 import sys
-sys.path.append('/Users/anshugsharma/VSCodeRepos/quantumTesting')
-from AST_Scripts.XMLProgrammer import *
-from AST_Scripts.AbstractProgramVisitor import *
+import os
+
+current_dir = os.path.dirname(os.path.realpath(__file__))
+parent_dir = os.path.dirname(current_dir)
+grandparent_dir = os.path.dirname(parent_dir)
+sys.path.insert(0,parent_dir)
+sys.path.insert(0,grandparent_dir)
+
+from XMLProgrammer import * 
+from AbstractProgramVisitor import *
 
 # example from https://docs.pytest.org/en/stable/
 def inc(x):
