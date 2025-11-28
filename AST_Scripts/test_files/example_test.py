@@ -9,6 +9,7 @@ sys.path.insert(0,grandparent_dir)
 
 from XMLProgrammer import * 
 from AbstractProgramVisitor import *
+from Retrievers import * 
 
 # example from https://docs.pytest.org/en/stable/
 def inc(x):
@@ -28,3 +29,7 @@ def test_not_qxexp():
 def test_qxroot_prog():
     test = QXRoot(QXProgram([QXExp()]))
     assert type(test.program()) == QXProgram
+
+def test_rpfretriever_idx():
+    test = RPFRetriever()
+    assert test.get_rpf_index() == -1
