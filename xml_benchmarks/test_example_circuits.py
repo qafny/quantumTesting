@@ -14,7 +14,7 @@ from AST_Scripts.Retrievers import MatchCounterRetriever
 from AST_Scripts.simulator import CoqNVal, Simulator, bit_array_to_int, to_binary_arr
 import math
 import qiskit
-sys.path.append('/Users/anshugsharma/VSCodeRepos/quantumTesting/qiskit-to-xmlprogrammer')
+sys.path.append(parent_dir+'/qiskit-to-xmlprogrammer')
 from qiskit_to_xmlprogrammer import QCtoXMLProgrammer
 from qiskit import transpile
 from qiskit import QuantumCircuit
