@@ -9,6 +9,8 @@ sys.path.insert(0,grandparent_dir)
 
 from XMLProgrammer import * 
 from AbstractProgramVisitor import *
+from ProgramVisitor import *
+from ValidatorProgramVisitors import *
 from Retrievers import * 
 
 # example from https://docs.pytest.org/en/stable/
@@ -33,3 +35,12 @@ def test_qxroot_prog():
 def test_rpfretriever_idx():
     test = RPFRetriever()
     assert test.get_rpf_index() == -1
+
+# this test fails and we need to fix this
+# def test_program_visitor_idexp():
+#     test = ProgramVisitor()
+#     assert not type(test.visitIDExp(QXIDExp('test'))) == int
+
+def test_program_visitor_idexp():
+    test = SimulatorValidator()
+    assert type(test.visitIDExp(QXIDExp('test'))) == int

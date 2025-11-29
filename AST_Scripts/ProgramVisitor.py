@@ -1,6 +1,6 @@
 from AST_Scripts import XMLProgrammer
 
-from .AbstractProgramVisitor import AbstractProgramVisitor
+from AST_Scripts.AbstractProgramVisitor import AbstractProgramVisitor
 
 
 class ProgramVisitor(AbstractProgramVisitor):
@@ -127,6 +127,7 @@ class ProgramVisitor(AbstractProgramVisitor):
         ctx.vexp().accept(self)
 
     def visitX(self, ctx: XMLProgrammer.QXX):
+        print(ctx)
         ctx.vexp().accept(self)
 
     def visitH(self, ctx: XMLProgrammer.QXH):
