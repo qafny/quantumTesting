@@ -75,11 +75,11 @@
 <qvexp op = "id" type = "Nor(size)" > re </qvexp>
   <qvexp op = "id" type = "Nor(1)" > c </qvexp>
    <match id = "n" >
-          <pair case = "0" > <pexp gate = "SKIP" > <id> re </id> <vexp> 0 </vexp> </pexp> </pair>
+          <pair case = "0" > <pexp gate = "SKIP"  id = "re" > <vexp op = "num" > 0 </vexp> </pexp> </pair>
           <pair case = "m" >
-          <app id = "f" > <vexp id = "id" > m </vexp> <vexp id = "id" > size </vexp> <qvexp id = "id" > x </qvexp> <qvexp id = "id"> y </qvexp>
-              <qvexp id = "id" > re </qvexp> <qvexp id = "id" > c </qvexp> </app>
-          <pexp gate = "CU" id = "id" > <vexp op = "id" > m </vexp>
+          <app id = "f" > <vexp op = "id" > m </vexp> <vexp op = "id" > size </vexp> <qvexp op = "id" > x </qvexp> <qvexp op = "id"> y </qvexp>
+              <qvexp op = "id" > re </qvexp> <qvexp op = "id" > c </qvexp> </app>
+          <pexp gate = "CU" id = "y" > <vexp op = "id" > m </vexp>
            <app id = "adder" > <vexp op = "-"> <vexp op = "id" > size </vexp> <vexp op = "id" > m </vexp> </vexp>
            <vexp op = "id" > size </vexp>
            <vexp op = "id" > m </vexp>
