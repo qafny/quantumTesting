@@ -31,8 +31,6 @@ from AST_Scripts.XMLProgrammer import QXProgram, QXQID, QXCU, QXX, QXH, QXRZ, QX
 # Ensure graphviz is in the PATH (for dag drawing)
 os.environ["PATH"] += os.pathsep + r"C:\Program Files\Graphviz\bin"
 
-
-
 # --------------------------- EXAMPLE CIRCUITS ---------------------------------
 
 # ----- 1: Common gates
@@ -71,16 +69,13 @@ qc.cx(0, 1)
 qc.cx(1, 2)
 qcEx3 = qc.copy()
 
-
 # -------------------------- COMPILE TO XMLPROGRAMMER --------------------------
-
 
 visitor = QCtoXMLProgrammer()
 
 # visitor.startVisit(qcEx1, circuitName="Example Circuit 1", optimiseCircuit=True, showDecomposedCircuit=True)
 # visitor.startVisit(qcEx2, circuitName="Example Circuit 2", optimiseCircuit=True)
 # visitor.startVisit(qcEx3, circuitName="Example Circuit 3", optimiseCircuit=True)
-
 
 # NOTE:: test how to run the code.
 
@@ -94,8 +89,6 @@ def read_program(file_path: str):
     # tree = parser.root()
     transform = ProgramTransformer()
     output = visitor.startVisit(qcEx1, circuitName="Example Circuit 1", optimiseCircuit=True, showDecomposedCircuit=False)
-    print(output)
-    print(type(output))
     # type needs to be QXRoot
     new_tree = transform.visitProgram((output))
 
@@ -105,7 +98,7 @@ def read_program(file_path: str):
 def get_tree():
     #new_tree = read_program(f"{os.path.dirname(os.path.realpath(__file__))}/mutants/mutant_38.xml")
     new_tree = visitor.startVisit(qcEx1, circuitName="Example Circuit 1", optimiseCircuit=True, showDecomposedCircuit=False)
-
+    print ('new tree type', type(new_tree))
     valid_tree = True
 
     try:
