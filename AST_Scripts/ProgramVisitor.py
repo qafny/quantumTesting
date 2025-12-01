@@ -127,7 +127,6 @@ class ProgramVisitor(AbstractProgramVisitor):
         ctx.vexp().accept(self)
 
     def visitX(self, ctx: XMLProgrammer.QXX):
-        print(ctx)
         ctx.vexp().accept(self)
 
     def visitH(self, ctx: XMLProgrammer.QXH):
