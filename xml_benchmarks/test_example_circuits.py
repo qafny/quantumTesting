@@ -97,7 +97,7 @@ def read_program(file_path: str):
 
 def get_tree():
     #new_tree = read_program(f"{os.path.dirname(os.path.realpath(__file__))}/mutants/mutant_38.xml")
-    new_tree = visitor.startVisit(qcEx1, circuitName="Example Circuit 1", optimiseCircuit=True, showDecomposedCircuit=False)
+    new_tree = visitor.startVisit(qcEx3, circuitName="Example Circuit 1", optimiseCircuit=True, showDecomposedCircuit=False)
     print ('new tree type', type(new_tree))
     valid_tree = True
 
@@ -140,74 +140,54 @@ def test_property_addition_with_edge_case_M(n,i,X,M, parse_tree):
     else :
         assert False
 
-parsetree = get_tree()
-
+parsetree = get_tree()[0]
 
 from hypothesis import given, strategies as st, assume, settings, HealthCheck
 
+def simulate_circuit(x_array_value, y_array_value, c_array_value, num_qubits, parse_tree):
+    val_array_x = to_binary_arr(x_array_value, num_qubits)
+    val_array_y = to_binary_arr(y_array_value, num_qubits)
+    num_qubits_ca = 1
+    val_array_ca = to_binary_arr(c_array_value, num_qubits_ca)
 
-# @st.composite
-# def valid_inputs(draw):
-#     n = draw(st.sampled_from([8,16,32,64]))
-#     i = draw(st.integers(max_value=n)) 
-#     X = st.integers()
-#     M = st.sampled_from([10,100,1000])
-#     return (n,i,X,M, parsetree)
-# @given(valid_inputs())
-@settings(suppress_health_check=[HealthCheck.filter_too_much])
-@given(n = st.sampled_from([8,16,32,64]), 
-    i = st.integers(min_value=1),
-    X = st.integers(min_value=0), 
-    M = st.sampled_from([10,100,1000])
-)
-def test_addition_with_small_i(n, i, X, M, parse_tree):
-    # assume((i > 0) and (X > 0) and (M > 0))
+    state = dict(
+        {"xa": [CoqNVal(val_array_x, 0)],
+         "ya": [CoqNVal(val_array_y, 0)],
+         "ca": [CoqNVal(val_array_ca, 0)],
+         "na": num_qubits,
+         })
+    environment = dict(
+        {"xa": num_qubits,
+         "ya": num_qubits,
+         "ca": num_qubits_ca,
+         })
 
-    assume (i < n)
+    simulator = Simulator(state, environment)
+    simulator.visitProgram(parse_tree)
+    new_state = simulator.state
+    return new_state
 
-    print (f"test_addition_with_small_i(), called with n = {n}, i = {i}, X = {X}, M = {M}")
-    if parse_tree[2]:
-        expected = (X + (M % (2 ** i))) % (2 ** n)
-        assert run_simulator (n, i, X, M, parse_tree[0]) == expected
-    else :
-        assert False
-    
-test_addition_with_small_i(parse_tree=parsetree)
+def process_bitwise_test_cases(test_cases: list):
+    # pt_output = read_program(f"{os.path.dirname(os.path.realpath(__file__))}/cl_adder_good.xml")
+    # print('pt_output', pt_output)
+    # print('pt_output type', type(pt_output))
+    insts = []
+    for test_case in test_cases:
+        na = test_case['na']
+        ca = test_case['ca']
+        xa = test_case['xa']
+        ya = test_case['ya']
 
+        expected = (xa + ya) % (2 ** na)
+        new_state = simulate_circuit(xa, ya, ca, na, parsetree)
+        # calculated = bit_array_to_int(new_state.get('ya')[0].getBits(), na)
 
-@settings(suppress_health_check=[HealthCheck.filter_too_much])
-@given(n = st.sampled_from([8,16,32,64]),
-    i = st.integers(min_value=1),
-    X = st.sampled_from([32,64]),
-    M = st.integers(min_value=10)
-)
-def test_addition_with_med_i(n,i,X,M,parse_tree):
-    assume (i < n)
-    print(f"test_addition_with_med_i(): n = {n}, i = {i}, X = {X}, M = {M}")
-    if (parse_tree[2]):
-        expected = (X + (M %(2 ** i))) % (2 ** n)
-        assert run_simulator(n,i,X,M,parse_tree[0]) == expected
-    else:
-        assert False
+        # insts.append((na, expected, calculated))
 
-test_addition_with_med_i(parse_tree = parsetree)
+    return new_state
 
+test_cases_for_bitwise = [
+    {"na": 20, "xa": 5, "ya": 5, "ca": 0, "expected": 10}
+]
 
-@settings(suppress_health_check=[HealthCheck.filter_too_much])
-@given(n = st.sampled_from([8,16,32,64]),
-    i = st.integers(min_value = 1),
-    X = st.integers(min_value=10),
-    M = st.sampled_from([0])
-)
-def test_addition_with_edge_case_M(n,i,X,M,parse_tree):
-    
-    assume (i < n)
-    print(f"test_addition_with_edge_case_M: n = {n}, i = {i}, X = {X}, M = {M}")
-    if parse_tree[2]:
-        expected = (X + (M % (2 ** i))) % (2 ** n)
-        assert run_simulator (n,i,X,M, parse_tree[0]) == expected
-    else:
-        assert False
-
-
-test_addition_with_edge_case_M(parse_tree=parsetree)
+bitwise_test_instances = process_bitwise_test_cases(test_cases_for_bitwise)
