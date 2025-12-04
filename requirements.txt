@@ -10,3 +10,4 @@ scipy==1.15.3
 sortedcontainers==2.4.0
 stevedore==5.5.0
 typing_extensions==4.15.0
+pytest==9.0.1

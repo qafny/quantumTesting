@@ -19,7 +19,8 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 # current_dir = os.path.dirname(os.path.abspath(__file__))
 # sys.path.append(os.path.join(current_dir, "PQASM"))
 
-from AST_Scripts.XMLProgrammer import QXProgram, QXQID, QXCU, QXX, QXH, QXRZ, QXRY
+from AST_Scripts.XMLProgrammer import QXProgram, QXQID, QXCU, QXX, QXH, QXRZ, QXRY, QXVexp, QXNum
+from AST_Scripts.XMLPrinter import XMLPrinter
 
 # Ensure graphviz is in the PATH (for dag drawing)
 os.environ["PATH"] += os.pathsep + r"C:\Program Files\Graphviz\bin"
@@ -39,7 +40,15 @@ class QCtoXMLProgrammer:
     def __init__(self):
         self.dag = None
 
-    def startVisit(self, qc, circuitName=None, optimiseCircuit=False, showDecomposedCircuit=False, showInputCircuit=True):
+    def startVisit(
+        self,
+        qc,
+        circuitName=None,
+        optimiseCircuit=False,
+        showDecomposedCircuit=False,
+        showInputCircuit=True,
+        emit_xml=True,
+    ):
         print()
         if circuitName is not None:
             print("------------------- COMPILING CIRCUIT: " + str(circuitName) + " -------------------")
@@ -73,10 +82,20 @@ class QCtoXMLProgrammer:
             self.visitNode(startingNode)
 
         self.program = QXProgram(self.expList)
-        print("Extracted QXProgram:")
+        print("Extracted QXProgram (AST):")
         print(self.program)
 
-        
+        if emit_xml:
+            xml = XMLPrinter()
+            xml.visitProgram(self.program)
+            print("XML Representation:")
+            print(xml.xml_output)
+        else:
+            print("XML emission skipped; AST is available via return value.")
+
+        print("------------------------------------------------------------")
+        return self.program
+
     def visitNode(self, node):
         if node in self.visitedNodes:
             return
@@ -98,40 +117,40 @@ class QCtoXMLProgrammer:
             elif node.name == "x":
                 exps.append(QXX("x", inputBits[0]))
             elif node.name == "y":
-                exps.append(QXRY("y", inputBits[0], 90))
+                exps.append(QXRY("y", inputBits[0], QXNum(90)))
             elif node.name == "z":
-                exps.append(QXRZ("z", inputBits[0], 180))
+                exps.append(QXRZ("z", inputBits[0], QXNum(180)))
 
             # Fractional phase shifts (S, SDG, T, TDG):
             elif node.name == "s":
-                exps.append(QXRZ("s", inputBits[0], 90))
+                exps.append(QXRZ("s", inputBits[0], QXNum(90)))
             elif node.name == "sdg":
-                exps.append(QXRZ("sdg", inputBits[0], -90))
+                exps.append(QXRZ("sdg", inputBits[0], QXNum(-90)))
             elif node.name == "t":
-                exps.append(QXRZ("t", inputBits[0], 45))
+                exps.append(QXRZ("t", inputBits[0], QXNum(45)))
             elif node.name == "tdg":
-                exps.append(QXRZ("tdg", inputBits[0], -45))
+                exps.append(QXRZ("tdg", inputBits[0], QXNum(-45)))
 
             # General rotations (RX, RY, RZ):
             # elif node.name == "rx":
-            #     exps.append(QXRX("rx", inputBits[0], node.params[0]*180/math.pi))
+            #     exps.append(QXRX("rx", inputBits[0], QXNum(node.params[0]*180/math.pi)))
             elif node.name == "ry":
-                exps.append(QXRY("ry", inputBits[0], node.params[0]*180/math.pi))
+                exps.append(QXRY("ry", inputBits[0], QXNum(node.params[0]*180/math.pi)))
             elif node.name == "rz":
-                exps.append(QXRZ("rz", inputBits[0], node.params[0]*180/math.pi))
+                exps.append(QXRZ("rz", inputBits[0], QXNum(node.params[0]*180/math.pi)))
 
             # Universal single-qubit gate (U):
             elif node.name == "u":
                 # U(a, b, c) = RZ(a) RY(b) RZ(c)
-                exps.append(QXRZ("rz", inputBits[0], node.params[0]*180/math.pi))
-                exps.append(QXRY("ry", inputBits[0], node.params[1]*180/math.pi))
-                exps.append(QXRZ("rz", inputBits[0], node.params[2]*180/math.pi))
+                exps.append(QXRZ("rz", inputBits[0], QXNum(node.params[0]*180/math.pi)))
+                exps.append(QXRY("ry", inputBits[0], QXNum(node.params[1]*180/math.pi)))
+                exps.append(QXRZ("rz", inputBits[0], QXNum(node.params[2]*180/math.pi)))
 
             # Controlled operations (CX, CZ):
             elif node.name == "cx":
                 exps.append(QXCU("cx", inputBits[0], QXProgram([QXX("x", inputBits[1])])))
             elif node.name == "cz":
-                exps.append(QXCU("cz", inputBits[0], QXProgram([QXRZ("z", inputBits[1], 180)])))
+                exps.append(QXCU("cz", inputBits[0], QXProgram([QXRZ("z", inputBits[1], QXNum(180))])))
             
             elif node.name in ignoredGates:
                 pass
@@ -142,7 +161,22 @@ class QCtoXMLProgrammer:
             # Turn the extracted operation into an expression, and add it to
             # the list of expressions
             for exp in exps:
+                
+
+                # Check if the QXNum is actually a number. This is important for
+                # parameterised circuits, sunce otherwise we get compiled cases such as
+                # QXRY(id=ry, v=QXQID(id=None), angle=57.29577951308232*θ[0]).
+                # if there is an error, we raise it here
+
+   
+                if type(exp) in [QXRY, QXRZ]:
+                    try:
+                        float(exp.num().num())
+                    except Exception as e:
+                        raise TypeError("Error: An unset external parameter in a parameterised circuit was found. From gate: " + str(node.name) + " with angle: " + str(exp.angle) + ". Please bind all parameters before compiling to XMLProgrammer.")
+
                 self.expList.append(exp)
+
             
             
 

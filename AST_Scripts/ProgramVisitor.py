@@ -1,6 +1,6 @@
 from AST_Scripts import XMLProgrammer
 
-from .AbstractProgramVisitor import AbstractProgramVisitor
+from AST_Scripts.AbstractProgramVisitor import AbstractProgramVisitor
 
 
 class ProgramVisitor(AbstractProgramVisitor):
@@ -159,4 +159,5 @@ class ProgramVisitor(AbstractProgramVisitor):
         pass
 
     def visitNum(self, ctx: XMLProgrammer.QXNum):
-        return ctx.num()
+        pass
+        # return ctx.num()

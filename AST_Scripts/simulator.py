@@ -2,8 +2,8 @@ import traceback
 from collections import ChainMap
 # from types import NoneType
 
-from .XMLProgrammer import *
-from .ProgramVisitor import *
+from AST_Scripts.XMLProgrammer import *
+from AST_Scripts.ProgramVisitor import *
 
 NoneType = type(None)
 
@@ -294,6 +294,9 @@ class Simulator(ProgramVisitor):
     # X posi, changed the following for an example
     def visitX(self, ctx: XMLProgrammer.QXX):
         vx = ctx.ID()
+        print('item', self.state.get(vx))
+        print('item', self.state)
+        print('item type', type(self.state))
         x = self.state.get(vx)[0]
         p = ctx.vexp().accept(self)  # this will pass the visitor to the child of ctx
         exchange(x, p)

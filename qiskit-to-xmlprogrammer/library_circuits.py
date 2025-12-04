@@ -15,7 +15,7 @@ from qiskit_to_xmlprogrammer import QCtoXMLProgrammer
 
 # Qiskit imports for circuit creation
 from qiskit import QuantumCircuit
-from qiskit.circuit.library import QFT, efficient_su2, GroverOperator, InnerProduct, FourierChecking, LinearAmplitudeFunction, PhaseOracle, GraphState
+from qiskit.circuit.library import QFT, EfficientSU2, GroverOperator, InnerProduct, FourierChecking, LinearAmplitudeFunction, PhaseOracle, GraphState
 from qiskit.circuit.library.arithmetic import FullAdderGate
 
 # The below lines were used to ensure PATH in windows has the necessary file path
@@ -78,7 +78,14 @@ qcEx4 = GroverOperator(oracle, insert_barriers=True)
 qcEx5 = InnerProduct(3)
 
 # 6: EfficientSU2
-qcEx6 = efficient_su2(3, reps=1)
+# Note: This circuit is parameterised - ie, it contains parameters that come from
+# Outside the circuit itself, but are set externally. We set random values here.
+qcEx6 = EfficientSU2(3, reps=1)
+params = np.random.rand(qcEx6.num_parameters)
+param_dict = {paramKey: paramVal for paramKey, paramVal in zip(qcEx6.parameters, params)}
+qcEx6 = qcEx6.assign_parameters(param_dict)
+
+
 
 # 7: Fourier Checking
 qcEx7 = FourierChecking([1,1,1,-1], [1,-1,1,-1])
@@ -95,6 +102,7 @@ adjacency_matrix = np.array([[0, 1, 0, 0],
                            [0, 1, 0, 1],
                            [0, 1, 1, 0]])
 qcEx10 = GraphState(adjacency_matrix)
+
 
 # -------------------------- COMPILE TO XMLPROGRAMMER --------------------------
 
