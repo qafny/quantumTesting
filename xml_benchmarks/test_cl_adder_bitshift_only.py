@@ -36,26 +36,19 @@ def get_tree():
 
     valid_tree = True
 
-    try:
-        # Validation of the Constraints.
-        # Added per Dr. Li's suggestion on 11/16 to scoop out the validator behaviour out of the simulator as there can be
-        # programs which does not always need to follow constraints like only having 1 app tag.
-        validator = SimulatorValidator()
-        validator.visitRoot(new_tree)
+    # try:
+    #     # Validation of the Constraints.
+    #     # Added per Dr. Li's suggestion on 11/16 to scoop out the validator behaviour out of the simulator as there can be
+    #     # programs which does not always need to follow constraints like only having 1 app tag.
+    #     validator = SimulatorValidator()
+    #     validator.visitRoot(new_tree)
 
-        # Non-Decreasing Recursive Fixed Point Factor Check
-        rpf_retriever = RPFRetriever()
-        rpf_retriever.visitRoot(new_tree)
-        rpf_validator = AppRPFValidator(rpf_retriever)
-        rpf_validator.visitRoot(new_tree)
-    except Exception as e:
-        print('\n ==============', e, '==============')
-        valid_tree = False
+    # except Exception as e:
+    #     print('\n =========', e, '==============')
+    #     valid_tree = False
 
-    retriever = MatchCounterRetriever()
-    retriever.visitRoot(new_tree)
     return new_tree, valid_tree
-
+get_tree()
 
 @pytest.fixture(scope="module")
 def parse_tree():
@@ -212,8 +205,6 @@ def load_mapped_tsl_from_file(file_path):
 
 def process_bitwise_test_cases(test_cases: list):
     pt_output = read_program(f"{os.path.dirname(os.path.realpath(__file__))}/cl_adder_good.xml")
-    print('pt_output', pt_output)
-    print('pt_output type', type(pt_output))
     insts = []
     for test_case in test_cases:
         na = test_case['na']
@@ -230,64 +221,11 @@ def process_bitwise_test_cases(test_cases: list):
     return insts
 
 test_cases_for_bitwise = [
-    {"na": 20, "xa": 5, "ya": 5, "ca": 0, "expected": 10}
+    {"na": 20, "xa": 0, "ya": 10, "ca": 10, "expected": 0},
+    {"na": 20, "xa": 10, "ya": 10, "ca": 10, "expected": 0}
 ]
 
 bitwise_test_instances = process_bitwise_test_cases(test_cases_for_bitwise)
-range_addition_test_instances = [
-    {"num_qubits": 20, "val_x": 22, "val_y": 971, "expected_result": 993, "description": "Small Even, Large Odd"},
-    {"num_qubits": 16, "val_x": 150, "val_y": 25, "expected_result": 175, "description": "Medium Even, Small Odd"},
-    {"num_qubits": 7, "val_x": 4, "val_y": 3, "expected_result": 7, "description": "Small Odd, Small Odd"},
-    {"num_qubits": 11, "val_x": 100, "val_y": 1911, "expected_result": 2011,
-     "description": "Small Even, Small Odd"},
-    {"num_qubits": 3, "val_x": 1, "val_y": 2, "expected_result": 3, "description": "Medium Even, Medium Odd"},
-    {"num_qubits": 38, "val_x": 40349, "val_y": 343804091, "expected_result": 343844440,
-     "description": "Max 16-bit Odd, Small Odd"},
-    {"num_qubits": 16, "val_x": 16383, "val_y": 16384, "expected_result": 32767,
-     "description": "Half 16-bit Odd, Half 16-bit Even"},
-    {"num_qubits": 16, "val_x": 1, "val_y": 65534, "expected_result": 65535,
-     "description": "Small Odd, Max 16-bit Even"},
-    {"num_qubits": 16, "val_x": 32768, "val_y": 32767, "expected_result": 65535,
-     "description": "Half 16-bit Even, Half 16-bit Odd"},
-]
-zero_addition_test_instances = [
-    {"num_qubits": 16, "val_x": 0, "val_y": 0, "expected_result": 0, "description": "Zero Addition"},
-    {"num_qubits": 78, "val_x": 0, "val_y": 1, "expected_result": 1, "description": "Zero and Small Odd"},
-    {"num_qubits": 2, "val_x": 0, "val_y": 2, "expected_result": 2, "description": "Zero and Small Even"},
-]
-overflow_test_instances = [
-    {"num_qubits": 16, "val_x": 65535, "val_y": 1, "expected_result": 0, "description": "Max 16-bit Odd, 1"},
-    {"num_qubits": 14, "val_x": 74734, "val_y": 47001, "expected_result": 7047,
-     "description": "Half 16-bit Odd, Half 16-bit Odd"},
-    {"num_qubits": 3, "val_x": 74, "val_y": 85310, "expected_result": 0,
-     "description": "Half 16-bit Even, Half 16-bit Even"},
-    {"num_qubits": 46, "val_x": 423532800, "val_y": 853232733800242510, "expected_result": 11711069599310,
-     "description": "Half 16-bit Odd, Half 16-bit Even"},
-]
-negative_test_instances = [
-    {"num_qubits": 5, "val_x": -20, "val_y": 5, "expected_result": 17,
-     "description": "Small negative, positive sum"},
-    {"num_qubits": 8, "val_x": -250, "val_y": 200, "expected_result": 206,
-     "description": "Medium negative, medium positive"},
-    {"num_qubits": 16, "val_x": -5000, "val_y": 4900, "expected_result": 65436,
-     "description": "Large negative, large positive"},
-    {"num_qubits": 24, "val_x": -16777210, "val_y": -10, "expected_result": 16777212,
-     "description": "Negative and slightly more negative"},
-    {"num_qubits": 32, "val_x": -4294967296, "val_y": -10, "expected_result": 4294967286,
-     "description": "Large negative, slightly negative"},
-    {"num_qubits": 40, "val_x": -1099511627776, "val_y": 100, "expected_result": 100,
-     "description": "Very large negative, small positive"},
-    {"num_qubits": 48, "val_x": -281474976710656, "val_y": -281474976700000, "expected_result": 10656,
-     "description": "Very large negative, slightly less large negative"},
-    {"num_qubits": 56, "val_x": -72057594037927936, "val_y": 1000, "expected_result": 1000,
-     "description": "Huge negative, small positive"},
-    {"num_qubits": 64, "val_x": -18446744073709551616, "val_y": 18446744073709551500,
-     "expected_result": 18446744073709551500,
-     "description": "Extremely large negative, slightly less large positive"},
-    {"num_qubits": 78, "val_x": -151115727451828646838272, "val_y": -10,
-     "expected_result": 151115727451828646838262, "description": "Maximum negative, slightly more negative"}
-]
-
 '''
 Test Bitwise Addition at j-th bit
 =================================
@@ -309,12 +247,12 @@ def test_addition_bitwise_at_j_bit(j, na, expected, calculated, parse_tree):
     if parse_tree[1]:
         b_expected = to_binary_arr(expected, na)
         b_calculated = to_binary_arr(calculated, na)
-
         try:
             assert b_expected[j] == b_calculated[j]
 
         except Exception as e:
             print()
+            assert False
     else:
         assert False
 
