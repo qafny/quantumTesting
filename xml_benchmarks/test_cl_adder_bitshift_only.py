@@ -221,8 +221,8 @@ def process_bitwise_test_cases(test_cases: list):
     return insts
 
 test_cases_for_bitwise = [
-    {"na": 20, "xa": 0, "ya": 10, "ca": 10, "expected": 0},
-    {"na": 20, "xa": 10, "ya": 10, "ca": 10, "expected": 0}
+    {"na": 20, "xa": 0, "ya": 10, "ca": 10},
+    {"na": 20, "xa": 10, "ya": 10, "ca": 10}
 ]
 
 bitwise_test_instances = process_bitwise_test_cases(test_cases_for_bitwise)
@@ -244,6 +244,9 @@ verifying the output at a granular, bit-level.
                                                             for j in range(na)
                                                         ][:150])
 def test_addition_bitwise_at_j_bit(j, na, expected, calculated, parse_tree):
+    print(expected)
+    print(calculated)
+    print(parse_tree)
     if parse_tree[1]:
         b_expected = to_binary_arr(expected, na)
         b_calculated = to_binary_arr(calculated, na)
