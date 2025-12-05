@@ -87,10 +87,10 @@ def read_program(file_path: str):
     # t_stream = CommonTokenStream(lexer)
     # parser = XMLExpParser(t_stream)
     # tree = parser.root()
-    transform = ProgramTransformer()
+    transform = QCtoXMLProgrammer()
     output = visitor.startVisit(qcEx1, circuitName="Example Circuit 1", optimiseCircuit=True, showDecomposedCircuit=False)
     # type needs to be QXRoot
-    new_tree = transform.visitProgram((output))
+    new_tree = transform.visitProgram(output)
 
     return new_tree
 
@@ -101,21 +101,21 @@ def get_tree():
     print ('new tree type', type(new_tree))
     valid_tree = True
 
-    try:
-        # Validation of the Constraints.
-        # Added per Dr. Li's suggestion on 11/16 to scoop out the validator behaviour out of the simulator as there can be
-        # programs which does not always need to follow constraints like only having 1 app tag.
-        validator = SimulatorValidator()
-        validator.visitProgram((new_tree))
+    # try:
+    #     # Validation of the Constraints.
+    #     # Added per Dr. Li's suggestion on 11/16 to scoop out the validator behaviour out of the simulator as there can be
+    #     # programs which does not always need to follow constraints like only having 1 app tag.
+    #     validator = SimulatorValidator()
+    #     validator.visitProgram((new_tree))
 
-        # Non-Decreasing Recursive Fixed Point Factor Check
-    except Exception as e:
-        print('\n ==============', e, '==============')
-        valid_tree = False
+    #     # Non-Decreasing Recursive Fixed Point Factor Check
+    # except Exception as e:
+    #     print('\n ==============', e, '==============')
+    #     valid_tree = False
 
-    retriever = MatchCounterRetriever()
-    retriever.visitProgram(new_tree)
-    return new_tree, retriever, valid_tree
+    # retriever = MatchCounterRetriever()
+    # retriever.visitProgram(new_tree)
+    return new_tree, valid_tree
 
 
 def run_simulator(n, i, X, M, parseTree):
