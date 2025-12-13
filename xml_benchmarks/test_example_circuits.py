@@ -117,29 +117,6 @@ def get_tree():
     # retriever.visitProgram(new_tree)
     return new_tree, valid_tree
 
-
-def run_simulator(n, i, X, M, parseTree):
-    val_array = to_binary_arr(X, n)  # Convert value to array
-    state = dict({"x": [CoqNVal(val_array, 0)],
-                  "size": n,
-                  "na": i,
-                  "m": M})  # Initial state
-    environment = dict({"x": n})  # Environment for simulation
-
-    # Run the Simulator
-    y = Simulator(state, environment)
-    y.visitProgram(parseTree)
-    new_state = y.get_state()
-    return bit_array_to_int(new_state.get('x')[0].getBits(), n)
- 
-
-def test_property_addition_with_edge_case_M(n,i,X,M, parse_tree):
-    if parse_tree[2]:
-        expected = (X + (M % (2 ** i))) % (2 ** n)
-        assert run_simulator(n,i,X,M, parse_tree[0]) == expected
-    else :
-        assert False
-
 parsetree = get_tree()[0]
 
 from hypothesis import given, strategies as st, assume, settings, HealthCheck
@@ -154,6 +131,7 @@ def simulate_circuit(x_array_value, y_array_value, c_array_value, num_qubits, pa
         {"xa": [CoqNVal(val_array_x, 0)],
          "ya": [CoqNVal(val_array_y, 0)],
          "ca": [CoqNVal(val_array_ca, 0)],
+         "h": [CoqNVal(val_array_ca, 0)],
          "na": num_qubits,
          })
     environment = dict(
@@ -163,6 +141,7 @@ def simulate_circuit(x_array_value, y_array_value, c_array_value, num_qubits, pa
          })
 
     simulator = Simulator(state, environment)
+    print('parse tree type', type(parse_tree))
     simulator.visitProgram(parse_tree)
     new_state = simulator.state
     return new_state
