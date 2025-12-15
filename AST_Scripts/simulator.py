@@ -304,6 +304,7 @@ class Simulator(ProgramVisitor):
         print('ctx.vexp()', ctx.vexp())
         x = self.state.get(vx)[0]
         p = ctx.vexp().accept(self)  # this will pass the visitor to the child of ctx
+        print('p', p)
         exchange(x, p)
 
     def visitRZ(self, ctx: XMLProgrammer.QXRZ):
