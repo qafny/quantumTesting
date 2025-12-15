@@ -1,15 +1,21 @@
 import time
 import pytest
 from antlr4 import InputStream, CommonTokenStream
+import os
+import sys
+
+current_dir = os.path.dirname(os.path.realpath(__file__))
+parent_dir = os.path.dirname(current_dir)
+sys.path.insert(0,parent_dir)
 
 # from Benchmark.Triangle.triangle import TriangleType, classify_triangle # this might not be correct
-from Source.quantumCode.AST_Scripts.XMLExpLexer import XMLExpLexer
-from Source.quantumCode.AST_Scripts.XMLExpParser import XMLExpParser
-from Source.quantumCode.AST_Scripts.simulator import to_binary_arr, CoqNVal, Simulator, bit_array_to_int
+from AST_Scripts.XMLExpLexer import XMLExpLexer
+from AST_Scripts.XMLExpParser import XMLExpParser
+from AST_Scripts.simulator import to_binary_arr, CoqNVal, Simulator, bit_array_to_int
 
 
 def simulate_cl_mult(x_array_value, y_array_value, result_array_val, num_qubits):
-    with open("Benchmark/cl_mult/cl_mult_good.xml", 'r') as f:
+    with open("cl_mult_good.xml", 'r') as f:
         str = f.read()
     i_stream = InputStream(str)
     lexer = XMLExpLexer(i_stream)

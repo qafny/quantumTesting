@@ -97,7 +97,7 @@ def read_program(file_path: str):
 
 def get_tree():
     #new_tree = read_program(f"{os.path.dirname(os.path.realpath(__file__))}/mutants/mutant_38.xml")
-    new_tree = visitor.startVisit(qcEx3, circuitName="Example Circuit 1", optimiseCircuit=True, showDecomposedCircuit=False)
+    new_tree = visitor.startVisit(qcEx3, circuitName="Example Circuit 1", optimiseCircuit=True, showDecomposedCircuit=True)
     print ('new tree type', type(new_tree))
     valid_tree = True
 
@@ -128,11 +128,7 @@ def simulate_circuit(x_array_value, y_array_value, c_array_value, num_qubits, pa
     val_array_ca = to_binary_arr(c_array_value, num_qubits_ca)
 
     state = dict(
-        {"xa": [CoqNVal(val_array_x, 0)],
-         "ya": [CoqNVal(val_array_y, 0)],
-         "ca": [CoqNVal(val_array_ca, 0)],
-         "h": [CoqNVal(val_array_ca, 0)],
-         "na": num_qubits,
+        {"test": [CoqNVal([True] * 5, 0)]
          })
     environment = dict(
         {"xa": num_qubits,

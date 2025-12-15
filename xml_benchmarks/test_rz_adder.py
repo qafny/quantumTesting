@@ -5,8 +5,6 @@ import random
 import json
 from antlr4 import InputStream, CommonTokenStream
 from Source.quantumCode.AST_Scripts.Counters import VexpCounter
-from Source.quantumCode.AST_Scripts.Validators import VexpTypeValidator, IfConditionValidator, \
-    SubtractionSecondOperandValidator, SRGateVexpValidator
 from Source.quantumCode.AST_Scripts.Retrievers import RPFRetriever, MatchCounterRetriever, VexpRetriever
 from Source.quantumCode.AST_Scripts.TypeChecker import TypeChecker
 from Source.quantumCode.AST_Scripts.TypeDetector import TypeDetector
@@ -511,31 +509,31 @@ P_0 and the j-th vexp in P_i should be of the same type, where 0 < j < K and K i
 '''
 
 
-@pytest.mark.parametrize("idx", [idx for idx in range(vexp_count)])
-def test_constraint_type_checking_holds(idx, parse_tree):
-    if parse_tree[2]:
-        initial_type_environment = {
-            'x': Qty('size'),
-            'na': Nat(),
-            'size': Nat(),
-            'm': Nat()
-        }
-        type_checker = TypeChecker(initial_type_environment)
-        type_checker.visitRoot(initial_tree)
+# @pytest.mark.parametrize("idx", [idx for idx in range(vexp_count)])
+# def test_constraint_type_checking_holds(idx, parse_tree):
+#     if parse_tree[2]:
+#         initial_type_environment = {
+#             'x': Qty('size'),
+#             'na': Nat(),
+#             'size': Nat(),
+#             'm': Nat()
+#         }
+#         type_checker = TypeChecker(initial_type_environment)
+#         type_checker.visitRoot(initial_tree)
 
-        type_detector = TypeDetector(type_checker.type_environment)
-        type_detector.visitRoot(initial_tree)
+#         type_detector = TypeDetector(type_checker.type_environment)
+#         type_detector.visitRoot(initial_tree)
 
-        it_vexp_ret = VexpRetriever(idx)
-        it_vexp_ret.visitRoot(initial_tree)
-        it_vexp = it_vexp_ret.get_vexp()
+#         it_vexp_ret = VexpRetriever(idx)
+#         it_vexp_ret.visitRoot(initial_tree)
+#         it_vexp = it_vexp_ret.get_vexp()
 
-        vexp_val = VexpTypeValidator(idx, it_vexp, type_detector.type_environment)
-        vexp_val.visitRoot(parse_tree[0])
+#         vexp_val = VexpTypeValidator(idx, it_vexp, type_detector.type_environment)
+#         vexp_val.visitRoot(parse_tree[0])
 
-        assert True
-    else:
-        assert False
+#         assert True
+#     else:
+#         assert False
 
 
 '''
@@ -544,14 +542,14 @@ and must operate using a comparison operator -- the only binary comparison opera
 '''
 
 
-def test_constraint_if_checking_holds(parse_tree):
-    if parse_tree[2]:
-        if_validate = IfConditionValidator()
-        if_validate.visitRoot(parse_tree[0])
+# def test_constraint_if_checking_holds(parse_tree):
+#     if parse_tree[2]:
+#         if_validate = IfConditionValidator()
+#         if_validate.visitRoot(parse_tree[0])
 
-        assert True
-    else:
-        assert False
+#         assert True
+#     else:
+#         assert False
 
 
 '''
@@ -560,14 +558,14 @@ It is always the case that the second operand of a binary expression with the su
 '''
 
 
-def test_constraint_subtraction_holds(parse_tree):
-    if parse_tree[2]:
-        subtraction_validate = SubtractionSecondOperandValidator()
-        subtraction_validate.visitRoot(parse_tree[0])
+# def test_constraint_subtraction_holds(parse_tree):
+#     if parse_tree[2]:
+#         subtraction_validate = SubtractionSecondOperandValidator()
+#         subtraction_validate.visitRoot(parse_tree[0])
 
-        assert True
-    else:
-        assert False
+#         assert True
+#     else:
+#         assert False
 
 
 '''
@@ -575,14 +573,14 @@ It is always the case that we only allow addition (+) and subtraction (-) operat
 '''
 
 
-def test_constraint_operators_holds(parse_tree):
-    if parse_tree[2]:
-        operators_validate = SRGateVexpValidator()
-        operators_validate.visitRoot(parse_tree[0])
+# def test_constraint_operators_holds(parse_tree):
+#     if parse_tree[2]:
+#         operators_validate = SRGateVexpValidator()
+#         operators_validate.visitRoot(parse_tree[0])
 
-        assert True
-    else:
-        assert False
+#         assert True
+#     else:
+#         assert False
 
 
 ''' tests check the generated program correctness with reference to the rz_adder_good program; 

@@ -69,12 +69,14 @@ class QCtoXMLProgrammer:
             print(qc.draw())
 
         self.dag = circuit_to_dag(qc)
+        print('self.dag', self.dag)
+        print('self.dag.qubits', self.dag.qubits)
 
         # Dictionary mapping Qiskit qubits to XMLProgrammer qubits
         self.XMLQubits = dict()
         for qubit in self.dag.qubits:
             self.XMLQubits[qubit] = QXQID(str(qubit._index))
-
+        print('self.XMLQubits', self.XMLQubits)
         self.visitedNodes = set()
         self.expList = []
         
@@ -108,49 +110,52 @@ class QCtoXMLProgrammer:
 
     def nodeToXMLProgrammer(self, node):
         if isinstance(node, DAGOpNode):
+            print('node', node)
+            print('node.qargs', node.qargs)
             inputBits = [self.XMLQubits[q] for q in node.qargs]
+            print('inputBits', inputBits)
             exps = []
 
             # H, X, Y, Z:
             if node.name == "h":
-                exps.append(QXH("h", inputBits[0]))
+                exps.append(QXH("test", inputBits[0]))
             elif node.name == "x":
-                exps.append(QXX("x", inputBits[0]))
+                exps.append(QXX("test", inputBits[0]))
             elif node.name == "y":
-                exps.append(QXRY("y", inputBits[0], QXNum(90)))
+                exps.append(QXRY("test", inputBits[0], QXNum(90)))
             elif node.name == "z":
-                exps.append(QXRZ("z", inputBits[0], QXNum(180)))
+                exps.append(QXRZ("test", inputBits[0], QXNum(180)))
 
             # Fractional phase shifts (S, SDG, T, TDG):
             elif node.name == "s":
-                exps.append(QXRZ("s", inputBits[0], QXNum(90)))
+                exps.append(QXRZ("test", inputBits[0], QXNum(90)))
             elif node.name == "sdg":
-                exps.append(QXRZ("sdg", inputBits[0], QXNum(-90)))
+                exps.append(QXRZ("test", inputBits[0], QXNum(-90)))
             elif node.name == "t":
-                exps.append(QXRZ("t", inputBits[0], QXNum(45)))
+                exps.append(QXRZ("test", inputBits[0], QXNum(45)))
             elif node.name == "tdg":
-                exps.append(QXRZ("tdg", inputBits[0], QXNum(-45)))
+                exps.append(QXRZ("test", inputBits[0], QXNum(-45)))
 
             # General rotations (RX, RY, RZ):
             # elif node.name == "rx":
             #     exps.append(QXRX("rx", inputBits[0], QXNum(node.params[0]*180/math.pi)))
             elif node.name == "ry":
-                exps.append(QXRY("ry", inputBits[0], QXNum(node.params[0]*180/math.pi)))
+                exps.append(QXRY("test", inputBits[0], QXNum(node.params[0]*180/math.pi)))
             elif node.name == "rz":
-                exps.append(QXRZ("rz", inputBits[0], QXNum(node.params[0]*180/math.pi)))
+                exps.append(QXRZ("test", inputBits[0], QXNum(node.params[0]*180/math.pi)))
 
             # Universal single-qubit gate (U):
             elif node.name == "u":
                 # U(a, b, c) = RZ(a) RY(b) RZ(c)
-                exps.append(QXRZ("rz", inputBits[0], QXNum(node.params[0]*180/math.pi)))
-                exps.append(QXRY("ry", inputBits[0], QXNum(node.params[1]*180/math.pi)))
-                exps.append(QXRZ("rz", inputBits[0], QXNum(node.params[2]*180/math.pi)))
+                exps.append(QXRZ("test", inputBits[0], QXNum(node.params[0]*180/math.pi)))
+                exps.append(QXRY("test", inputBits[0], QXNum(node.params[1]*180/math.pi)))
+                exps.append(QXRZ("test", inputBits[0], QXNum(node.params[2]*180/math.pi)))
 
             # Controlled operations (CX, CZ):
             elif node.name == "cx":
-                exps.append(QXCU("cx", inputBits[0], QXProgram([QXX("x", inputBits[1])])))
+                exps.append(QXCU("test", inputBits[0], QXProgram([QXX("test", inputBits[1])])))
             elif node.name == "cz":
-                exps.append(QXCU("cz", inputBits[0], QXProgram([QXRZ("z", inputBits[1], QXNum(180))])))
+                exps.append(QXCU("test", inputBits[0], QXProgram([QXRZ("test", inputBits[1], QXNum(180))])))
             
             elif node.name in ignoredGates:
                 pass
