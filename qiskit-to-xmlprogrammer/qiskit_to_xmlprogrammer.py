@@ -75,7 +75,7 @@ class QCtoXMLProgrammer:
         # Dictionary mapping Qiskit qubits to XMLProgrammer qubits
         self.XMLQubits = dict()
         for qubit in self.dag.qubits:
-            self.XMLQubits[qubit] = QXQID(str(qubit._index))
+            self.XMLQubits[qubit] = QXNum(qubit._index)
         print('self.XMLQubits', self.XMLQubits)
         self.visitedNodes = set()
         self.expList = []
