@@ -70,6 +70,9 @@ Helper Functions
 
 def exchange(coq_val: CoqVal, n: int):
     if isinstance(coq_val, CoqNVal):
+        print('coq_val', coq_val)
+        print('coq_val.getBits()', coq_val.getBits())
+        print('n', n)
         coq_val.getBits()[n] = not coq_val.getBits()[n]
 
 
@@ -297,8 +300,11 @@ class Simulator(ProgramVisitor):
         print('item', self.state.get(vx))
         print('item', self.state)
         print('item type', type(self.state))
+        print('key', vx)
+        print('ctx.vexp()', ctx.vexp())
         x = self.state.get(vx)[0]
         p = ctx.vexp().accept(self)  # this will pass the visitor to the child of ctx
+        print('p', p)
         exchange(x, p)
 
     def visitRZ(self, ctx: XMLProgrammer.QXRZ):
@@ -442,6 +448,8 @@ class Simulator(ProgramVisitor):
     def visitIDExp(self, ctx: XMLProgrammer.QXIDExp):
         # print("idexp var",ctx.Identifier().accept(self))
         # print("idexp val",self.get_state().get(ctx.Identifier().accept(self)))
+        print('self.get_state()', self.get_state())
+        print('ctx.ID()', ctx.ID())
         return self.get_state().get(ctx.ID())
 
     def visitQID(self, ctx: XMLProgrammer.QXQID):

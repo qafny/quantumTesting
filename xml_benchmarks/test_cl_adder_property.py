@@ -89,7 +89,9 @@ def test_property_addition_with_edge_case_M(na, ca, xa, ya, parse_tree):
     if (parse_tree[1]):
         expected = (xa + ya) % (2 ** na)
         new_state = simulate_cl_adder(xa, ya, ca, na, parse_tree[0])
-        calculated = bit_array_to_int(new_state.get('ya')[0].getBits(), na)
+        ya_value = new_state.get('ya')
+        assert ya_value is not None, "Key 'ya' not found in new_state"
+        calculated = bit_array_to_int(ya_value[0].getBits(), na)
         assert calculated == expected
     else:
          assert False
@@ -105,13 +107,14 @@ def test_addition_with_med_i(na, ca, xa, ya, parse_tree):
     if parse_tree[1]:
         expected = (xa + ya) % (2 ** na)
         new_state = simulate_cl_adder(xa, ya, ca, na, parse_tree[0])
-        calculated = bit_array_to_int(new_state.get('ya')[0].getBits(), na)
+        ya_value = new_state.get('ya')
+        assert ya_value is not None, "Key 'ya' not found in new_state"
+        calculated = bit_array_to_int(ya_value[0].getBits(), na)
         assert calculated == expected
     else:
         assert False
 
-# test_property_addition_with_edge_case_M(parse_tree = parsetree)
-
+test_property_addition_with_edge_case_M(parse_tree = parsetree)
 
 @settings(suppress_health_check=[HealthCheck.filter_too_much])
 @given(
@@ -122,11 +125,14 @@ def test_addition_with_med_i(na, ca, xa, ya, parse_tree):
 def test_in_range_addition(num_qubits, val_x, val_y, parse_tree):
     # test for positive integers.
     print(f"range_addition() called with n_bits= {num_qubits}, x = {val_x}, y = {val_y}")
+    # print(f"parse_tree valid: {parse_tree}")
 
     if parse_tree[0]:
         expected = (val_x + val_y) % (2 ** num_qubits)
-        new_state = simulate_cl_adder(val_x, val_y, 0, num_qubits, parse_tree)
-        actual = bit_array_to_int(new_state.get('ya')[0].getBits(), num_qubits) 
+        new_state = simulate_cl_adder(val_x, val_y, 0, num_qubits, parse_tree[0])
+        ya_value = new_state.get('ya')
+        assert ya_value is not None, "Key 'ya' not found in new_state"
+        actual = bit_array_to_int(ya_value[0].getBits(), num_qubits) 
         assert expected == actual
     else:
         assert False
@@ -145,8 +151,10 @@ def test_in_range_addition_val_x(num_qubits, val_x, val_y, parse_tree):
         return
     print(f"range_addition() called with n_bits = {num_qubits}, x = {val_x}, y = {val_y}")
     if (parse_tree[0]):
-        new_state = simulate_cl_adder(val_x, val_y, 0, num_qubits, parse_tree)
-        assert val_x == bit_array_to_int(new_state.get('xa')[0].getBits(), num_qubits)
+        new_state = simulate_cl_adder(val_x, val_y, 0, num_qubits, parse_tree[0])
+        xa_value = new_state.get('xa')
+        assert xa_value is not None, "Key 'xa' not found in new_state"
+        assert val_x == bit_array_to_int(xa_value[0].getBits(), num_qubits)
     else:
         assert False
 

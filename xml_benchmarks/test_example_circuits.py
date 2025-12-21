@@ -87,58 +87,35 @@ def read_program(file_path: str):
     # t_stream = CommonTokenStream(lexer)
     # parser = XMLExpParser(t_stream)
     # tree = parser.root()
-    transform = ProgramTransformer()
+    transform = QCtoXMLProgrammer()
     output = visitor.startVisit(qcEx1, circuitName="Example Circuit 1", optimiseCircuit=True, showDecomposedCircuit=False)
     # type needs to be QXRoot
-    new_tree = transform.visitProgram((output))
+    new_tree = transform.visitProgram(output)
 
     return new_tree
 
 
 def get_tree():
     #new_tree = read_program(f"{os.path.dirname(os.path.realpath(__file__))}/mutants/mutant_38.xml")
-    new_tree = visitor.startVisit(qcEx3, circuitName="Example Circuit 1", optimiseCircuit=True, showDecomposedCircuit=False)
+    new_tree = visitor.startVisit(qcEx3, circuitName="Example Circuit 1", optimiseCircuit=True, showDecomposedCircuit=True)
     print ('new tree type', type(new_tree))
     valid_tree = True
 
-    try:
-        # Validation of the Constraints.
-        # Added per Dr. Li's suggestion on 11/16 to scoop out the validator behaviour out of the simulator as there can be
-        # programs which does not always need to follow constraints like only having 1 app tag.
-        validator = SimulatorValidator()
-        validator.visitProgram((new_tree))
+    # try:
+    #     # Validation of the Constraints.
+    #     # Added per Dr. Li's suggestion on 11/16 to scoop out the validator behaviour out of the simulator as there can be
+    #     # programs which does not always need to follow constraints like only having 1 app tag.
+    #     validator = SimulatorValidator()
+    #     validator.visitProgram((new_tree))
 
-        # Non-Decreasing Recursive Fixed Point Factor Check
-    except Exception as e:
-        print('\n ==============', e, '==============')
-        valid_tree = False
+    #     # Non-Decreasing Recursive Fixed Point Factor Check
+    # except Exception as e:
+    #     print('\n ==============', e, '==============')
+    #     valid_tree = False
 
-    retriever = MatchCounterRetriever()
-    retriever.visitProgram(new_tree)
-    return new_tree, retriever, valid_tree
-
-
-def run_simulator(n, i, X, M, parseTree):
-    val_array = to_binary_arr(X, n)  # Convert value to array
-    state = dict({"x": [CoqNVal(val_array, 0)],
-                  "size": n,
-                  "na": i,
-                  "m": M})  # Initial state
-    environment = dict({"x": n})  # Environment for simulation
-
-    # Run the Simulator
-    y = Simulator(state, environment)
-    y.visitProgram(parseTree)
-    new_state = y.get_state()
-    return bit_array_to_int(new_state.get('x')[0].getBits(), n)
- 
-
-def test_property_addition_with_edge_case_M(n,i,X,M, parse_tree):
-    if parse_tree[2]:
-        expected = (X + (M % (2 ** i))) % (2 ** n)
-        assert run_simulator(n,i,X,M, parse_tree[0]) == expected
-    else :
-        assert False
+    # retriever = MatchCounterRetriever()
+    # retriever.visitProgram(new_tree)
+    return new_tree, valid_tree
 
 parsetree = get_tree()[0]
 
@@ -151,10 +128,7 @@ def simulate_circuit(x_array_value, y_array_value, c_array_value, num_qubits, pa
     val_array_ca = to_binary_arr(c_array_value, num_qubits_ca)
 
     state = dict(
-        {"xa": [CoqNVal(val_array_x, 0)],
-         "ya": [CoqNVal(val_array_y, 0)],
-         "ca": [CoqNVal(val_array_ca, 0)],
-         "na": num_qubits,
+        {"test": [CoqNVal([True] * 5, 0)]
          })
     environment = dict(
         {"xa": num_qubits,
@@ -163,6 +137,7 @@ def simulate_circuit(x_array_value, y_array_value, c_array_value, num_qubits, pa
          })
 
     simulator = Simulator(state, environment)
+    print('parse tree type', type(parse_tree))
     simulator.visitProgram(parse_tree)
     new_state = simulator.state
     return new_state

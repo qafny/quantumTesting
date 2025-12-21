@@ -32,7 +32,7 @@ def read_program(file_path: str):
 
 
 def get_tree():
-    new_tree = read_program(f"{os.path.dirname(os.path.realpath(__file__))}/cl_adder_u.xml")
+    new_tree = read_program(f"{os.path.dirname(os.path.realpath(__file__))}/cl_adder_good.xml")
 
     valid_tree = True
 
@@ -298,7 +298,6 @@ def test_in_range_addition_expected(num_qubits, val_x, val_y, expected, parse_tr
         assert expected == bit_array_to_int(new_state.get('ya')[0].getBits(), num_qubits)
     else:
         assert False
-
 
 @pytest.mark.parametrize("num_qubits, val_x, val_y, expected", [
     (case["num_qubits"], case["val_x"], case["val_y"], case["expected_result"])
