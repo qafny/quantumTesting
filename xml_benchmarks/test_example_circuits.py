@@ -25,7 +25,8 @@ import graphviz
 import os
 import sys
 from qiskit.circuit.library.arithmetic import FullAdderGate
-
+from qiskit.circuit.library.boolean_logic import InnerProductGate
+from qiskit.circuit import Gate
 from AST_Scripts.XMLProgrammer import QXProgram, QXQID, QXCU, QXX, QXH, QXRZ, QXRY, QXRoot
 
 # Ensure graphviz is in the PATH (for dag drawing)
@@ -63,12 +64,17 @@ qcEx2 = qc.copy()
 
 # ----- 3: 3-Qubit GHZ
 
-qc = QuantumCircuit(3, 0)
+qc = QuantumCircuit(3, 3)
 qc.h(0)
 qc.cx(0, 1)
 qc.cx(1, 2)
+qc.measure([0,1,2], [0,1,2])
 qcEx3 = qc.copy()
 
+# ---- 4: inner product gates
+gate1 = InnerProductGate(4)
+gate2 = InnerProductGate(4)
+gate2 = gate2.power(4.0)
 # -------------------------- COMPILE TO XMLPROGRAMMER --------------------------
 
 visitor = QCtoXMLProgrammer()
@@ -124,16 +130,14 @@ from hypothesis import given, strategies as st, assume, settings, HealthCheck
 def simulate_circuit(x_array_value, y_array_value, c_array_value, num_qubits, parse_tree):
     val_array_x = to_binary_arr(x_array_value, num_qubits)
     val_array_y = to_binary_arr(y_array_value, num_qubits)
-    num_qubits_ca = 1
+    num_qubits_ca = 3
     val_array_ca = to_binary_arr(c_array_value, num_qubits_ca)
 
     state = dict(
-        {"test": [CoqNVal([True] * 5, 0)]
+        {"test": [CoqNVal([True] * num_qubits, 0)]
          })
     environment = dict(
-        {"xa": num_qubits,
-         "ya": num_qubits,
-         "ca": num_qubits_ca,
+        {"test": num_qubits
          })
 
     simulator = Simulator(state, environment)
@@ -162,7 +166,12 @@ def process_bitwise_test_cases(test_cases: list):
     return new_state
 
 test_cases_for_bitwise = [
-    {"na": 20, "xa": 5, "ya": 5, "ca": 0, "expected": 10}
+    {"na": 3, "xa": 5, "ya": 5, "ca": 3, "expected": 10}
 ]
 
 bitwise_test_instances = process_bitwise_test_cases(test_cases_for_bitwise)
+print('bitwise_test_instances', bitwise_test_instances)
+print('bitwise_test_instances[test]', bitwise_test_instances['test'][0].getBits())
+
+def test_ghz_circuit():
+    assert bitwise_test_instances['test'][0]
