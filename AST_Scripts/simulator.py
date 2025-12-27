@@ -441,8 +441,8 @@ class Simulator(ProgramVisitor):
     def visitIDExp(self, ctx: XMLProgrammer.QXIDExp):
         # print("idexp var",ctx.Identifier().accept(self))
         # print("idexp val",self.get_state().get(ctx.Identifier().accept(self)))
-        print('self.get_state()', self.get_state())
-        print('ctx.ID()', ctx.ID())
+        # print('self.get_state()', self.get_state())
+        # print('ctx.ID()', ctx.ID())
         return self.get_state().get(ctx.ID())
 
     def visitQID(self, ctx: XMLProgrammer.QXQID):

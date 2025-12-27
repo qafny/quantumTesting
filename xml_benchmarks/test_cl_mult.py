@@ -11,34 +11,69 @@ sys.path.insert(0,parent_dir)
 # from Benchmark.Triangle.triangle import TriangleType, classify_triangle # this might not be correct
 from AST_Scripts.XMLExpLexer import XMLExpLexer
 from AST_Scripts.XMLExpParser import XMLExpParser
+from AST_Scripts.ProgramTransformer import ProgramTransformer
+from AST_Scripts.Retrievers import MatchCounterRetriever
+from AST_Scripts.ValidatorProgramVisitors import SimulatorValidator
 from AST_Scripts.simulator import to_binary_arr, CoqNVal, Simulator, bit_array_to_int
 
-
-def simulate_cl_mult(x_array_value, y_array_value, result_array_val, num_qubits):
-    with open("cl_mult_good.xml", 'r') as f:
+def read_program(file_path: str):
+    with open(file_path, 'r') as f:
         str = f.read()
     i_stream = InputStream(str)
     lexer = XMLExpLexer(i_stream)
     t_stream = CommonTokenStream(lexer)
     parser = XMLExpParser(t_stream)
-    tree = parser.program()
-    print(tree.toStringTree(recog=parser))
+    tree = parser.root()
+    transform = ProgramTransformer()
+    new_tree = transform.visitRoot(tree)
+    return new_tree 
+
+def get_tree():
+    new_tree = read_program(f"{os.path.dirname(os.path.realpath(__file__))}/cl_mult_good.xml")
+    valid_tree = True
+    try:
+        validator = SimulatorValidator()
+        validator.visitRoot(new_tree)
+    except:
+        vali_tree = False
+    retriever = MatchCounterRetriever()
+    retriever.visitRoot(new_tree)
+    return new_tree, retriever, valid_tree
+
+def simulate_cl_mult(x_array_value, y_array_value, result_array_val, num_qubits):
+    # with open("/home/biryani/research/quantumTesting/xml_benchmarks/cl_mult_good.xml", 'r') as f:
+    #     str = f.read()
+    # i_stream = InputStream(str)
+    # lexer = XMLExpLexer(i_stream)
+    # t_stream = CommonTokenStream(lexer)
+    # parser = XMLExpParser(t_stream)
+    # tree = parser.program()
+    # print(tree.toStringTree(recog=parser))
+    tree = get_tree()
+
+    x_array_value = to_binary_arr(x_array_value, num_qubits)
+    y_array_value = to_binary_arr(y_array_value, num_qubits)
+    num_qubits_ca = 1
+    ca_array_val = to_binary_arr(0, num_qubits_ca)
+    result_array_val = to_binary_arr(result_array_val, num_qubits)
+
 
     state = dict(
-        {"xa": [CoqNVal(x_array_value, 0)],
-         "ya": [CoqNVal(y_array_value, 0)],
-         "ca": [CoqNVal(0, 0)],
-         "result": [CoqNVal(result_array_val, 0)],
-         "na": num_qubits,
+        {"x": [CoqNVal(x_array_value, 0)],
+         "y": [CoqNVal(y_array_value, 0)],
+         "c": [CoqNVal(ca_array_val, 0)],
+         "re": [CoqNVal(result_array_val, 0)],
+         "n": num_qubits,
          })
     environment = dict(
-        {"xa": num_qubits,
-         "ya": num_qubits,
-         "ca": 1,
-         "result": num_qubits
+        {"x": num_qubits,
+         "y": num_qubits,
+         "c": 1,
+         "re": num_qubits
          })
     simulator = Simulator(state, environment)
-    simulator.visitProgram(tree)
+    # simulator.visitProgram(tree)
+    simulator.visitRoot(tree[0])
     new_state = simulator.get_state()
     return new_state
 
@@ -53,7 +88,11 @@ def test_in_range_multiplication():
     ]
     for case in test_cases:
         new_state = simulate_cl_mult(case["val_x"], case["val_y"], 0, case["num_qubits"])
-        assert (case["expected_result"] == bit_array_to_int(new_state.get('ya')[0].getBits(), case["num_qubits"]))
+        expected = case["expected_result"]
+        actual = bit_array_to_int(new_state.get('re')[0].getBits(), case['num_qubits'])
+        print( "expected: ", expected, " actual: ", actual)
+        assert expected == actual
+        # assert (case["expected_result"] == bit_array_to_int(new_state.get('y')[0].getBits(), case["num_qubits"]))
 
 
 def test_zero_multiplication():
@@ -65,7 +104,7 @@ def test_zero_multiplication():
 
     for case in test_cases:
         new_state = simulate_cl_mult(case["val_x"], case["val_y"], 0, case["num_qubits"])
-        assert (case["expected_result"] == bit_array_to_int(new_state.get('ya')[0].getBits(), case["num_qubits"]))
+        assert (case["expected_result"] == bit_array_to_int(new_state.get('re')[0].getBits(), case["num_qubits"]))
 
 def test_overflow_multiplication():
     test_cases = [
@@ -75,7 +114,11 @@ def test_overflow_multiplication():
     ]
     for case in test_cases:
         new_state = simulate_cl_mult(case["val_x"], case["val_y"], 0, case["num_qubits"])
-        assert (case["expected_result"] == bit_array_to_int(new_state.get('ya')[0].getBits(), case["num_qubits"]))
+        expected = case["expected_result"]
+        actual = bit_array_to_int(new_state.get('re')[0].getBits(), case['num_qubits'])
+        print("expected: ", expected, " actual: ", actual)
+        assert actual == expected
+        # assert (case["expected_result"] == bit_array_to_int(new_state.get('re')[0].getBits(), case["num_qubits"]))
 
 
 def test_negative_multiplication():
@@ -88,7 +131,11 @@ def test_negative_multiplication():
     ]
     for case in test_cases:
         new_state = simulate_cl_mult(case["val_x"], case["val_y"], 0, case["num_qubits"])
-        assert (case["expected_result"] == bit_array_to_int(new_state.get('ya')[0].getBits(), case["num_qubits"]))
+        expected = case["expected_result"]
+        actual = bit_array_to_int(new_state.get('re')[0].getBits(), case['num_qubits'])
+        print("expected: ", expected, " actual: ", actual)
+        assert actual == expected
+        # assert (case["expected_result"] == bit_array_to_int(new_state.get('re')[0].getBits(), case["num_qubits"]))
 
 
 def test_multiplication_by_zero():
@@ -99,7 +146,7 @@ def test_multiplication_by_zero():
     ]
     for case in test_cases:
         new_state = simulate_cl_mult(case["val_x"], case["val_y"], 0, case["num_qubits"])
-        assert case["expected_result"] == bit_array_to_int(new_state.get('ya')[0].getBits(), case["num_qubits"]), f"Test failed for case: {case['description']}. Expected {case['expected_result']}, got {bit_array_to_int(new_state.get('ya')[0].getBits(), case['num_qubits'])}"
+        assert case["expected_result"] == bit_array_to_int(new_state.get('re')[0].getBits(), case["num_qubits"]), f"Test failed for case: {case['description']}. Expected {case['expected_result']}, got {bit_array_to_int(new_state.get('re')[0].getBits(), case['num_qubits'])}"
 
 
 def test_values_greater_than_2_power_num_qubits():
@@ -117,7 +164,7 @@ def test_values_greater_than_2_power_num_qubits():
     ]
     for case in test_cases:
         new_state = simulate_cl_mult(case["val_x"], case["val_y"], 0, case["num_qubits"])
-        assert case["expected_result"] == bit_array_to_int(new_state.get('result')[0].getBits(), case["num_qubits"]), f"Test failed for case: {case['description']}. Expected {case['expected_result']}, got {bit_array_to_int(new_state.get('result')[0].getBits(), case['num_qubits'])}"
+        assert case["expected_result"] == bit_array_to_int(new_state.get('re')[0].getBits(), case["num_qubits"]), f"Test failed for case: {case['description']}. Expected {case['expected_result']}, got {bit_array_to_int(new_state.get('re')[0].getBits(), case['num_qubits'])}"
 
 
 @pytest.fixture(scope="session", autouse=True)
@@ -128,3 +175,8 @@ def starter(request):
         print("runtime: {}".format(str(time.time() - start_time)))
 
     request.addfinalizer(finalizer)
+
+
+# test_in_range_multiplication()
+# test_overflow_multiplication()
+test_negative_multiplication()

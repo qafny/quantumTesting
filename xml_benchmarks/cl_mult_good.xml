@@ -83,7 +83,7 @@
            <app id = "adder" > <vexp op = "-"> <vexp op = "id" > size </vexp> <vexp op = "id" > m </vexp> </vexp>
            <vexp op = "id" > size </vexp>
            <vexp op = "id" > m </vexp>
-              <qvexp op = "id" > x </qvexp> <qvexp op = "id" > re </qvexp> <qvexp op = "id" > c </qvexp> </pexp>
+              <qvexp op = "id" > x </qvexp> <qvexp op = "id" > re </qvexp> <qvexp op = "id" > c </qvexp> </app> </pexp>
           </pair>
    </match>
 </let>   
