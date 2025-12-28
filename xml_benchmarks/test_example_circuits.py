@@ -26,7 +26,7 @@ import os
 import sys
 from qiskit.circuit.library.arithmetic import FullAdderGate
 
-from AST_Scripts.XMLProgrammer import QXProgram, QXQID, QXCU, QXX, QXH, QXRZ, QXRY, QXRoot
+from AST_Scripts.XMLProgrammer import QXProgram, QXQID, QXCU, QXX, QXH, QXRZ, QXRY, QXRoot, QXNum
 
 # Ensure graphviz is in the PATH (for dag drawing)
 os.environ["PATH"] += os.pathsep + r"C:\Program Files\Graphviz\bin"
@@ -137,7 +137,6 @@ def simulate_circuit(x_array_value, y_array_value, c_array_value, num_qubits, pa
          })
 
     simulator = Simulator(state, environment)
-    print('parse tree type', type(parse_tree))
     simulator.visitProgram(parse_tree)
     new_state = simulator.state
     return new_state
@@ -155,6 +154,9 @@ def process_bitwise_test_cases(test_cases: list):
 
         expected = (xa + ya) % (2 ** na)
         new_state = simulate_circuit(xa, ya, ca, na, parsetree)
+        indicesOfQHX = [ind for ind, item in enumerate(parsetree._exps) if type(item) == QXH]
+        for index in indicesOfQHX:
+            parsetree._exps[index] = QXNum(0)
         # calculated = bit_array_to_int(new_state.get('ya')[0].getBits(), na)
 
         # insts.append((na, expected, calculated))
