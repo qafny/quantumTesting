@@ -73,27 +73,7 @@ qcEx3 = qc.copy()
 
 visitor = QCtoXMLProgrammer()
 
-# visitor.startVisit(qcEx1, circuitName="Example Circuit 1", optimiseCircuit=True, showDecomposedCircuit=True)
-# visitor.startVisit(qcEx2, circuitName="Example Circuit 2", optimiseCircuit=True)
-# visitor.startVisit(qcEx3, circuitName="Example Circuit 3", optimiseCircuit=True)
-
 # NOTE:: test how to run the code.
-
-def read_program(file_path: str):
-    # with open(file_path, 'r') as f:
-    #     str = f.read()
-    # i_stream = InputStream(str)
-    # lexer = XMLExpLexer(i_stream)
-    # t_stream = CommonTokenStream(lexer)
-    # parser = XMLExpParser(t_stream)
-    # tree = parser.root()
-    transform = QCtoXMLProgrammer()
-    output = visitor.startVisit(qcEx1, circuitName="Example Circuit 1", optimiseCircuit=True, showDecomposedCircuit=False)
-    # type needs to be QXRoot
-    new_tree = transform.visitProgram(output)
-
-    return new_tree
-
 
 def get_tree():
     #new_tree = read_program(f"{os.path.dirname(os.path.realpath(__file__))}/mutants/mutant_38.xml")
@@ -121,19 +101,12 @@ parsetree = get_tree()[0]
 
 from hypothesis import given, strategies as st, assume, settings, HealthCheck
 
-def simulate_circuit(x_array_value, y_array_value, c_array_value, num_qubits, parse_tree):
-    val_array_x = to_binary_arr(x_array_value, num_qubits)
-    val_array_y = to_binary_arr(y_array_value, num_qubits)
-    num_qubits_ca = 1
-    val_array_ca = to_binary_arr(c_array_value, num_qubits_ca)
-
+def simulate_circuit(num_qubits, parse_tree):
     state = dict(
-        {"test": [CoqNVal([True] * 5, 0)]
+        {"test": [CoqNVal([False]+([False] * (num_qubits-1)), 0)]
          })
     environment = dict(
-        {"xa": num_qubits,
-         "ya": num_qubits,
-         "ca": num_qubits_ca,
+        {"xa": num_qubits
          })
 
     simulator = Simulator(state, environment)
@@ -141,30 +114,18 @@ def simulate_circuit(x_array_value, y_array_value, c_array_value, num_qubits, pa
     new_state = simulator.state
     return new_state
 
-def process_bitwise_test_cases(test_cases: list):
+def process_bitwise_test_cases():
     # pt_output = read_program(f"{os.path.dirname(os.path.realpath(__file__))}/cl_adder_good.xml")
     # print('pt_output', pt_output)
     # print('pt_output type', type(pt_output))
-    insts = []
-    for test_case in test_cases:
-        na = test_case['na']
-        ca = test_case['ca']
-        xa = test_case['xa']
-        ya = test_case['ya']
-
-        expected = (xa + ya) % (2 ** na)
-        new_state = simulate_circuit(xa, ya, ca, na, parsetree)
-        indicesOfQHX = [ind for ind, item in enumerate(parsetree._exps) if type(item) == QXH]
-        for index in indicesOfQHX:
-            parsetree._exps[index] = QXNum(0)
-        # calculated = bit_array_to_int(new_state.get('ya')[0].getBits(), na)
-
-        # insts.append((na, expected, calculated))
+    indicesOfQHX = [ind for ind, item in enumerate(parsetree._exps) if type(item) == QXH]
+    for index in indicesOfQHX:
+        parsetree._exps[index] = QXNum(0)
+    print('type parsetree', type(parsetree))
+    print('parsetree', parsetree)
+    new_state = simulate_circuit(5,parsetree)
+    # calculated = bit_array_to_int(new_state.get('ya')[0].getBits(), na)
+    # insts.append((na, expected, calculated))
 
     return new_state
-
-test_cases_for_bitwise = [
-    {"na": 20, "xa": 5, "ya": 5, "ca": 0, "expected": 10}
-]
-
-bitwise_test_instances = process_bitwise_test_cases(test_cases_for_bitwise)
+print(process_bitwise_test_cases()['test'][0].getBits())
