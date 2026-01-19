@@ -93,7 +93,7 @@ visitor = QCtoXMLProgrammer()
 
 def get_tree():
     #new_tree = read_program(f"{os.path.dirname(os.path.realpath(__file__))}/mutants/mutant_38.xml")
-    new_tree = visitor.startVisit(qcEx3, circuitName="Example Circuit 1", optimiseCircuit=True, showDecomposedCircuit=True)
+    new_tree = visitor.startVisit(qcEx4, circuitName="Example Circuit 1", optimiseCircuit=True, showDecomposedCircuit=True)
     valid_tree = True
 
     # try:

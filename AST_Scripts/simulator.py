@@ -304,10 +304,15 @@ class Simulator(ProgramVisitor):
         vx = ctx.ID()
         val = self.state.get(vx)[0]
         p = ctx.num().accept(self)  # this will pass the visitor to the child of ctx
-        if p >= 0:
-            times_rotate(val, p, val.getNum())
+        # CoqNVal uses len(bits), CoqQVal uses getNum()
+        if isinstance(val, CoqNVal):
+            rmax = len(val.getBits())
         else:
-            times_r_rotate(val, p, val.getNum())
+            rmax = val.getNum()
+        if p >= 0:
+            times_rotate(val, p, rmax)
+        else:
+            times_r_rotate(val, p, rmax)
 
     def visitRY(self, ctx: XMLProgrammer.QXRY):
         vx = ctx.ID()
