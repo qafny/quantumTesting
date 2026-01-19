@@ -47,6 +47,8 @@ class ProgramVisitor(AbstractProgramVisitor):
                 return self.visitRY(ctx)
             case QXRZ():
                 return self.visitRZ(ctx)
+            case QXRY():
+                return self.visitRY(ctx)
             case QXSR():
                 return self.visitSR(ctx)
             case QXQFT():
