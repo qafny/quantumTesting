@@ -6,7 +6,7 @@ hypothesis==6.145.1
 numpy==2.2.6
 qiskit==2.2.1
 rustworkx==0.17.1
-scipy==1.15.3
+scipy>=1.11.0
 sortedcontainers==2.4.0
 stevedore==5.5.0
 typing_extensions==4.15.0
