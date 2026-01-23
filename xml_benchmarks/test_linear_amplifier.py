@@ -87,7 +87,7 @@ def process_bitwise_test_cases():
     indicesOfQHX = [ind for ind, item in enumerate(parsetree._exps) if type(item) == QXH]
     for index in indicesOfQHX:
         parsetree._exps[index] = QXNum(0)
-    new_state = simulate_circuit(4,parsetree)
+    new_state = simulate_circuit(5,parsetree)
     # calculated = bit_array_to_int(new_state.get('ya')[0].getBits(), na)
     # insts.append((na, expected, calculated))
 
