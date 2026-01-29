@@ -1,6 +1,6 @@
 [
   {
-    "class_name": "AND",
+    "class_name": "ANDGate",
     "module": "qiskit.circuit.library.boolean_logic.quantum_and",
     "doc": "A circuit implementing the logical AND operation on a number of qubits.\n\n    For the AND operation the state :math:`|1\\rangle` is interpreted as ``True``. The result\n    qubit is flipped, if the state of all variable qubits is ``True``. In this format, the AND\n    operation equals a multi-controlled X gate, which is controlled on all variable qubits.\n    Using a list of flags however, qubits can be skipped or negated. Practically, the flags\n    allow to skip controls or to apply pre- and post-X gates to the negated qubits.\n\n    The AND gate without special flags equals the multi-controlled-X gate:\n\n    .. plot::\n       :alt: Diagram illustrating the previously described circuit.\n\n       from qiskit.circuit.library import AND\n       from qiskit.visualization.library import _generate_circuit_library_visualization\n       circuit = AND(5)\n       _generate_circuit_library_visualization(circuit)\n\n    Using flags we can negate qubits or skip them. For instance, if we have 5 qubits and want to\n    return ``True`` if the first qubit is ``False`` and the last two are ``True`` we use the flags\n    ``[-1, 0, 0, 1, 1]``.\n\n    .. plot::\n       :alt: Diagram illustrating the previously described circuit.\n\n       from qiskit.circuit.library import AND\n       from qiskit.visualization.library import _generate_circuit_library_visualization\n       circuit = AND(5, flags=[-1, 0, 0, 1, 1])\n       _generate_circuit_library_visualization(circuit)\n\n    ",
     "parameters": {
@@ -53,7 +53,7 @@
     }
   },
   {
-    "class_name": "Diagonal",
+    "class_name": "DiagonalGate",
     "module": "qiskit.circuit.library.generalized_gates.diagonal",
     "doc": "Circuit implementing a diagonal transformation.",
     "parameters": {
@@ -173,7 +173,7 @@
     }
   },
   {
-    "class_name": "ExactReciprocal",
+    "class_name": "ExactReciprocalGate",
     "module": "qiskit.circuit.library.arithmetic.exact_reciprocal",
     "doc": "Exact reciprocal\n\n    .. math::\n\n        |x\\rangle |0\\rangle \\mapsto \\cos(1/x)|x\\rangle|0\\rangle + \\sin(1/x)|x\\rangle |1\\rangle\n    ",
     "parameters": {
@@ -281,7 +281,7 @@
     }
   },
   {
-    "class_name": "GMS",
+    "class_name": "MSGate",
     "module": "qiskit.circuit.library.generalized_gates.gms",
     "doc": "Global M\u00f8lmer\u2013S\u00f8rensen gate.\n\n    Circuit symbol:\n\n    .. code-block:: text\n\n             \u250c\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2510\n        q_0: \u25240          \u251c\n             \u2502           \u2502\n        q_1: \u25241   GMS    \u251c\n             \u2502           \u2502\n        q_2: \u25242          \u251c\n             \u2514\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2518\n\n    Expanded Circuit:\n\n    .. plot::\n       :alt: Diagram illustrating the previously described circuit.\n\n       from qiskit.circuit.library import GMS\n       from qiskit.visualization.library import _generate_circuit_library_visualization\n       import numpy as np\n       circuit = GMS(num_qubits=3, theta=[[0, np.pi/4, np.pi/8],\n                                          [0, 0, np.pi/2],\n                                          [0, 0, 0]])\n       _generate_circuit_library_visualization(circuit.decompose())\n\n    The M\u00f8lmer\u2013S\u00f8rensen gate is native to ion-trap systems. The global MS\n    can be applied to multiple ions to entangle multiple qubits simultaneously [1].\n\n    In the two-qubit case, this is equivalent to an XX(theta) interaction,\n    and is thus reduced to the RXXGate. The global MS gate is a sum of XX\n    interactions on all pairs [2].\n\n    .. math::\n\n        GMS(\\chi_{12}, \\chi_{13}, ..., \\chi_{n-1 n}) =\n        exp(-i \\sum_{i=1}^{n} \\sum_{j=i+1}^{n} X{\\otimes}X \\frac{\\chi_{ij}}{2})\n\n    References:\n\n    [1] S\u00f8rensen, A. and M\u00f8lmer, K., Multi-particle entanglement of hot trapped ions.\n    Physical Review Letters. 82 (9): 1835\u20131838.\n    `arXiv:9810040 <https://arxiv.org/abs/quant-ph/9810040>`_\n\n    [2] Maslov, D. and Nam, Y., Use of global interactions in efficient quantum circuit\n    constructions. New Journal of Physics, 20(3), p.033018.\n    `arXiv:1707.06356 <https://arxiv.org/abs/1707.06356>`_\n    ",
     "parameters": {
@@ -360,7 +360,7 @@
     }
   },
   {
-    "class_name": "GraphState",
+    "class_name": "GraphStateGate",
     "module": "qiskit.circuit.library.graph_state",
     "doc": "Circuit to prepare a graph state.\n\n    Given a graph G = (V, E), with the set of vertices V and the set of edges E,\n    the corresponding graph state is defined as\n\n    .. math::\n\n        |G\\rangle = \\prod_{(a,b) \\in E} CZ_{(a,b)} {|+\\rangle}^{\\otimes V}\n\n    Such a state can be prepared by first preparing all qubits in the :math:`+`\n    state, then applying a :math:`CZ` gate for each corresponding graph edge.\n\n    Graph state preparation circuits are Clifford circuits, and thus\n    easy to simulate classically. However, by adding a layer of measurements\n    in a product basis at the end, there is evidence that the circuit becomes\n    hard to simulate [2].\n\n    Reference Circuit:\n\n    .. plot::\n       :alt: Diagram illustrating the previously described circuit.\n\n       from qiskit.circuit.library import GraphState\n       from qiskit.visualization.library import _generate_circuit_library_visualization\n       import rustworkx as rx\n       G = rx.generators.cycle_graph(5)\n       circuit = GraphState(rx.adjacency_matrix(G))\n       circuit.name = \"Graph state\"\n       _generate_circuit_library_visualization(circuit)\n\n    References:\n\n    [1] M. Hein, J. Eisert, H.J. Briegel, Multi-party Entanglement in Graph States,\n        `arXiv:0307130 <https://arxiv.org/pdf/quant-ph/0307130.pdf>`_\n    [2] D. Koh, Further Extensions of Clifford Circuits & their Classical Simulation Complexities.\n        `arXiv:1512.07892 <https://arxiv.org/pdf/1512.07892.pdf>`_\n    ",
     "parameters": {
@@ -485,7 +485,7 @@
     }
   },
   {
-    "class_name": "LinearAmplitudeFunction",
+    "class_name": "LinearAmplitudeFunctionGate",
     "module": "qiskit.circuit.library.arithmetic.linear_amplitude_function",
     "doc": "A circuit implementing a (piecewise) linear function on qubit amplitudes.\n\n    An amplitude function :math:`F` of a function :math:`f` is a mapping\n\n    .. math::\n\n        F|x\\rangle|0\\rangle = \\sqrt{1 - \\hat{f}(x)} |x\\rangle|0\\rangle + \\sqrt{\\hat{f}(x)}\n            |x\\rangle|1\\rangle.\n\n    for a function :math:`\\hat{f}: \\{ 0, ..., 2^n - 1 \\} \\rightarrow [0, 1]`, where\n    :math:`|x\\rangle` is a :math:`n` qubit state.\n\n    This circuit implements :math:`F` for piecewise linear functions :math:`\\hat{f}`.\n    In this case, the mapping :math:`F` can be approximately implemented using a Taylor expansion\n    and linearly controlled Pauli-Y rotations, see [1, 2] for more detail. This approximation\n    uses a ``rescaling_factor`` to determine the accuracy of the Taylor expansion.\n\n    In general, the function of interest :math:`f` is defined from some interval :math:`[a,b]`,\n    the ``domain`` to :math:`[c,d]`, the ``image``, instead of :math:`\\{ 1, ..., N \\}` to\n    :math:`[0, 1]`. Using an affine transformation we can rescale :math:`f` to :math:`\\hat{f}`:\n\n    .. math::\n\n        \\hat{f}(x) = \\frac{f(\\phi(x)) - c}{d - c}\n\n    with\n\n    .. math::\n\n        \\phi(x) = a + \\frac{b - a}{2^n - 1} x.\n\n    If :math:`f` is a piecewise linear function on :math:`m` intervals\n    :math:`[p_{i-1}, p_i], i \\in \\{1, ..., m\\}` with slopes :math:`\\alpha_i` and\n    offsets :math:`\\beta_i` it can be written as\n\n    .. math::\n\n        f(x) = \\sum_{i=1}^m 1_{[p_{i-1}, p_i]}(x) (\\alpha_i x + \\beta_i)\n\n    where :math:`1_{[a, b]}` is an indication function that is 1 if the argument is in the interval\n    :math:`[a, b]` and otherwise 0. The breakpoints :math:`p_i` can be specified by the\n    ``breakpoints`` argument.\n\n    References:\n\n    [1] Woerner, S., & Egger, D. J. (2018). Quantum Risk Analysis.\n    `arXiv:1806.06893 <http://arxiv.org/abs/1806.06893>`_\n\n    [2] Gacon, J., Zoufal, C., & Woerner, S. (2020). Quantum-Enhanced Simulation-Based Optimization.\n    `arXiv:2005.10780 <http://arxiv.org/abs/2005.10780>`_\n    ",
     "parameters": {
@@ -551,7 +551,7 @@
     }
   },
   {
-    "class_name": "MCMT",
+    "class_name": "MCMTGate",
     "module": "qiskit.circuit.library.generalized_gates.mcmt",
     "doc": "The multi-controlled multi-target gate, for an arbitrary singly controlled target gate.\n\n    For example, the H gate controlled on 3 qubits and acting on 2 target qubit is represented as:\n\n    .. code-block:: text\n\n        \u2500\u2500\u2500\u25a0\u2500\u2500\u2500\u2500\n           \u2502\n        \u2500\u2500\u2500\u25a0\u2500\u2500\u2500\u2500\n           \u2502\n        \u2500\u2500\u2500\u25a0\u2500\u2500\u2500\u2500\n        \u250c\u2500\u2500\u2534\u2500\u2500\u2500\u2510\n        \u25240     \u251c\n        \u2502  2-H \u2502\n        \u25241     \u251c\n        \u2514\u2500\u2500\u2500\u2500\u2500\u2500\u2518\n\n    This default implementations requires no ancilla qubits, by broadcasting the target gate\n    to the number of target qubits and using Qiskit's generic control routine to control the\n    broadcasted target on the control qubits. If ancilla qubits are available, a more efficient\n    variant using the so-called V-chain decomposition can be used. This is implemented in\n    :class:`~qiskit.circuit.library.MCMTVChain`.\n    ",
     "parameters": {
@@ -737,7 +737,7 @@
     }
   },
   {
-    "class_name": "Permutation",
+    "class_name": "PermutationGate",
     "module": "qiskit.circuit.library.generalized_gates.permutation",
     "doc": "An n_qubit circuit that permutes qubits.",
     "parameters": {
@@ -779,7 +779,7 @@
     }
   },
   {
-    "class_name": "PhaseOracle",
+    "class_name": "PhaseOracleGate",
     "module": "qiskit.circuit.library.phase_oracle",
     "doc": "Phase Oracle.\n\n    The Phase Oracle object constructs circuits for any arbitrary\n    input logical expressions. A logical expression is composed of logical operators\n    `&` (logical `AND`), `|` (logical  `OR`),\n    `~` (logical  `NOT`), and `^` (logical  `XOR`).\n    as well as symbols for literals (variables).\n    For example, `'a & b'`, and `(v0 | ~v1) & (~v2 & v3)`\n    are both valid string representation of boolean logical expressions.\n\n    A phase oracle for a boolean function `f(x)` performs the following\n    quantum operation:\n\n    .. math::\n\n            |x\\rangle \\mapsto (-1)^{f(x)}|x\\rangle\n\n    For convenience, this oracle, in addition to parsing arbitrary logical expressions,\n    also supports input strings in the `DIMACS CNF format\n    <https://web.archive.org/web/20190325181937/https://www.satcompetition.org/2009/format-benchmarks2009.html>`__,\n    which is the standard format for specifying SATisfiability (SAT) problem instances in\n    `Conjunctive Normal Form (CNF) <https://en.wikipedia.org/wiki/Conjunctive_normal_form>`__,\n    which is a conjunction of one or more clauses, where a clause is a disjunction of one\n    or more literals. See :meth:`qiskit.circuit.library.phase_oracle.PhaseOracle.from_dimacs_file`.\n\n    From 16 variables on, possible performance issues should be expected when using the\n    default synthesizer.\n    ",
     "parameters": {
@@ -847,33 +847,6 @@
       },
       "name": {
         "default": "pw_lin",
-        "annotation": "str"
-      }
-    }
-  },
-  {
-    "class_name": "PiecewisePolynomialPauliRotations",
-    "module": "qiskit.circuit.library.arithmetic.piecewise_polynomial_pauli_rotations",
-    "doc": "Piecewise-polynomially-controlled Pauli rotations.\n\n    This class implements a piecewise polynomial (not necessarily continuous) function,\n    :math:`f(x)`, on qubit amplitudes, which is defined through breakpoints and coefficients as\n    follows.\n    Suppose the breakpoints :math:`(x_0, ..., x_J)` are a subset of :math:`[0, 2^n-1]`, where\n    :math:`n` is the number of state qubits. Further on, denote the corresponding coefficients by\n    :math:`[a_{j,1},...,a_{j,d}]`, where :math:`d` is the highest degree among all polynomials.\n\n    Then :math:`f(x)` is defined as:\n\n    .. math::\n\n        f(x) = \\begin{cases}\n            0, x < x_0 \\\\\n            \\sum_{i=0}^{i=d}a_{j,i}/2 x^i, x_j \\leq x < x_{j+1}\n            \\end{cases}\n\n    where if given the same number of breakpoints as polynomials, we implicitly assume\n    :math:`x_{J+1} = 2^n`.\n\n    .. note::\n\n        Note the :math:`1/2` factor in the coefficients of :math:`f(x)`, this is consistent with\n        Qiskit's Pauli rotations.\n\n    Examples:\n\n        >>> from qiskit import QuantumCircuit\n        >>> from qiskit.circuit.library.arithmetic.piecewise_polynomial_pauli_rotations import\\\n        ... PiecewisePolynomialPauliRotations\n        >>> qubits, breakpoints, coeffs = (2, [0, 2], [[0, -1.2],[-1, 1, 3]])\n        >>> poly_r = PiecewisePolynomialPauliRotations(num_state_qubits=qubits,\n        ...breakpoints=breakpoints, coeffs=coeffs)\n        >>>\n        >>> qc = QuantumCircuit(poly_r.num_qubits)\n        >>> qc.h(list(range(qubits)));\n        >>> qc.append(poly_r.to_instruction(), list(range(qc.num_qubits)));\n        >>> qc.draw()\n             \u250c\u2500\u2500\u2500\u2510\u250c\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2510\n        q_0: \u2524 H \u251c\u25240         \u251c\n             \u251c\u2500\u2500\u2500\u2524\u2502          \u2502\n        q_1: \u2524 H \u251c\u25241         \u251c\n             \u2514\u2500\u2500\u2500\u2518\u2502          \u2502\n        q_2: \u2500\u2500\u2500\u2500\u2500\u25242         \u251c\n                  \u2502  pw_poly \u2502\n        q_3: \u2500\u2500\u2500\u2500\u2500\u25243         \u251c\n                  \u2502          \u2502\n        q_4: \u2500\u2500\u2500\u2500\u2500\u25244         \u251c\n                  \u2502          \u2502\n        q_5: \u2500\u2500\u2500\u2500\u2500\u25245         \u251c\n                  \u2514\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2518\n\n    References:\n\n    [1] Haener, T., Roetteler, M., & Svore, K. M. (2018).\n    Optimizing Quantum Circuits for Arithmetic.\n    `arXiv:1805.12445 <http://arxiv.org/abs/1805.12445>`_\n\n    [2] Carrera Vazquez, A., Hiptmair, R., & Woerner, S. (2022).\n    Enhancing the Quantum Linear Systems Algorithm using Richardson Extrapolation.\n    `ACM Transactions on Quantum Computing 3, 1, Article 2 <https://doi.org/10.1145/3490631>`_\n    ",
-    "parameters": {
-      "num_state_qubits": {
-        "default": null,
-        "annotation": "Optional[int]"
-      },
-      "breakpoints": {
-        "default": null,
-        "annotation": "Optional[List[int]]"
-      },
-      "coeffs": {
-        "default": null,
-        "annotation": "Optional[List[List[float]]]"
-      },
-      "basis": {
-        "default": "Y",
-        "annotation": "str"
-      },
-      "name": {
-        "default": "pw_poly",
         "annotation": "str"
       }
     }
@@ -1185,25 +1158,6 @@
     }
   },
   {
-    "class_name": "WeightedAdder",
-    "module": "qiskit.circuit.library.arithmetic.weighted_adder",
-    "doc": "A circuit to compute the weighted sum of qubit registers.\n\n    Given :math:`n` qubit basis states :math:`q_0, \\ldots, q_{n-1} \\in \\{0, 1\\}` and non-negative\n    integer weights :math:`\\lambda_0, \\ldots, \\lambda_{n-1}`, this circuit performs the operation\n\n    .. math::\n\n        |q_0 \\ldots q_{n-1}\\rangle |0\\rangle_s\n        \\mapsto |q_0 \\ldots q_{n-1}\\rangle |\\sum_{j=0}^{n-1} \\lambda_j q_j\\rangle_s\n\n    where :math:`s` is the number of sum qubits required.\n    This can be computed as\n\n    .. math::\n\n        s = 1 + \\left\\lfloor \\log_2\\left( \\sum_{j=0}^{n-1} \\lambda_j \\right) \\right\\rfloor\n\n    or :math:`s = 1` if the sum of the weights is 0 (then the expression in the logarithm is\n    invalid).\n\n    For qubits in a circuit diagram, the first weight applies to the upper-most qubit.\n    For an example where the state of 4 qubits is added into a sum register, the circuit can\n    be schematically drawn as\n\n    .. code-block:: text\n\n                   \u250c\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2510\n          state_0: \u25240       \u251c | state_0 * weights[0]\n                   \u2502        \u2502 |\n          state_1: \u25241       \u251c | + state_1 * weights[1]\n                   \u2502        \u2502 |\n          state_2: \u25242       \u251c | + state_2 * weights[2]\n                   \u2502        \u2502 |\n          state_3: \u25243       \u251c | + state_3 * weights[3]\n                   \u2502        \u2502\n            sum_0: \u25244       \u251c |\n                   \u2502  Adder \u2502 |\n            sum_1: \u25245       \u251c | = sum_0 * 2^0 + sum_1 * 2^1 + sum_2 * 2^2\n                   \u2502        \u2502 |\n            sum_2: \u25246       \u251c |\n                   \u2502        \u2502\n          carry_0: \u25247       \u251c\n                   \u2502        \u2502\n          carry_1: \u25248       \u251c\n                   \u2502        \u2502\n        control_0: \u25249       \u251c\n                   \u2514\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2518\n    ",
-    "parameters": {
-      "num_state_qubits": {
-        "default": null,
-        "annotation": "Optional[int]"
-      },
-      "weights": {
-        "default": null,
-        "annotation": "Optional[List[int]]"
-      },
-      "name": {
-        "default": "adder",
-        "annotation": "str"
-      }
-    }
-  },
-  {
     "class_name": "XOR",
     "module": "qiskit.circuit.library.boolean_logic.quantum_xor",
     "doc": "An n_qubit circuit for bitwise xor-ing the input with some integer ``amount``.\n\n    The ``amount`` is xor-ed in bitstring form with the input.\n\n    This circuit can also represent addition by ``amount`` over the finite field GF(2).\n    ",
@@ -1327,29 +1281,6 @@
     }
   },
   {
-    "class_name": "ExactReciprocal",
-    "module": "qiskit.circuit.library.arithmetic.exact_reciprocal",
-    "doc": "Exact reciprocal\n\n    .. math::\n\n        |x\\rangle |0\\rangle \\mapsto \\cos(1/x)|x\\rangle|0\\rangle + \\sin(1/x)|x\\rangle |1\\rangle\n    ",
-    "parameters": {
-      "num_state_qubits": {
-        "default": null,
-        "annotation": "<class 'int'>"
-      },
-      "scaling": {
-        "default": null,
-        "annotation": "<class 'float'>"
-      },
-      "neg_vals": {
-        "default": false,
-        "annotation": "<class 'bool'>"
-      },
-      "name": {
-        "default": "1/x",
-        "annotation": "<class 'str'>"
-      }
-    }
-  },
-  {
     "class_name": "FunctionalPauliRotations",
     "module": "qiskit.circuit.library.arithmetic.functional_pauli_rotations",
     "doc": "Base class for functional Pauli rotations.",
@@ -1415,45 +1346,6 @@
     }
   },
   {
-    "class_name": "LinearAmplitudeFunction",
-    "module": "qiskit.circuit.library.arithmetic.linear_amplitude_function",
-    "doc": "A circuit implementing a (piecewise) linear function on qubit amplitudes.\n\n    An amplitude function :math:`F` of a function :math:`f` is a mapping\n\n    .. math::\n\n        F|x\\rangle|0\\rangle = \\sqrt{1 - \\hat{f}(x)} |x\\rangle|0\\rangle + \\sqrt{\\hat{f}(x)}\n            |x\\rangle|1\\rangle.\n\n    for a function :math:`\\hat{f}: \\{ 0, ..., 2^n - 1 \\} \\rightarrow [0, 1]`, where\n    :math:`|x\\rangle` is a :math:`n` qubit state.\n\n    This circuit implements :math:`F` for piecewise linear functions :math:`\\hat{f}`.\n    In this case, the mapping :math:`F` can be approximately implemented using a Taylor expansion\n    and linearly controlled Pauli-Y rotations, see [1, 2] for more detail. This approximation\n    uses a ``rescaling_factor`` to determine the accuracy of the Taylor expansion.\n\n    In general, the function of interest :math:`f` is defined from some interval :math:`[a,b]`,\n    the ``domain`` to :math:`[c,d]`, the ``image``, instead of :math:`\\{ 1, ..., N \\}` to\n    :math:`[0, 1]`. Using an affine transformation we can rescale :math:`f` to :math:`\\hat{f}`:\n\n    .. math::\n\n        \\hat{f}(x) = \\frac{f(\\phi(x)) - c}{d - c}\n\n    with\n\n    .. math::\n\n        \\phi(x) = a + \\frac{b - a}{2^n - 1} x.\n\n    If :math:`f` is a piecewise linear function on :math:`m` intervals\n    :math:`[p_{i-1}, p_i], i \\in \\{1, ..., m\\}` with slopes :math:`\\alpha_i` and\n    offsets :math:`\\beta_i` it can be written as\n\n    .. math::\n\n        f(x) = \\sum_{i=1}^m 1_{[p_{i-1}, p_i]}(x) (\\alpha_i x + \\beta_i)\n\n    where :math:`1_{[a, b]}` is an indication function that is 1 if the argument is in the interval\n    :math:`[a, b]` and otherwise 0. The breakpoints :math:`p_i` can be specified by the\n    ``breakpoints`` argument.\n\n    References:\n\n    [1] Woerner, S., & Egger, D. J. (2018). Quantum Risk Analysis.\n    `arXiv:1806.06893 <http://arxiv.org/abs/1806.06893>`_\n\n    [2] Gacon, J., Zoufal, C., & Woerner, S. (2020). Quantum-Enhanced Simulation-Based Optimization.\n    `arXiv:2005.10780 <http://arxiv.org/abs/2005.10780>`_\n    ",
-    "parameters": {
-      "num_state_qubits": {
-        "default": null,
-        "annotation": "int"
-      },
-      "slope": {
-        "default": null,
-        "annotation": "float | list[float]"
-      },
-      "offset": {
-        "default": null,
-        "annotation": "float | list[float]"
-      },
-      "domain": {
-        "default": null,
-        "annotation": "tuple[float, float]"
-      },
-      "image": {
-        "default": null,
-        "annotation": "tuple[float, float]"
-      },
-      "rescaling_factor": {
-        "default": 1,
-        "annotation": "float"
-      },
-      "breakpoints": {
-        "default": null,
-        "annotation": "list[float] | None"
-      },
-      "name": {
-        "default": "F",
-        "annotation": "str"
-      }
-    }
-  },
-  {
     "class_name": "LinearPauliRotations",
     "module": "qiskit.circuit.library.arithmetic.linear_pauli_rotations",
     "doc": "Linearly-controlled X, Y or Z rotation.\n\n    For a register of state qubits :math:`|x\\rangle`, a target qubit :math:`|0\\rangle` and the\n    basis ``'Y'`` this circuit acts as:\n\n    .. code-block:: text\n\n            q_0: \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u25a0\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500 ... \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\n                                          \u2502\n                                          .\n                                          \u2502\n        q_(n-1): \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u253c\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500 ... \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u25a0\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\n                  \u250c\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2510  \u250c\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2534\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2510       \u250c\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2534\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2510\n            q_n: \u2500\u2524 RY(offset) \u251c\u2500\u2500\u2524 RY(2^0 slope) \u251c  ...  \u2524 RY(2^(n-1) slope) \u251c\n                  \u2514\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2518  \u2514\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2518       \u2514\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2518\n\n    This can for example be used to approximate linear functions, with :math:`a =` ``slope``:math:`/2`\n    and :math:`b =` ``offset``:math:`/2` and the basis ``'Y'``:\n\n    .. math::\n\n        |x\\rangle |0\\rangle \\mapsto \\cos(ax + b)|x\\rangle|0\\rangle + \\sin(ax + b)|x\\rangle |1\\rangle\n\n    Since for small arguments :math:`\\sin(x) \\approx x` this operator can be used to approximate\n    linear functions.\n    ",
@@ -1481,34 +1373,7 @@
     }
   },
   {
-    "class_name": "PiecewiseChebyshev",
-    "module": "qiskit.circuit.library.arithmetic.piecewise_chebyshev",
-    "doc": "Piecewise Chebyshev approximation to an input function.\n\n    For a given function :math:`f(x)` and degree :math:`d`, this class implements a piecewise\n    polynomial Chebyshev approximation on :math:`n` qubits to :math:`f(x)` on the given intervals.\n    All the polynomials in the approximation are of degree :math:`d`.\n\n    The values of the parameters are calculated according to [1] and see [2] for a more\n    detailed explanation of the circuit construction and how it acts on the qubits.\n\n    Examples:\n\n    .. plot::\n        :alt: Circuit diagram output by the previous code.\n        :include-source:\n\n        import numpy as np\n        from qiskit import QuantumCircuit\n        from qiskit.circuit.library.arithmetic.piecewise_chebyshev import PiecewiseChebyshev\n        f_x, degree, breakpoints, num_state_qubits = lambda x: np.arcsin(1 / x), 2, [2, 4], 2\n        pw_approximation = PiecewiseChebyshev(f_x, degree, breakpoints, num_state_qubits)\n        pw_approximation._build()\n        qc = QuantumCircuit(pw_approximation.num_qubits)\n        qc.h(list(range(num_state_qubits)))\n        qc.append(pw_approximation.to_instruction(), qc.qubits)\n        qc.draw(output='mpl')\n\n    References:\n\n    [1] Haener, T., Roetteler, M., & Svore, K. M. (2018).\n    Optimizing Quantum Circuits for Arithmetic.\n    `arXiv:1805.12445 <http://arxiv.org/abs/1805.12445>`_\n\n    [2] Carrera Vazquez, A., Hiptmair, H., & Woerner, S. (2022).\n    Enhancing the Quantum Linear Systems Algorithm Using Richardson Extrapolation.\n    `ACM Transactions on Quantum Computing 3, 1, Article 2 <https://doi.org/10.1145/3490631>`_\n    ",
-    "parameters": {
-      "f_x": {
-        "default": null,
-        "annotation": "float | Callable[[int], float]"
-      },
-      "degree": {
-        "default": null,
-        "annotation": "int | None"
-      },
-      "breakpoints": {
-        "default": null,
-        "annotation": "list[int] | None"
-      },
-      "num_state_qubits": {
-        "default": null,
-        "annotation": "int | None"
-      },
-      "name": {
-        "default": "pw_cheb",
-        "annotation": "str"
-      }
-    }
-  },
-  {
-    "class_name": "PiecewiseLinearPauliRotations",
+    "class_name": "PiecewiseLinearPauliRotationsGate",
     "module": "qiskit.circuit.library.arithmetic.piecewise_linear_pauli_rotations",
     "doc": "Piecewise-linearly-controlled Pauli rotations.\n\n    For a piecewise linear (not necessarily continuous) function :math:`f(x)`, which is defined\n    through breakpoints, slopes and offsets as follows.\n    Suppose the breakpoints :math:`(x_0, ..., x_J)` are a subset of :math:`[0, 2^n-1]`, where\n    :math:`n` is the number of state qubits. Further on, denote the corresponding slopes and\n    offsets by :math:`a_j` and :math:`b_j` respectively.\n    Then f(x) is defined as:\n\n    .. math::\n\n        f(x) = \\begin{cases}\n            0, x < x_0 \\\\\n            a_j (x - x_j) + b_j, x_j \\leq x < x_{j+1}\n            \\end{cases}\n\n    where we implicitly assume :math:`x_{J+1} = 2^n`.\n    ",
     "parameters": {
@@ -1539,7 +1404,7 @@
     }
   },
   {
-    "class_name": "PiecewisePolynomialPauliRotations",
+    "class_name": "PiecewisePolynomialPauliRotationsGate",
     "module": "qiskit.circuit.library.arithmetic.piecewise_polynomial_pauli_rotations",
     "doc": "Piecewise-polynomially-controlled Pauli rotations.\n\n    This class implements a piecewise polynomial (not necessarily continuous) function,\n    :math:`f(x)`, on qubit amplitudes, which is defined through breakpoints and coefficients as\n    follows.\n    Suppose the breakpoints :math:`(x_0, ..., x_J)` are a subset of :math:`[0, 2^n-1]`, where\n    :math:`n` is the number of state qubits. Further on, denote the corresponding coefficients by\n    :math:`[a_{j,1},...,a_{j,d}]`, where :math:`d` is the highest degree among all polynomials.\n\n    Then :math:`f(x)` is defined as:\n\n    .. math::\n\n        f(x) = \\begin{cases}\n            0, x < x_0 \\\\\n            \\sum_{i=0}^{i=d}a_{j,i}/2 x^i, x_j \\leq x < x_{j+1}\n            \\end{cases}\n\n    where if given the same number of breakpoints as polynomials, we implicitly assume\n    :math:`x_{J+1} = 2^n`.\n\n    .. note::\n\n        Note the :math:`1/2` factor in the coefficients of :math:`f(x)`, this is consistent with\n        Qiskit's Pauli rotations.\n\n    Examples:\n\n        >>> from qiskit import QuantumCircuit\n        >>> from qiskit.circuit.library.arithmetic.piecewise_polynomial_pauli_rotations import\\\n        ... PiecewisePolynomialPauliRotations\n        >>> qubits, breakpoints, coeffs = (2, [0, 2], [[0, -1.2],[-1, 1, 3]])\n        >>> poly_r = PiecewisePolynomialPauliRotations(num_state_qubits=qubits,\n        ...breakpoints=breakpoints, coeffs=coeffs)\n        >>>\n        >>> qc = QuantumCircuit(poly_r.num_qubits)\n        >>> qc.h(list(range(qubits)));\n        >>> qc.append(poly_r.to_instruction(), list(range(qc.num_qubits)));\n        >>> qc.draw()\n             \u250c\u2500\u2500\u2500\u2510\u250c\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2510\n        q_0: \u2524 H \u251c\u25240         \u251c\n             \u251c\u2500\u2500\u2500\u2524\u2502          \u2502\n        q_1: \u2524 H \u251c\u25241         \u251c\n             \u2514\u2500\u2500\u2500\u2518\u2502          \u2502\n        q_2: \u2500\u2500\u2500\u2500\u2500\u25242         \u251c\n                  \u2502  pw_poly \u2502\n        q_3: \u2500\u2500\u2500\u2500\u2500\u25243         \u251c\n                  \u2502          \u2502\n        q_4: \u2500\u2500\u2500\u2500\u2500\u25244         \u251c\n                  \u2502          \u2502\n        q_5: \u2500\u2500\u2500\u2500\u2500\u25245         \u251c\n                  \u2514\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2518\n\n    References:\n\n    [1] Haener, T., Roetteler, M., & Svore, K. M. (2018).\n    Optimizing Quantum Circuits for Arithmetic.\n    `arXiv:1805.12445 <http://arxiv.org/abs/1805.12445>`_\n\n    [2] Carrera Vazquez, A., Hiptmair, R., & Woerner, S. (2022).\n    Enhancing the Quantum Linear Systems Algorithm using Richardson Extrapolation.\n    `ACM Transactions on Quantum Computing 3, 1, Article 2 <https://doi.org/10.1145/3490631>`_\n    ",
     "parameters": {
