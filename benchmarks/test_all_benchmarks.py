@@ -126,6 +126,7 @@ class BenchmarkTester:
             return circuit
             
         except Exception as e:
+            print(e)
             return None
     
     def create_specification(self, circuit_info, circuit):
@@ -240,7 +241,7 @@ Expected Behavior:
             
             # Step 5: Run simulator
             try:
-                # Initialize state
+                # Initialize state (may have to move this to specs file)
                 state = {
                     "test": [CoqNVal([True] + [False] * (circuit.num_qubits - 1), phase=0)]
                 }
