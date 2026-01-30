@@ -11,10 +11,6 @@
       "flags": {
         "default": null,
         "annotation": "list[int] | None"
-      },
-      "mcx_mode": {
-        "default": "noancilla",
-        "annotation": "str"
       }
     }
   },
