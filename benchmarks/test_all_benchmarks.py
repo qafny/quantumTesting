@@ -262,6 +262,7 @@ Expected Behavior:
                 return result
             
         except Exception as e:
+            print(e)
             result["status"] = "FAILED"
             result["error_type"] = "UNEXPECTED_ERROR"
             result["error_classification"] = "UNKNOWN"
@@ -280,12 +281,12 @@ Expected Behavior:
         print(f"Found {len(circuits)} circuits to test")
         
         # Filter out already tested circuits
-        untested = [c for c in circuits if f"{c['class_name']}_" not in str(self.tested_circuits)]
-        print(f"Testing {len(untested)} untested circuits")
+        # untested = [c for c in circuits if f"{c['class_name']}_" not in str(self.tested_circuits)]
+        # print(f"Testing {len(untested)} untested circuits")
         
         # Test each circuit
-        for i, circuit_info in enumerate(untested, 1):
-            print(f"\n[{i}/{len(untested)}] Testing {circuit_info['class_name']}...")
+        for i, circuit_info in enumerate(circuits, 1):
+            print(f"\n[{i}/{len(circuits)}] Testing {circuit_info['class_name']}...")
             result = self.test_circuit(circuit_info)
             self.results.append(result)
             
