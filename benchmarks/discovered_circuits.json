@@ -795,19 +795,19 @@
     "doc": "Piecewise Chebyshev approximation to an input function.\n\n    For a given function :math:`f(x)` and degree :math:`d`, this class implements a piecewise\n    polynomial Chebyshev approximation on :math:`n` qubits to :math:`f(x)` on the given intervals.\n    All the polynomials in the approximation are of degree :math:`d`.\n\n    The values of the parameters are calculated according to [1] and see [2] for a more\n    detailed explanation of the circuit construction and how it acts on the qubits.\n\n    Examples:\n\n    .. plot::\n        :alt: Circuit diagram output by the previous code.\n        :include-source:\n\n        import numpy as np\n        from qiskit import QuantumCircuit\n        from qiskit.circuit.library.arithmetic.piecewise_chebyshev import PiecewiseChebyshev\n        f_x, degree, breakpoints, num_state_qubits = lambda x: np.arcsin(1 / x), 2, [2, 4], 2\n        pw_approximation = PiecewiseChebyshev(f_x, degree, breakpoints, num_state_qubits)\n        pw_approximation._build()\n        qc = QuantumCircuit(pw_approximation.num_qubits)\n        qc.h(list(range(num_state_qubits)))\n        qc.append(pw_approximation.to_instruction(), qc.qubits)\n        qc.draw(output='mpl')\n\n    References:\n\n    [1] Haener, T., Roetteler, M., & Svore, K. M. (2018).\n    Optimizing Quantum Circuits for Arithmetic.\n    `arXiv:1805.12445 <http://arxiv.org/abs/1805.12445>`_\n\n    [2] Carrera Vazquez, A., Hiptmair, H., & Woerner, S. (2022).\n    Enhancing the Quantum Linear Systems Algorithm Using Richardson Extrapolation.\n    `ACM Transactions on Quantum Computing 3, 1, Article 2 <https://doi.org/10.1145/3490631>`_\n    ",
     "parameters": {
       "f_x": {
-        "default": null,
+        "default": 3.0,
         "annotation": "float | Callable[[int], float]"
       },
       "degree": {
-        "default": null,
+        "default": 3,
         "annotation": "int | None"
       },
       "breakpoints": {
-        "default": null,
+        "default": [2],
         "annotation": "list[int] | None"
       },
       "num_state_qubits": {
-        "default": null,
+        "default": 6,
         "annotation": "int | None"
       },
       "name": {

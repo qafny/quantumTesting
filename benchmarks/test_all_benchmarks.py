@@ -251,6 +251,7 @@ Expected Behavior:
                 simulator.visitProgram(ast_tree)
                 result["notes"] += "Simulation: SUCCESS"
                 result["status"] = "PASSED"
+                # TODO: add hypothesis tests here
                 
             except Exception as e:
                 result["status"] = "FAILED"
