@@ -116,9 +116,9 @@ parsetree = get_tree()[0]
 
 from hypothesis import given, strategies as st, assume, settings, HealthCheck
 
-def simulate_circuit(num_qubits, parse_tree):
+def simulate_circuit(num_qubits, parse_tree, first_qubit):
     state = dict(
-        {"test": [CoqNVal([False]+([False] * (num_qubits-1)), phase=0)]
+        {"test": [CoqNVal([first_qubit]+([False] * (num_qubits-1)), phase=0)]
          })
     environment = dict(
         {"xa": num_qubits
@@ -129,16 +129,20 @@ def simulate_circuit(num_qubits, parse_tree):
     new_state = simulator.state
     return new_state
 
-def process_bitwise_test_cases():
+@given(first_qubit = st.sampled_from([True, False]))
+def test_bitwise_test_cases(first_qubit):
     # pt_output = read_program(f"{os.path.dirname(os.path.realpath(__file__))}/cl_adder_good.xml")
     # print('pt_output', pt_output)
     # print('pt_output type', type(pt_output))
     indicesOfQHX = [ind for ind, item in enumerate(parsetree._exps) if type(item) == QXH]
     for index in indicesOfQHX:
         parsetree._exps[index] = QXNum(0)
-    new_state = simulate_circuit(4,parsetree)
+    new_state = simulate_circuit(4,parsetree, first_qubit)
     # calculated = bit_array_to_int(new_state.get('ya')[0].getBits(), na)
     # insts.append((na, expected, calculated))
-
-    return new_state
-print(process_bitwise_test_cases()['test'][0].getBits())
+    print(new_state['test'][0].getBits())
+    if (new_state['test'][0].getBits()[0] == new_state['test'][0].getBits()[1] == new_state['test'][0].getBits()[2]):
+        assert True
+    else:
+        assert False
+test_bitwise_test_cases()
