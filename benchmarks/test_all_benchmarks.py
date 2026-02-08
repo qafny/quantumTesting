@@ -267,7 +267,6 @@ Expected Behavior:
                 result["notes"] += "Simulation: SUCCESS"
                 result["status"] = "PASSED"
 
-                # TODO: add hypothesis tests here; use simulator.state
                 print('simulator.state', simulator.state)
                 print('bits', simulator.state['test'][0].getBits())
                 if(properties.get(circuit.name) != None):
