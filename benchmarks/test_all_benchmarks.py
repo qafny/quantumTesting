@@ -12,6 +12,7 @@ This script:
 4. Logs all results to CSV/JSON
 """
 
+import array
 import json
 import os
 import sys
@@ -33,6 +34,7 @@ from AST_Scripts.simulator import Simulator, CoqNVal
 from AST_Scripts.ValidatorProgramVisitors import SimulatorValidator
 from AST_Scripts.Retrievers import MatchCounterRetriever
 from program_properties import properties, test_properties
+from qiskit import QuantumCircuit
 
 class BenchmarkTester:
     def __init__(self, benchmarks_dir):
@@ -64,27 +66,27 @@ class BenchmarkTester:
             
             # Handle None defaults
             if default is None:
-                # Try to infer from annotation or parameter name
-                if 'int' in str(annotation):
-                    if 'num_qubits' in param_name or 'num_state_qubits' in param_name or 'num_variable_qubits' in param_name:
-                        params[param_name] = 2  # Small default for testing
-                    elif 'reps' in param_name:
-                        params[param_name] = 1
-                    else:
-                        params[param_name] = 2
-                elif 'list' in str(annotation) or 'Sequence' in str(annotation):
-                    # Skip complex list parameters for now
-                    continue
-                elif 'str' in str(annotation):
-                    # Use default from param_data if available
-                    if default is not None:
-                        params[param_name] = default
-                else:
-                    # Skip unknown types
-                    continue
+                # # Try to infer from annotation or parameter name
+                # if 'int' in str(annotation):
+                #     if 'num_qubits' in param_name or 'num_state_qubits' in param_name or 'num_variable_qubits' in param_name:
+                #         params[param_name] = 2  # Small default for testing
+                #     elif 'reps' in param_name:
+                #         params[param_name] = 1
+                #     else:
+                #         params[param_name] = 2
+                # elif 'list' in str(annotation) or 'Sequence' in str(annotation):
+                #     # Skip complex list parameters for now
+                #     continue
+                # elif 'str' in str(annotation):
+                #     # Use default from param_data if available
+                #     if default is not None:
+                #         params[param_name] = default
+                # else:
+                #     # Skip unknown types
+                continue
             else:
                 params[param_name] = default
-        
+        print('params', params)
         return params
     
     def instantiate_circuit(self, circuit_info):
@@ -103,22 +105,24 @@ class BenchmarkTester:
             # Check if it's a BlueprintCircuit (needs special handling)
             base_classes = [b.__name__ for b in circuit_class.__bases__]
             if 'BlueprintCircuit' in base_classes:
+                print('in if case')
                 # Blueprint circuits need to be built
                 circuit = circuit_class(**params)
                 if hasattr(circuit, '_build'):
                     circuit._build()
             else:
+                print('in else case')
                 # Regular instantiation
                 circuit = circuit_class(**params)
             
             # Generate a unique name
             circuit_name = f"{class_name}_{params.get('num_qubits', params.get('num_state_qubits', params.get('num_variable_qubits', 2)))}"
             circuit.name = circuit_name
-            
+            print('circuit', circuit)
             return circuit
             
         except Exception as e:
-            print(e)
+            print('exception', e)
             return None
     
     def create_specification(self, circuit_info, circuit):
@@ -140,7 +144,7 @@ class BenchmarkTester:
 Circuit: {circuit.name}
 Qubits: {num_qubits}
 Classical bits: {num_clbits}
-Depth: {circuit.depth()}
+Depth: {circuit['depth']}
 Size: {len(circuit.data)}
 
 Expected Behavior:
@@ -151,7 +155,7 @@ Expected Behavior:
 """,
             "expected_behavior": f"Circuit from {circuit_info['class_name']} class"
         }
-        
+        print('spec', spec)
         return spec
     
     def test_circuit(self, circuit_info):
@@ -172,6 +176,7 @@ Expected Behavior:
         
         try:
             # Step 1: Instantiate circuit
+            print('about to try instantiating circuit')
             circuit = self.instantiate_circuit(circuit_info)
             if circuit is None:
                 result["status"] = "FAILED"
@@ -186,21 +191,30 @@ Expected Behavior:
             result["num_qubits"] = circuit.num_qubits
             
             # Step 2: Create specification
-            spec = self.create_specification(circuit_info, circuit)
-            if spec:
-                spec_file = self.specs_dir / f"{circuit.name}_spec.json"
-                with open(spec_file, 'w') as f:
-                    json.dump(spec, f, indent=2)
+            # print('about to try creating specification')
+            # spec = self.create_specification(circuit_info, circuit)
+            # if spec:
+            #     spec_file = self.specs_dir / f"{circuit.name}_spec.json"
+            #     with open(spec_file, 'w') as f:
+            #         json.dump(spec, f, indent=2)
             
             # Step 3: Convert to AST using QCtoXMLProgrammer
             try:
+                print('about to try converting to AST')
                 # Suppress stdout to avoid broken pipe errors
                 import io
                 import contextlib
                 f = io.StringIO()
                 with contextlib.redirect_stdout(f):
+                    # TODO: will want to remove hardcoding here
+                    # note 'circuit' is of type Instruction not
+                    # QuantumCircuit; QCtoXMLProgrammer needs
+                    # the circuit to be of type QuantumCircuit
+                    print('circuit', circuit)
+                    qc = QuantumCircuit(4, 4)
+                    qc.append(circuit, array.array('i', range(0, 4)))
                     ast_tree = self.visitor.startVisit(
-                        circuit,
+                        qc,
                         circuitName=circuit.name,
                         optimiseCircuit=True,
                         showDecomposedCircuit=False,
@@ -209,6 +223,7 @@ Expected Behavior:
                     )
                 result["notes"] += "AST generation: SUCCESS; "
             except Exception as e:
+                print(e)
                 result["status"] = "FAILED"
                 result["error_type"] = "AST_GENERATION_ERROR"
                 result["error_classification"] = "FRAMEWORK_LIMITATION"
@@ -219,6 +234,7 @@ Expected Behavior:
             
             # Step 4: Validate AST
             try:
+                print('about to validate AST')
                 validator = SimulatorValidator()
                 validator.visitProgram(ast_tree)
                 result["notes"] += "AST validation: SUCCESS; "
@@ -234,18 +250,26 @@ Expected Behavior:
             # Step 5: Run simulator
             try:
                 # Initialize state (may have to move this to specs file)
+
+                # TODO: will need to refactor this into a separate method as 
+                # we want to use randomly generated values for the state, see 
+                # qc_to_xmlprogrammer_tests/test_example_circuits.py  and 
+                # xml_benchmarks/test_cl_mult_property.py as examples
+
                 state = {
-                    "test": [CoqNVal([True] + [False] * (circuit.num_qubits - 1), phase=0)]
+                    "test": [CoqNVal([True] + [True] * (circuit.num_qubits - 1), phase=0)]
                 }
                 environment = {"xa": circuit.num_qubits}
                 
                 simulator = Simulator(state, environment)
+                print('about to visit program')
                 simulator.visitProgram(ast_tree)
                 result["notes"] += "Simulation: SUCCESS"
                 result["status"] = "PASSED"
 
                 # TODO: add hypothesis tests here; use simulator.state
-                print('circuit.name', circuit.name)
+                print('simulator.state', simulator.state)
+                print('bits', simulator.state['test'][0].getBits())
                 if(properties.get(circuit.name) != None):
                     test_properties(properties[circuit.name])
             except Exception as e:
