@@ -20,6 +20,7 @@ import importlib
 from datetime import datetime
 from pathlib import Path
 import inspect
+from hypothesis import given, strategies as st, assume, settings, HealthCheck
 
 # Add parent directory to path
 current_dir = os.path.dirname(os.path.abspath(__file__))
@@ -47,16 +48,6 @@ class BenchmarkTester:
         
         self.visitor = QCtoXMLProgrammer()
         self.results = []
-        self.tested_circuits = set()
-        self.load_tested_circuits()
-    
-    def load_tested_circuits(self):
-        """Load list of already tested circuits."""
-        tested_file = self.results_dir / "test_results.json"
-        if tested_file.exists():
-            with open(tested_file, 'r') as f:
-                existing_results = json.load(f)
-                self.tested_circuits = {r.get('circuit_name', '') for r in existing_results}
     
     def get_default_parameters(self, circuit_info):
         """Generate default parameters for circuit instantiation."""
@@ -280,11 +271,7 @@ Expected Behavior:
             circuits = json.load(f)
         
         print(f"Found {len(circuits)} circuits to test")
-        
-        # Filter out already tested circuits
-        # untested = [c for c in circuits if f"{c['class_name']}_" not in str(self.tested_circuits)]
-        # print(f"Testing {len(untested)} untested circuits")
-        
+           
         # Test each circuit
         for i, circuit_info in enumerate(circuits, 1):
             print(f"\n[{i}/{len(circuits)}] Testing {circuit_info['class_name']}...")
