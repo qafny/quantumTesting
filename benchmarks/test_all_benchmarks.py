@@ -32,6 +32,7 @@ from qiskit_to_xmlprogrammer import QCtoXMLProgrammer
 from AST_Scripts.simulator import Simulator, CoqNVal
 from AST_Scripts.ValidatorProgramVisitors import SimulatorValidator
 from AST_Scripts.Retrievers import MatchCounterRetriever
+from program_properties import properties, test_properties
 
 class BenchmarkTester:
     def __init__(self, benchmarks_dir):
@@ -242,8 +243,11 @@ Expected Behavior:
                 simulator.visitProgram(ast_tree)
                 result["notes"] += "Simulation: SUCCESS"
                 result["status"] = "PASSED"
-                # TODO: add hypothesis tests here
-                
+
+                # TODO: add hypothesis tests here; use simulator.state
+                print('circuit.name', circuit.name)
+                if(properties.get(circuit.name) != None):
+                    test_properties(properties[circuit.name])
             except Exception as e:
                 result["status"] = "FAILED"
                 result["error_type"] = "SIMULATION_ERROR"
