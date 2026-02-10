@@ -66,23 +66,6 @@ class BenchmarkTester:
             
             # Handle None defaults
             if default is None:
-                # # Try to infer from annotation or parameter name
-                # if 'int' in str(annotation):
-                #     if 'num_qubits' in param_name or 'num_state_qubits' in param_name or 'num_variable_qubits' in param_name:
-                #         params[param_name] = 2  # Small default for testing
-                #     elif 'reps' in param_name:
-                #         params[param_name] = 1
-                #     else:
-                #         params[param_name] = 2
-                # elif 'list' in str(annotation) or 'Sequence' in str(annotation):
-                #     # Skip complex list parameters for now
-                #     continue
-                # elif 'str' in str(annotation):
-                #     # Use default from param_data if available
-                #     if default is not None:
-                #         params[param_name] = default
-                # else:
-                #     # Skip unknown types
                 continue
             else:
                 params[param_name] = default
@@ -125,39 +108,6 @@ class BenchmarkTester:
             print('exception', e)
             return None
     
-    def create_specification(self, circuit_info, circuit):
-        """Create a test specification (oracle) for the circuit."""
-        if circuit is None:
-            return None
-        
-        num_qubits = circuit.num_qubits
-        num_clbits = circuit.num_clbits
-        
-        spec = {
-            "circuit_name": circuit.name,
-            "class_name": circuit_info['class_name'],
-            "module": circuit_info['module'],
-            "description": circuit_info.get('doc', '')[:500],  # Truncate long descriptions
-            "num_qubits": num_qubits,
-            "num_clbits": num_clbits,
-            "specification": f"""
-Circuit: {circuit.name}
-Qubits: {num_qubits}
-Classical bits: {num_clbits}
-Depth: {circuit['depth']}
-Size: {len(circuit.data)}
-
-Expected Behavior:
-- Circuit should compile to XMLProgrammer AST without errors
-- AST should be valid according to SimulatorValidator
-- Simulator should execute without runtime errors
-- Output state should be consistent with circuit semantics
-""",
-            "expected_behavior": f"Circuit from {circuit_info['class_name']} class"
-        }
-        print('spec', spec)
-        return spec
-    
     def test_circuit(self, circuit_info):
         """Test a single circuit through the pipeline."""
         result = {
@@ -190,15 +140,7 @@ Expected Behavior:
             result["circuit_name"] = circuit.name
             result["num_qubits"] = circuit.num_qubits
             
-            # Step 2: Create specification
-            # print('about to try creating specification')
-            # spec = self.create_specification(circuit_info, circuit)
-            # if spec:
-            #     spec_file = self.specs_dir / f"{circuit.name}_spec.json"
-            #     with open(spec_file, 'w') as f:
-            #         json.dump(spec, f, indent=2)
-            
-            # Step 3: Convert to AST using QCtoXMLProgrammer
+            # Step 3: Convert to AST using QCtoXMLProgrammer (Step 2: Create specification - removed for now)
             try:
                 print('about to try converting to AST')
                 # Suppress stdout to avoid broken pipe errors
@@ -206,12 +148,15 @@ Expected Behavior:
                 import contextlib
                 f = io.StringIO()
                 with contextlib.redirect_stdout(f):
-                    # TODO: will want to remove hardcoding here
-                    # note 'circuit' is of type Instruction not
-                    # QuantumCircuit; QCtoXMLProgrammer needs
-                    # the circuit to be of type QuantumCircuit
+                    # default values
+                    num_classical_bits = 4
+                    num_quantum_bits = 4
+                    if circuit_info.get("quantum_bits") != None:
+                        num_quantum_bits = circuit_info.get("quantum_bits")
+                    if circuit_info.get("classical_bits") != None:
+                        num_classical_bits = circuit_info.get("classical_bits")    
                     print('circuit', circuit)
-                    qc = QuantumCircuit(4, 4)
+                    qc = QuantumCircuit(num_quantum_bits, num_classical_bits)
                     qc.append(circuit, array.array('i', range(0, 4)))
                     ast_tree = self.visitor.startVisit(
                         qc,
