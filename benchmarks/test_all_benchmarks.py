@@ -195,27 +195,7 @@ class BenchmarkTester:
             # Step 5: Run simulator
             try:
                 # Initialize state (may have to move this to specs file)
-
-                # TODO: will need to refactor this into a separate method as 
-                # we want to use randomly generated values for the state, see 
-                # qc_to_xmlprogrammer_tests/test_example_circuits.py  and 
-                # xml_benchmarks/test_cl_mult_property.py as examples
-
-                state = {
-                    "test": [CoqNVal([True] + [True] * (circuit.num_qubits - 1), phase=0)]
-                }
-                environment = {"xa": circuit.num_qubits}
-                
-                simulator = Simulator(state, environment)
-                print('about to visit program')
-                simulator.visitProgram(ast_tree)
-                result["notes"] += "Simulation: SUCCESS"
-                result["status"] = "PASSED"
-
-                print('simulator.state', simulator.state)
-                print('bits', simulator.state['test'][0].getBits())
-                if(properties.get(circuit.name) != None):
-                    test_properties(properties[circuit.name])
+                self.run_simulation(result, circuit, ast_tree)
             except Exception as e:
                 result["status"] = "FAILED"
                 result["error_type"] = "SIMULATION_ERROR"
@@ -235,6 +215,27 @@ class BenchmarkTester:
             result["notes"] = f"Unexpected error occurred: {str(e)}"
         
         return result
+
+    def run_simulation(self, result, circuit, ast_tree):
+        # TODO: we will probably want to set the state and environment up
+        #  inside the hypothesis tests, see 
+        # qc_to_xmlprogrammer_tests/test_example_circuits.py  and 
+        # xml_benchmarks/test_cl_mult_property.py as examples
+        state = {
+                    "test": [CoqNVal([True] + [True] * (circuit.num_qubits - 1), phase=0)]
+                }
+        environment = {"xa": circuit.num_qubits}
+                
+        simulator = Simulator(state, environment)
+        print('about to visit program')
+        simulator.visitProgram(ast_tree)
+        result["notes"] += "Simulation: SUCCESS"
+        result["status"] = "PASSED"
+
+        print('simulator.state', simulator.state)
+        print('bits', simulator.state['test'][0].getBits())
+        # if(properties.get(circuit.name) != None):
+        #  test_properties(properties[circuit.name])
     
     def run_all_tests(self):
         """Run tests on all discovered circuits."""
