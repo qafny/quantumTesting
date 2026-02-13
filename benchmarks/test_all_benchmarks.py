@@ -217,25 +217,34 @@ class BenchmarkTester:
         return result
 
     def run_simulation(self, result, circuit, ast_tree):
-        # TODO: we will probably want to set the state and environment up
-        #  inside the hypothesis tests, see 
-        # qc_to_xmlprogrammer_tests/test_example_circuits.py  and 
-        # xml_benchmarks/test_cl_mult_property.py as examples
-        state = {
-                    "test": [CoqNVal([True] + [True] * (circuit.num_qubits - 1), phase=0)]
-                }
-        environment = {"xa": circuit.num_qubits}
-                
-        simulator = Simulator(state, environment)
-        print('about to visit program')
-        simulator.visitProgram(ast_tree)
-        result["notes"] += "Simulation: SUCCESS"
-        result["status"] = "PASSED"
+        
+        # Generate different state and environment configurations.
+        @settings(max_examples=20, suppress_health_check=[HealthCheck.too_slow])
+        @given(
+            state_bits=st.lists(st.booleans(), min_size=circuit.num_qubits, max_size=circuit.num_qubits),
+            env_xa=st.integers(min_value=0, max_value=circuit.num_qubits)
+        )
+        def simulate_instances(state_bits, env_xa):
+            state = {"test": [CoqNVal(state_bits, phase=0)]}
+            environment = {"xa": env_xa}
+            sim = Simulator(state, environment)
+            sim.visitProgram(ast_tree)
+            # TODO: validate properties for each instance
 
-        print('simulator.state', simulator.state)
-        print('bits', simulator.state['test'][0].getBits())
-        # if(properties.get(circuit.name) != None):
-        #  test_properties(properties[circuit.name])
+        try:
+            simulate_instances()
+            
+        except Exception as e:
+            # TODO: catch exceptions from hypothesis.
+            result["status"] = "FAILED"
+            result["error_type"] = "SIMULATION_ERROR"
+            result["error_classification"] = "PROPERTY_FAILURE"
+            result["error_details"] = f"Simulator failed on generated case: {str(e)}"
+            result["full_error"] = traceback.format_exc()
+            result["notes"] += f"Simulation: FAILED ({str(e)})"
+
+        result["notes"] += "Simulation: SUCCCESS"
+        result["status"] = "PASSED"
     
     def run_all_tests(self):
         """Run tests on all discovered circuits."""
