@@ -84,7 +84,7 @@ class BenchmarkTester:
             
             # Get default parameters
             params = self.get_default_parameters(circuit_info)
-            
+            print('params after getting defaults', params)
             # Check if it's a BlueprintCircuit (needs special handling)
             base_classes = [b.__name__ for b in circuit_class.__bases__]
             if 'BlueprintCircuit' in base_classes:
@@ -97,6 +97,7 @@ class BenchmarkTester:
                 print('in else case')
                 # Regular instantiation
                 circuit = circuit_class(**params)
+                print('circuit after instantiation in else case', circuit)
             
             # Generate a unique name
             circuit_name = f"{class_name}_{params.get('num_qubits', params.get('num_state_qubits', params.get('num_variable_qubits', 2)))}"
@@ -144,28 +145,29 @@ class BenchmarkTester:
             try:
                 print('about to try converting to AST')
                 # Suppress stdout to avoid broken pipe errors
-                import io
-                import contextlib
-                f = io.StringIO()
-                with contextlib.redirect_stdout(f):
+                # import io
+                # import contextlib
+                # f = io.StringIO()
+                # with contextlib.redirect_stdout(f):
                     # default values
-                    num_classical_bits = 4
-                    num_quantum_bits = 4
-                    if circuit_info.get("quantum_bits") != None:
-                        num_quantum_bits = circuit_info.get("quantum_bits")
-                    if circuit_info.get("classical_bits") != None:
-                        num_classical_bits = circuit_info.get("classical_bits")    
-                    print('circuit', circuit)
-                    qc = QuantumCircuit(num_quantum_bits, num_classical_bits)
-                    qc.append(circuit, array.array('i', range(0, 4)))
-                    ast_tree = self.visitor.startVisit(
-                        qc,
-                        circuitName=circuit.name,
-                        optimiseCircuit=True,
-                        showDecomposedCircuit=False,
-                        showInputCircuit=False,
-                        emit_xml=False
-                    )
+                num_classical_bits = 4
+                num_quantum_bits = 4
+                if circuit_info.get("quantum_bits") != None:
+                    num_quantum_bits = circuit_info.get("quantum_bits")
+                if circuit_info.get("classical_bits") != None:
+                    num_classical_bits = circuit_info.get("classical_bits")    
+                print('circuit', circuit)
+                qc = QuantumCircuit(num_quantum_bits, num_classical_bits)
+                qc.append(circuit, array.array('i', range(0, num_quantum_bits)))
+                ast_tree = self.visitor.startVisit(
+                    qc,
+                    circuitName=circuit.name,
+                    optimiseCircuit=False,
+                    showDecomposedCircuit=True,
+                    showInputCircuit=True,
+                    emit_xml=False
+                )
+                print('ast_tree', ast_tree)
                 result["notes"] += "AST generation: SUCCESS; "
             except Exception as e:
                 print(e)
@@ -217,19 +219,21 @@ class BenchmarkTester:
         return result
 
     def run_simulation(self, result, circuit, ast_tree):
-        
+        print('circuit.num_qubits', circuit.num_qubits)
         # Generate different state and environment configurations.
         @settings(max_examples=20, suppress_health_check=[HealthCheck.too_slow])
         @given(
-            state_bits=st.lists(st.booleans(), min_size=circuit.num_qubits, max_size=circuit.num_qubits),
+            state_bits=st.lists(st.booleans(), min_size=circuit.num_qubits-1, max_size=circuit.num_qubits-1),
             env_xa=st.integers(min_value=0, max_value=circuit.num_qubits)
         )
         def simulate_instances(state_bits, env_xa):
-            state = {"test": [CoqNVal(state_bits, phase=0)]}
+            state = {"test": [CoqNVal(state_bits+[False], phase=0)]}
             environment = {"xa": env_xa}
             sim = Simulator(state, environment)
             sim.visitProgram(ast_tree)
             # TODO: validate properties for each instance
+            post_sim_state = sim.state
+            print(post_sim_state['test'][0].getBits())
 
         try:
             simulate_instances()

@@ -63,20 +63,16 @@ class QCtoXMLProgrammer:
 
 
         qc = decomposeToGates(qc, optimiseCircuit)
-
         if showDecomposedCircuit:
             print("Decomposed Circuit:")
             print(qc.draw())
 
         self.dag = circuit_to_dag(qc)
-        print('self.dag', self.dag)
-        print('self.dag.qubits', self.dag.qubits)
 
         # Dictionary mapping Qiskit qubits to XMLProgrammer qubits
         self.XMLQubits = dict()
         for i, qubit in enumerate(self.dag.qubits):
             self.XMLQubits[qubit] = QXNum(i)
-        print('self.XMLQubits', self.XMLQubits)
         self.visitedNodes = set()
         self.expList = []
         
@@ -110,10 +106,7 @@ class QCtoXMLProgrammer:
 
     def nodeToXMLProgrammer(self, node):
         if isinstance(node, DAGOpNode):
-            print('node', node)
-            print('node.qargs', node.qargs)
             inputBits = [self.XMLQubits[q] for q in node.qargs]
-            print('inputBits', inputBits)
             exps = []
 
             # H, X, Y, Z:
