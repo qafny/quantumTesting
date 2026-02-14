@@ -18,7 +18,7 @@ qc.append(testGate, [0,1,2,3])
 visitor = QCtoXMLProgrammer()
 
 def get_tree():
-    new_tree = visitor.startVisit(qc, circuitName="Example Circuit 1", optimiseCircuit=True, showDecomposedCircuit=True)
+    new_tree = visitor.startVisit(qc, circuitName="Example Circuit 1", optimiseCircuit=False, showDecomposedCircuit=True)
     return new_tree
 
 parseTree = get_tree()
