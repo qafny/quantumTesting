@@ -1,3 +1,4 @@
+import math
 import traceback
 from collections import ChainMap
 # from types import NoneType
@@ -47,26 +48,71 @@ class CoqQVal(CoqVal):
 
 
 
+#first flow is the amplitude, and the second flow is the phase int ==> exp(i * pi/int)
 class CoqYVal(CoqVal):
 
-    def __init__(self, r1: int, r2: float):
+    def __init__(self, r1: list[tuple[float, int]], r2: list[tuple[float, int]]):
         self.r1 = r1
         self.r2 = r2
 
-    def getPhase(self):
+    def getZero(self):
         return self.r1
 
-    def getLocal(self):
+    def getOne(self):
         return self.r2
 
-    def addLocal(self, r):
-        self.r2 += r
+    def addY(self, r):
+        if len(self.r1) == 1 and len(self.r2) == 1 and self.r1[0][1] == 0 and self.r2[0][1] == 0:
+                self.r1 = [(math.cos(math.pi*r/90)*self.r1[0][0]-math.sin(math.pi*r/90)*self.r2[0][0],0)]
+                self.r2 = [(math.sin(math.pi*r/90)*self.r1[0][0]+math.cos(math.pi*r/90)*self.r2[0][0],0)]
 
+    def addH(self):
+        if len(self.r1) == 1 and len(self.r2) == 1 and self.r1[0][1] == 0 and self.r2[0][1] == 0:
+            self.r1 = [((self.r1[0][0]+self.r2[0][0]) / math.sqrt(2),0)]
+            self.r2 = [((self.r1[0][0]-self.r2[0][0]) / math.sqrt(2),0)]
+        else:
+            self.r1 = simpRyPoint(divSqrt(self.r1) + divSqrt(self.r2))
+            self.r2 = simpRyPoint(divSqrt(self.r1) + applyNeg(divSqrt(self.r2)))
+
+    def applyMult(self, r):
+        newr = []
+        for e in self.r2:
+            newr += [(e[0], e[1] + r)]
+        self.r2 = newr
 
 """
 Helper Functions
 """
+def divSqrt(r:list[tuple[float, int]]):
+    newr = []
+    for e in r:
+        newr += [(e[0] / math.sqrt(2),e[1])]
+    return newr
 
+def applyNeg(r:list[tuple[float, int]]):
+    newr = []
+    for e in r:
+        newr += [(-e[0],e[1])]
+    return newr
+
+def simpRyPoint(r:list[tuple[float, int]]):
+    newr = []
+    for e in r:
+        if e[0] != 0:
+            newr += [(e[0],e[1])]
+    return newr
+
+def simpRy(a:CoqYVal):
+    if not a.getZero():
+        return CoqNVal([0],0)
+    elif len(a.getZero()) == 1 and a.getZero()[0][0] == 0:
+        return CoqNVal([0],0)
+    elif not a.getOne():
+        return CoqNVal([0],0)
+    elif len(a.getOne()) == 1 and a.getOne()[0][0] == 0:
+        return CoqNVal([0],0)
+    else:
+        return a
 
 def exchange(coq_val: CoqVal, n: int):
     if isinstance(coq_val, CoqNVal):
@@ -314,13 +360,42 @@ class Simulator(ProgramVisitor):
         else:
             times_r_rotate(val, p, rmax)
 
+        if isinstance(val, CoqYVal):
+            val.getOne().applyMult(p)
+
     def visitRY(self, ctx: XMLProgrammer.QXRY):
         vx = ctx.ID()
         val = ctx.vexp().accept(self)
         p = ctx.num().accept(self)  # this will pass the visitor to the child of ctx
         x = self.state.get(vx)[0]
-        if isinstance(x.getBits()[val], CoqYVal):
-            x.getBits()[val].addLocal(p)
+        if isinstance(x.getBits[val], CoqNVal):
+            v = x.getBits[val].getBits()[0]
+            if v == True:
+                x.getBits()[val] = CoqYVal([(-math.sin(math.pi * p / 90),0)],[(math.cos(math.pi * p / 90),0)])
+            else:
+                x.getBits()[val] = CoqYVal([(math.cos(math.pi * p / 90),0)],[(math.sin(math.pi * p / 90),0)])
+        elif isinstance(x.getBits()[val], CoqYVal):
+            x.getBits()[val].addY(p)
+
+        newv = simpRy(x.getBits()[val])
+        x.getBits()[val] = newv
+
+
+    def visitH(self, ctx: XMLProgrammer.QXH):
+        vx = ctx.ID()
+        val = ctx.vexp().accept(self)
+        x = self.state.get(vx)[0]
+        if isinstance(x.getBits[val], CoqNVal):
+            v = x.getBits[val].getBits()[0]
+            if v == True:
+                x.getBits()[val] = CoqYVal([(math.sqrt(2)/2,0)],[(-math.sqrt(2)/2,0)])
+            else:
+                x.getBits()[val] = CoqYVal([(math.sqrt(2)/2,0)],[(math.sqrt(2)/2,0)])
+        elif isinstance(x.getBits()[val], CoqYVal):
+            x.getBits()[val].addH()
+
+        newv = simpRy(x.getBits()[val])
+        x.getBits()[val] = newv
 
     # we will first get the position in st and check if the state is 0 or 1,
     # then decide if we go to recursively call ctx.exp

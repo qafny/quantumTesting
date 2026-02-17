@@ -437,7 +437,7 @@ class QXH(QXExp):
         self._block = block
 
     def accept(self, visitor : AbstractProgramVisitor):
-        visitor.visitX(self)
+        visitor.visitH(self)
 
     def ID(self):
         return self._id if isinstance(self._id, str) else self._id.getText()
