@@ -322,7 +322,7 @@ class Simulator(ProgramVisitor):
             val.setPhase(p)
 
         if isinstance(val, CoqYVal):
-            val.getOne().applyMult(p)
+            val.applyMult(p)
 
     def visitRY(self, ctx: XMLProgrammer.QXRY):
         vx = ctx.ID()
