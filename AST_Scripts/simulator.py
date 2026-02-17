@@ -15,12 +15,15 @@ class CoqVal:
 
 class CoqNVal(CoqVal):
 
-    def __init__(self, boolean_binary_array: [bool], phase: int):
+    def __init__(self, boolean_binary_array: bool, phase: int):
         self.boolean_binary = boolean_binary_array
         self.phase = phase
 
-    def getBits(self):
+    def getBit(self):
         return self.boolean_binary
+
+    def setBit(self, b:bool):
+        self.boolean_binary = b
 
     def getPhase(self):
         return self.phase
@@ -122,12 +125,12 @@ def simpRy(a:CoqYVal):
     else:
         return a
 
-def exchange(coq_val: CoqVal, n: int):
+def exchange(coq_val: CoqVal):
     if isinstance(coq_val, CoqNVal):
-        coq_val.getBits()[n] = not coq_val.getBits()[n]
+        coq_val.setBit(not coq_val.getBit)
     if isinstance(coq_val, CoqYVal):
         coq_val.flip()
-
+'''
 def times_rotate(v, q, rmax):
     if isinstance(v, CoqNVal):
         if v.boolean_binary:
@@ -136,7 +139,7 @@ def times_rotate(v, q, rmax):
             return CoqNVal(v.getBits(), v.getPhase())
     else:
         return CoqQVal(v.r1, rotate(v.r2, q, rmax))
-
+'''
 
 def addto(r, n, rmax):
     return (r + 2 ** max_helper(rmax, n)) % 2 ** rmax
@@ -157,7 +160,7 @@ def addto_n(r, n, rmax):
 def r_rotate(r, n, rmax):
     return addto_n(r, n, rmax)
 
-
+'''
 def times_r_rotate(v, q, rmax):
     if isinstance(v, CoqNVal):
         if v.boolean_binary:
@@ -166,7 +169,7 @@ def times_r_rotate(v, q, rmax):
             return CoqNVal(v.getBits(), v.getPhase())
     else:
         return CoqQVal(v.r1, r_rotate(v.r2, q, rmax))
-
+'''
 
 def up_h(v, rmax):
     if isinstance(v, CoqNVal):
@@ -305,14 +308,14 @@ class Simulator(ProgramVisitor):
     # X posi, changed the following for an example
     def visitX(self, ctx: XMLProgrammer.QXX):
         vx = ctx.ID()
-        x = self.state.get(vx)[0]
         p = ctx.vexp().accept(self)  # this will pass the visitor to the child of ctx
-        exchange(x, p)
+        x = self.state.get(vx)[p]
+        exchange(x)
 
     def visitRZ(self, ctx: XMLProgrammer.QXRZ):
         vx = ctx.ID()
         index = ctx.vexp().accept(self)
-        val = self.state.get(vx)[0][index]
+        val = self.state.get(vx)[index]
         p = ctx.num().accept(self)  # this will pass the visitor to the child of ctx
         # CoqNVal uses len(bits), CoqQVal uses getNum()
         if isinstance(val, CoqNVal):
@@ -325,43 +328,43 @@ class Simulator(ProgramVisitor):
         vx = ctx.ID()
         val = ctx.vexp().accept(self)
         p = ctx.num().accept(self)  # this will pass the visitor to the child of ctx
-        x = self.state.get(vx)[0]
-        if isinstance(x.getBits[val], CoqNVal):
-            v = x.getBits[val].getBits()[0]
+        x = self.state.get(vx)
+        if isinstance(x[val].getBit(), CoqNVal):
+            v = x[val].getBit()
             if v == True:
-                x.getBits()[val] = CoqYVal([(-math.sin(math.pi * p / 90),0)],[(math.cos(math.pi * p / 90),0)])
+                x[val] = CoqYVal([(-math.sin(math.pi * p / 90),0)],[(math.cos(math.pi * p / 90),0)])
             else:
-                x.getBits()[val] = CoqYVal([(math.cos(math.pi * p / 90),0)],[(math.sin(math.pi * p / 90),0)])
-        elif isinstance(x.getBits()[val], CoqYVal):
-            x.getBits()[val].addY(p)
+                x[val] = CoqYVal([(math.cos(math.pi * p / 90),0)],[(math.sin(math.pi * p / 90),0)])
+        elif isinstance(x[val], CoqYVal):
+            x[val].addY(p)
 
-        newv = simpRy(x.getBits()[val])
-        x.getBits()[val] = newv
+        newv = simpRy(x[val])
+        x[val] = newv
 
 
     def visitH(self, ctx: XMLProgrammer.QXH):
         vx = ctx.ID()
         val = ctx.vexp().accept(self)
-        x = self.state.get(vx)[0]
-        if isinstance(x.getBits[val], CoqNVal):
-            v = x.getBits[val].getBits()[0]
+        x = self.state.get(vx)
+        if isinstance(x[val], CoqNVal):
+            v = x[val].getBit()
             if v == True:
-                x.getBits()[val] = CoqYVal([(math.sqrt(2)/2,0)],[(-math.sqrt(2)/2,0)])
+                x[val] = CoqYVal([(math.sqrt(2)/2,0)],[(-math.sqrt(2)/2,0)])
             else:
-                x.getBits()[val] = CoqYVal([(math.sqrt(2)/2,0)],[(math.sqrt(2)/2,0)])
-        elif isinstance(x.getBits()[val], CoqYVal):
-            x.getBits()[val].addH()
+                x[val] = CoqYVal([(math.sqrt(2)/2,0)],[(math.sqrt(2)/2,0)])
+        elif isinstance(x[val], CoqYVal):
+            x[val].addH()
 
-        newv = simpRy(x.getBits()[val])
-        x.getBits()[val] = newv
+        newv = simpRy(x[val])
+        x[val] = newv
 
     # we will first get the position in st and check if the state is 0 or 1,
     # then decide if we go to recursively call ctx.exp
     def visitCU(self, ctx: XMLProgrammer.QXCU):
         vx = ctx.ID()
-        x = self.state.get(vx)[0]
+        x = self.state.get(vx)
         p = ctx.vexp().accept(self)  # this will pass the visitor to the child of ctx
-        if x.getBits()[p]:
+        if x[p].getBit() == True:
             ctx.program().accept(self)
         else:
             return  # do nothing
@@ -441,8 +444,8 @@ class Simulator(ProgramVisitor):
         r2 = 0
         if isinstance(val, CoqNVal):
             for i in range(n):
-                r2 = (r2 + pow(2, i) * int(val.getBits()[i])) % pow(2, n)
-        result = val.getBits()[n:]
+                r2 = (r2 + pow(2, i) * int(val[i].getBit())) % pow(2, n)
+        result = val[n:]
         self.state.get(x)[0] = CoqQVal(r1, r2, result, n)
 
         # actually, we need to change the QFT function
@@ -465,8 +468,11 @@ class Simulator(ProgramVisitor):
                 b = tmp % 2
                 tmp = tmp // 2
                 tov[i] = bool(b)
-            result = tov + val.getRest()
-            self.state.get(x)[0] = CoqNVal(result, val.getPhase())
+            result = tov
+            for i in range(n):
+                self.state.get(x)[i] = CoqNVal(result[i], val.getPhase())
+            self.state[x] += val.getRest()
+            #self.state.get(x)[0] = CoqNVal(result, val.getPhase())
 
     def visitRQFT(self, ctx: XMLProgrammer.QXRQFT):
         x = ctx.ID()
