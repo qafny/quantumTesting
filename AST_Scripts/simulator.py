@@ -25,6 +25,9 @@ class CoqNVal(CoqVal):
     def getPhase(self):
         return self.phase
 
+    def setPhase(self, i:int):
+        self.phase += i
+
 
 class CoqQVal(CoqVal):
 
@@ -302,17 +305,12 @@ class Simulator(ProgramVisitor):
 
     def visitRZ(self, ctx: XMLProgrammer.QXRZ):
         vx = ctx.ID()
-        val = self.state.get(vx)[0]
+        index = ctx.vexp().accept(self)
+        val = self.state.get(vx)[0][index]
         p = ctx.num().accept(self)  # this will pass the visitor to the child of ctx
         # CoqNVal uses len(bits), CoqQVal uses getNum()
         if isinstance(val, CoqNVal):
-            rmax = len(val.getBits())
-        else:
-            rmax = val.getNum()
-        if p >= 0:
-            times_rotate(val, p, rmax)
-        else:
-            times_r_rotate(val, p, rmax)
+            val.setPhase(p)
 
         if isinstance(val, CoqYVal):
             val.getOne().applyMult(p)
