@@ -188,9 +188,6 @@ def natminusmod(x, v, a):
 
 def bit_array_to_int(bit_array, num_qubits):
     val = 0
-    #print("bit_array", bit_array)
-    #print("length of bit array", len(bit_array))
-    #print("num_qubits", num_qubits)
     for i in range(min(len(bit_array), num_qubits)):
         val += pow(2, i) * int(bit_array[i])
     return val
@@ -233,38 +230,10 @@ class Simulator(ProgramVisitor):
     def visitLet(self, ctx: XMLProgrammer.QXLet):
         f = ctx.ID()
         self.state.update({f: ctx})
-        #print("f", ctx)
-        #ctx.exp().accept(self)
-
-    # def visitMatchexp(self, ctx: XMLExpParser.MatchexpContext):
-    #     print('1')
-    #     return
-    #     match_ID = ctx.idexp().accept(self)
-    #     print('match_ID:', match_ID)
-    #     print(self.st)
-    #     match_state_value = self.st.get(match_ID)
-    #     i = 0
-    #     while ctx.exppair(i) is not None:
-    #         vexp_node = ctx.exppair(i).vexp()
-    #         if vexp_node.OP() is not None:
-    #             va = vexp_node.accept(self)
-    #             if match_state_value == va:
-    #                 # ctx.exppair(i).exp().accept(self)
-    #                 return
-    #         else:
-    #             # y : list= ctx.exppair(i).vexp().vexp()
-    #             y = ctx.exppair(i).vexp().vexp()
-    #             print('Y')
-    #             print(y)
-    #             print(type(y))
-    #             #self.st.update({y: match_state_value - 1})
-    #            # ctx.exppair(i).exp().accept(self)
-    #         i += 1
 
     def visitMatch(self, ctx: XMLProgrammer.QXMatch):
         x = ctx.ID()
         value = self.state.get(x)
-        #print("old value", value)
         if value <= 0:
             ctx.zero().program().accept(self)
         else:
@@ -277,18 +246,12 @@ class Simulator(ProgramVisitor):
     def visitApp(self, ctx: XMLProgrammer.QXApp):
         vx = ctx.ID()
         ctxa = self.state.get(vx)
-        #print("here",ctx.idexp().Identifier())
-        #print("herea",ctxa.idexp(0).Identifier())
-        #ctxa = self.st.get(f)
         i = 0
         tmpv = dict()
         tmpa = dict()
         while ctxa.idexp(i) is not None:
             x = ctxa.idexp(i).ID()
-            #print("here",x)
-            #print("var",ctxa.idexp(i+1).Identifier())
             v = ctx.vexp(i).accept(self)
-            #print("val",v)
             tmpv.update({x:self.state.get(x)})
             tmpa.update({x:v})
             i += 1
@@ -296,7 +259,6 @@ class Simulator(ProgramVisitor):
         while len(tmpa) != 0:
             xv,re = tmpa.popitem()
             self.state.update({xv: re})
-            #print("vara",xv,"vala",re)
 
         ctxa.program().accept(self)
         while len(tmpv) != 0:
@@ -306,16 +268,11 @@ class Simulator(ProgramVisitor):
             else:
                 self.state.pop(xv, None)
 
-            #print ("var",xv)
-            #print("val",re)
-
     def visitIf(self, ctx: XMLProgrammer.QXIf):
         v = ctx.vexp().accept(self)
         if v == 1:
-            #print("here", ctx.left())
             ctx.left().accept(self)
         else:
-            #print("here",ctx.right())
             ctx.right().accept(self)
 
     def get_state(self):
@@ -327,7 +284,6 @@ class Simulator(ProgramVisitor):
             self.state.get(x)[0] = CoqQVal(val.r1, (val.r2 + pow(2, val.getNum() - n)) % pow(2, val.getNum()), val.getRest(), val.getNum())
 
     def srr_rotate(self, x, n):
-        #print("here")
         val = self.state.get(x)[0]
         if isinstance(val, CoqQVal):
             self.state.get(x)[0] = CoqQVal(val.r1, ((val.r2 +
@@ -342,8 +298,6 @@ class Simulator(ProgramVisitor):
         vx = ctx.ID()
         x = self.state.get(vx)[0]
         p = ctx.vexp().accept(self)  # this will pass the visitor to the child of ctx
-        print('p', p)
-        print('x', x)
         exchange(x, p)
 
     def visitRZ(self, ctx: XMLProgrammer.QXRZ):
@@ -485,7 +439,6 @@ class Simulator(ProgramVisitor):
             for i in range(n):
                 r2 = (r2 + pow(2, i) * int(val.getBits()[i])) % pow(2, n)
         result = val.getBits()[n:]
-        #print("val", result)
         self.state.get(x)[0] = CoqQVal(r1, r2, result, n)
 
         # actually, we need to change the QFT function
@@ -496,8 +449,6 @@ class Simulator(ProgramVisitor):
         v = ctx.vexp().accept(self)
         b = int(v)
         self.turn_qft(x, self.env.get(x) - b)
-        #print("qft_exp val",self.env.get(x)-b)
-        #print("qft_exp x",self.st.get(x))
         # TODO implement
 
     def turn_rqft(self, x):
@@ -516,26 +467,17 @@ class Simulator(ProgramVisitor):
     def visitRQFT(self, ctx: XMLProgrammer.QXRQFT):
         x = ctx.ID()
         self.turn_rqft(x)
-        #print("rqftexp end")
 
     def visitIDExp(self, ctx: XMLProgrammer.QXIDExp):
-        # print("idexp var",ctx.Identifier().accept(self))
-        # print("idexp val",self.get_state().get(ctx.Identifier().accept(self)))
-        # print('self.get_state()', self.get_state())
-        # print('ctx.ID()', ctx.ID())
         return self.get_state().get(ctx.ID())
 
     def visitQID(self, ctx: XMLProgrammer.QXQID):
-            # print("idexp var",ctx.Identifier().accept(self))
-            # print("idexp val",self.get_state().get(ctx.Identifier().accept(self)))
         return self.get_state().get(ctx.ID())
         # Visit a parse tree produced by XMLExpParser#vexp.
 
     def visitBin(self, ctx: XMLProgrammer.QXBin):
         x = ctx.left().accept(self)
         y = ctx.right().accept(self)
-            #print("val",y)
-        #print(ctx.OP())
         if ctx.OP() == "+":
             return x + y
         elif ctx.OP() == "-":
@@ -553,23 +495,10 @@ class Simulator(ProgramVisitor):
                 return 0
             return x % y
         elif ctx.OP() == "$":
-            #print("here1")
             tmp = (calBinNoLength(x))
-                #print("val",tmp)
-                #print("val",tmp)
-                #print("vala", y)
             if y < len(tmp):
-                #print("here",tmp[y])
                 return int(tmp[y])
         return 0
-    # def visitIDExp(self, ctx: XMLProgrammer.QXIDExp):
-    #     ctx.type().accept(self)
 
     def visitNum(self, ctx: XMLProgrammer.QXNum):
-        #print("nonecc",ctx.num())
         return ctx.num()
-
-    #def visitIda(self, ctx: XMLExpParser.IdaContext):
-    #    return ctx.Identifier().getText()
-
-        # the only thing that matters will be 48 and 47
