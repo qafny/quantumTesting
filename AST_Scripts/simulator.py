@@ -83,6 +83,11 @@ class CoqYVal(CoqVal):
             newr += [(e[0], e[1] + r)]
         self.r2 = newr
 
+    def flip(self):
+        v = self.r2
+        self.r2 = self.r1
+        self.r1 = v
+
 """
 Helper Functions
 """
@@ -120,7 +125,8 @@ def simpRy(a:CoqYVal):
 def exchange(coq_val: CoqVal, n: int):
     if isinstance(coq_val, CoqNVal):
         coq_val.getBits()[n] = not coq_val.getBits()[n]
-
+    if isinstance(coq_val, CoqYVal):
+        coq_val.flip()
 
 def times_rotate(v, q, rmax):
     if isinstance(v, CoqNVal):
