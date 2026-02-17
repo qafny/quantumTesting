@@ -11,7 +11,7 @@ from hypothesis import given, strategies as st, assume, settings, HealthCheck
 
 os.environ["PATH"] += os.pathsep + r"C:\Program Files\Graphviz\bin"
 
-testGate = AndGate(num_variable_qubits=3)
+testGate = AndGate(num_variable_qubits=4)
 qc = QuantumCircuit(QuantumRegister(4))
 qc.append(testGate, [0,1,2,3])
 
@@ -29,8 +29,12 @@ parseTree = get_tree()
 )
 def simulate_circuit(num_qubits, parse_tree, state_bits):
     print('generated state', state_bits)
-    state = {"test": [CoqNVal(state_bits+[False], phase=0)]}
-    environment = {"xa": num_qubits}
+    val = []
+    for i in range(num_qubits):
+        val += [CoqNVal(state_bits[i],phase=0)]
+    state = {"test": val}
+    #state = {"test": [CoqNVal(state_bits+[False], phase=0)]}
+    environment = {"test": num_qubits}
     sim = Simulator(state, environment)
     sim.visitProgram(parseTree)
     # TODO: validate properties for each instance

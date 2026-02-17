@@ -329,7 +329,7 @@ class Simulator(ProgramVisitor):
         val = ctx.vexp().accept(self)
         p = ctx.num().accept(self)  # this will pass the visitor to the child of ctx
         x = self.state.get(vx)
-        if isinstance(x[val].getBit(), CoqNVal):
+        if isinstance(x[val], CoqNVal):
             v = x[val].getBit()
             if v == True:
                 x[val] = CoqYVal([(-math.sin(math.pi * p / 90),0)],[(math.cos(math.pi * p / 90),0)])
@@ -337,7 +337,7 @@ class Simulator(ProgramVisitor):
                 x[val] = CoqYVal([(math.cos(math.pi * p / 90),0)],[(math.sin(math.pi * p / 90),0)])
         elif isinstance(x[val], CoqYVal):
             x[val].addY(p)
-
+        #print(type(x[val]))
         newv = simpRy(x[val])
         x[val] = newv
 
