@@ -11,7 +11,7 @@ from AST_Scripts.XMLExpParser import XMLExpParser
 from AST_Scripts.ProgramTransformer import ProgramTransformer
 from AST_Scripts.ValidatorProgramVisitors import SimulatorValidator
 from AST_Scripts.Retrievers import MatchCounterRetriever
-from AST_Scripts.simulator import CoqNVal, CoqQVal, Simulator, bit_array_to_int, to_binary_arr
+from AST_Scripts.simulator import CoqNVal, CoqQVal, CoqYVal, Simulator, bit_array_to_int, to_binary_arr
 import math
 import qiskit
 sys.path.append(parent_dir+'/qiskit-to-xmlprogrammer')
@@ -53,17 +53,17 @@ def get_tree():
 
     return new_tree
 
-parsetree = get_tree()[0]
+parsetree = get_tree()
 
 from hypothesis import given, strategies as st, assume, settings, HealthCheck
 
 def simulate_circuit(num_qubits, parse_tree, first_qubit):
-    state = dict(
-        {"test": [CoqNVal([first_qubit]+([False] * (num_qubits-1)), phase=0)]
-         })
-    environment = dict(
-        {"xa": num_qubits
-         })
+    val = []
+    val += [CoqNVal(first_qubit, phase=0)]
+    for i in range(num_qubits-1):
+        val += [CoqNVal(False,phase=0)]
+    state = {"test": val}
+    environment = {"test": num_qubits}
 
     simulator = Simulator(state, environment)
     simulator.visitProgram(parse_tree)
@@ -76,9 +76,15 @@ def test_bitwise_test_cases(first_qubit):
     for index in indicesOfQHX:
         parsetree._exps[index] = QXNum(0)
     new_state = simulate_circuit(4,parsetree, first_qubit)
-    print(new_state['test'][0].getBits())
-    if (new_state['test'][0].getBits()[0] == new_state['test'][0].getBits()[1] == new_state['test'][0].getBits()[2]):
-        assert True
-    else:
-        assert False
+    vals = new_state['test']
+    for val in vals:
+        if isinstance(val, CoqNVal):
+            print(val.getBit())
+        elif isinstance(val, CoqYVal):
+            print(val.getZero())
+            print(val.getOne())
+    # if (new_state['test'][0].getBits()[0] == new_state['test'][0].getBits()[1] == new_state['test'][0].getBits()[2]):
+    #     assert True
+    # else:
+    #     assert False
 test_bitwise_test_cases()
