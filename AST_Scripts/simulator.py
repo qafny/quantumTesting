@@ -127,7 +127,7 @@ def simpRy(a:CoqYVal):
 
 def exchange(coq_val: CoqVal):
     if isinstance(coq_val, CoqNVal):
-        coq_val.setBit(not coq_val.getBit)
+        coq_val.setBit(not coq_val.getBit())
     if isinstance(coq_val, CoqYVal):
         coq_val.flip()
 '''
@@ -337,7 +337,6 @@ class Simulator(ProgramVisitor):
                 x[val] = CoqYVal([(math.cos(math.pi * p / 90),0)],[(math.sin(math.pi * p / 90),0)])
         elif isinstance(x[val], CoqYVal):
             x[val].addY(p)
-        #print(type(x[val]))
         newv = simpRy(x[val])
         x[val] = newv
 
