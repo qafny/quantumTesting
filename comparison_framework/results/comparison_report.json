@@ -1,0 +1,187 @@
+{
+  "timestamp": "2026-02-13T00:53:44.739845",
+  "summary": {
+    "total_circuits": 10,
+    "both_passed": 8,
+    "both_failed": 2,
+    "qiskit_only_passed": 0,
+    "xmlprogrammer_only_passed": 0,
+    "discrepancies": 0
+  },
+  "statistics": {
+    "success_rate_qiskit": 0.8,
+    "success_rate_xmlprogrammer": 0.8,
+    "agreement_rate": 0.8
+  },
+  "discrepancies": [],
+  "detailed_comparisons": [
+    {
+      "circuit_name": "CDKMRippleCarryAdder",
+      "qiskit_status": "PASSED",
+      "xmlprogrammer_status": "PASSED",
+      "both_passed": true,
+      "both_failed": false,
+      "discrepancy": false,
+      "state_vector_comparison": {
+        "comparable": true,
+        "match": false,
+        "difference": null,
+        "note": "State vector comparison requires format conversion",
+        "qiskit_statevector_size": 64
+      },
+      "measurement_comparison": null,
+      "circuit_properties_match": true,
+      "notes": []
+    },
+    {
+      "circuit_name": "DraperQFTAdder",
+      "qiskit_status": "PASSED",
+      "xmlprogrammer_status": "PASSED",
+      "both_passed": true,
+      "both_failed": false,
+      "discrepancy": false,
+      "state_vector_comparison": {
+        "comparable": true,
+        "match": false,
+        "difference": null,
+        "note": "State vector comparison requires format conversion",
+        "qiskit_statevector_size": 16
+      },
+      "measurement_comparison": null,
+      "circuit_properties_match": true,
+      "notes": []
+    },
+    {
+      "circuit_name": "FunctionalPauliRotations",
+      "qiskit_status": "FAILED",
+      "xmlprogrammer_status": "FAILED",
+      "both_passed": false,
+      "both_failed": true,
+      "discrepancy": false,
+      "state_vector_comparison": null,
+      "measurement_comparison": null,
+      "circuit_properties_match": false,
+      "notes": []
+    },
+    {
+      "circuit_name": "RGQFTMultiplier",
+      "qiskit_status": "PASSED",
+      "xmlprogrammer_status": "PASSED",
+      "both_passed": true,
+      "both_failed": false,
+      "discrepancy": false,
+      "state_vector_comparison": {
+        "comparable": true,
+        "match": false,
+        "difference": null,
+        "note": "State vector comparison requires format conversion",
+        "qiskit_statevector_size": 64
+      },
+      "measurement_comparison": null,
+      "circuit_properties_match": true,
+      "notes": []
+    },
+    {
+      "circuit_name": "VBERippleCarryAdder",
+      "qiskit_status": "PASSED",
+      "xmlprogrammer_status": "PASSED",
+      "both_passed": true,
+      "both_failed": false,
+      "discrepancy": false,
+      "state_vector_comparison": {
+        "comparable": true,
+        "match": false,
+        "difference": null,
+        "note": "State vector comparison requires format conversion",
+        "qiskit_statevector_size": 128
+      },
+      "measurement_comparison": null,
+      "circuit_properties_match": true,
+      "notes": []
+    },
+    {
+      "circuit_name": "CDKMRippleCarryAdder",
+      "qiskit_status": "PASSED",
+      "xmlprogrammer_status": "PASSED",
+      "both_passed": true,
+      "both_failed": false,
+      "discrepancy": false,
+      "state_vector_comparison": {
+        "comparable": true,
+        "match": false,
+        "difference": null,
+        "note": "State vector comparison requires format conversion",
+        "qiskit_statevector_size": 64
+      },
+      "measurement_comparison": null,
+      "circuit_properties_match": true,
+      "notes": []
+    },
+    {
+      "circuit_name": "DraperQFTAdder",
+      "qiskit_status": "PASSED",
+      "xmlprogrammer_status": "PASSED",
+      "both_passed": true,
+      "both_failed": false,
+      "discrepancy": false,
+      "state_vector_comparison": {
+        "comparable": true,
+        "match": false,
+        "difference": null,
+        "note": "State vector comparison requires format conversion",
+        "qiskit_statevector_size": 16
+      },
+      "measurement_comparison": null,
+      "circuit_properties_match": true,
+      "notes": []
+    },
+    {
+      "circuit_name": "FunctionalPauliRotations",
+      "qiskit_status": "FAILED",
+      "xmlprogrammer_status": "FAILED",
+      "both_passed": false,
+      "both_failed": true,
+      "discrepancy": false,
+      "state_vector_comparison": null,
+      "measurement_comparison": null,
+      "circuit_properties_match": false,
+      "notes": []
+    },
+    {
+      "circuit_name": "RGQFTMultiplier",
+      "qiskit_status": "PASSED",
+      "xmlprogrammer_status": "PASSED",
+      "both_passed": true,
+      "both_failed": false,
+      "discrepancy": false,
+      "state_vector_comparison": {
+        "comparable": true,
+        "match": false,
+        "difference": null,
+        "note": "State vector comparison requires format conversion",
+        "qiskit_statevector_size": 64
+      },
+      "measurement_comparison": null,
+      "circuit_properties_match": true,
+      "notes": []
+    },
+    {
+      "circuit_name": "VBERippleCarryAdder",
+      "qiskit_status": "PASSED",
+      "xmlprogrammer_status": "PASSED",
+      "both_passed": true,
+      "both_failed": false,
+      "discrepancy": false,
+      "state_vector_comparison": {
+        "comparable": true,
+        "match": false,
+        "difference": null,
+        "note": "State vector comparison requires format conversion",
+        "qiskit_statevector_size": 128
+      },
+      "measurement_comparison": null,
+      "circuit_properties_match": true,
+      "notes": []
+    }
+  ]
+}

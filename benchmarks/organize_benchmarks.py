@@ -57,4 +57,3 @@ if __name__ == "__main__":
     import sys
     benchmarks_dir = Path(__file__).parent
     organize_benchmarks(benchmarks_dir)
-
