@@ -21,19 +21,18 @@ def get_tree():
     new_tree = visitor.startVisit(qc, circuitName="Example Circuit 1", optimiseCircuit=False, showDecomposedCircuit=True)
     return new_tree
 
-parseTree = get_tree()
-
 @settings(max_examples=20, suppress_health_check=[HealthCheck.too_slow])
 @given(
     state_bits=st.lists(st.booleans(), min_size=number_of_input_qubits, max_size=number_of_input_qubits),
 )
-def simulate_circuit(num_qubits, parse_tree, state_bits):
+def test_SwapGate(state_bits):
+    parseTree = get_tree()
     print('generated state', state_bits)
     val = []
-    for i in range(num_qubits):
+    for i in range(number_of_input_qubits):
         val += [CoqNVal(state_bits[i],phase=0)]
     state = {"test": val}
-    environment = {"test": num_qubits}
+    environment = {"test": number_of_input_qubits}
     sim = Simulator(state, environment)
     sim.visitProgram(parseTree)
     post_sim_state = sim.state
@@ -47,5 +46,5 @@ def simulate_circuit(num_qubits, parse_tree, state_bits):
             print(val.getZero())
             print(val.getOne())
 
-simulate_circuit(number_of_input_qubits, parseTree)
+test_SwapGate()
 
