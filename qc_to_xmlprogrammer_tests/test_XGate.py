@@ -21,13 +21,12 @@ def get_tree():
     new_tree = visitor.startVisit(qc, circuitName="Example Circuit 1", optimiseCircuit=False, showDecomposedCircuit=True)
     return new_tree
 
-parseTree = get_tree()
-
 @settings(max_examples=20, suppress_health_check=[HealthCheck.too_slow])
 @given(
     state_bits=st.lists(st.booleans(), min_size=number_of_input_qubits, max_size=number_of_input_qubits),
 )
-def simulate_circuit(num_qubits, parse_tree, state_bits):
+def test_simulate_circuit(num_qubits, state_bits):
+    parseTree = get_tree()
     print('generated state', state_bits)
     val = []
     for i in range(num_qubits):
@@ -38,12 +37,11 @@ def simulate_circuit(num_qubits, parse_tree, state_bits):
     sim.visitProgram(parseTree)
     post_sim_state = sim.state
     vals = post_sim_state['test']
+    assert val[0].getBit() != state_bits[0]
     for val in vals:
         if isinstance(val, CoqNVal):
             print(val.getBit())
         elif isinstance(val, CoqYVal):
             print(val.getZero())
             print(val.getOne())
-
-simulate_circuit(number_of_input_qubits, parseTree)
 
