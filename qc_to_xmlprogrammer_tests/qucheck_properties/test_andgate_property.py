@@ -27,7 +27,7 @@ class AndGateProperty(Property):
     
     def operations(self, a, b, c):
         # Build circuit with inputs and AndGate
-        qc = QuantumCircuit(4, 1)  # 4 qubits, 1 classical bit for measurement
+        qc = QuantumCircuit(4, 4)  # 4 qubits, 4 classical bits for measurement
         if a == 1:
             qc.x(0)
         if b == 1:
@@ -43,7 +43,7 @@ class AndGateProperty(Property):
         expected_result = 1 if (a == 1 and b == 1 and c == 1) else 0
         
         # Create expected circuit with same structure
-        expected_qc = QuantumCircuit(4, 1)
+        expected_qc = QuantumCircuit(4, 4)
         if expected_result == 1:
             expected_qc.x(3)  # Set output qubit to |1> if expected is 1
         

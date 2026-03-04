@@ -75,7 +75,7 @@ def test_bitwise_test_cases(first_qubit):
     indicesOfQHX = [ind for ind, item in enumerate(parsetree._exps) if type(item) == QXH]
     for index in indicesOfQHX:
         parsetree._exps[index] = QXNum(0)
-    new_state = simulate_circuit(4,parsetree, first_qubit)
+    new_state = simulate_circuit(3,parsetree, first_qubit)
     vals = new_state['test']
     assert vals[0].getBit() == vals[1].getBit() == vals[2].getBit()
     for val in vals:

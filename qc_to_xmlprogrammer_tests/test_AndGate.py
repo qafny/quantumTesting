@@ -35,7 +35,7 @@ def simulate_circuit(num_qubits, parse_tree, state_bits):
     val += [CoqNVal(False, phase=0)]
     state = {"test": val}
     #state = {"test": [CoqNVal(state_bits+[False], phase=0)]}
-    environment = {"test": num_qubits}
+    environment = {"test": num_qubits + 1}
     sim = Simulator(state, environment)
     sim.visitProgram(parseTree)
     # TODO: validate properties for each instance

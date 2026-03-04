@@ -26,7 +26,7 @@ class GHZProperty(Property):
     
     def operations(self, dummy):
         # Build GHZ circuit: H on first, then CNOTs
-        qc = QuantumCircuit(3)
+        qc = QuantumCircuit(3, 3)
         qc.h(0)
         qc.cx(0, 1)
         qc.cx(1, 2)
