@@ -13,3 +13,5 @@ CoqMakefile.conf
 bin/*
 lib/*
 *.pyc 
+.venv/
+.vscode/settings.json
