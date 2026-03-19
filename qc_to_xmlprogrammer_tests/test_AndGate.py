@@ -5,7 +5,7 @@ parent_dir = os.path.dirname(current_dir)
 sys.path.insert(0,parent_dir)
 sys.path.append(parent_dir+'/qiskit-to-xmlprogrammer')
 from AST_Scripts.simulator import CoqNVal,CoqYVal, Simulator
-from qiskit import QuantumCircuit, QuantumRegister, ClassicalRegister
+from qiskit import QuantumCircuit, QuantumRegister, ClassicalRegister, generate_preset_pass_manager
 from qiskit_to_xmlprogrammer import QCtoXMLProgrammer
 from hypothesis import given, strategies as st, assume, settings, HealthCheck
 
@@ -14,11 +14,11 @@ number_of_input_qubits = 3
 testGate = AndGate(num_variable_qubits=number_of_input_qubits)
 qc = QuantumCircuit(QuantumRegister(4))
 qc.append(testGate, [0,1,2,3])
-
+transpiled_circuit = generate_preset_pass_manager(basis_gates=["x", "cx", "ccx", "rz", "h"]).run(qc)
 visitor = QCtoXMLProgrammer()
 
 def get_tree():
-    new_tree = visitor.startVisit(qc, circuitName="Example Circuit 1", optimiseCircuit=False, showDecomposedCircuit=True)
+    new_tree = visitor.startVisit(transpiled_circuit, circuitName="Example Circuit 1", optimiseCircuit=False, showDecomposedCircuit=True)
     return new_tree
 
 parseTree = get_tree()
@@ -43,10 +43,10 @@ def simulate_circuit(num_qubits, parse_tree, state_bits):
     vals = post_sim_state['test']
     for val in vals:
         if isinstance(val, CoqNVal):
-            print(val.getBit())
+            print('bit', val.getBit())
         elif isinstance(val, CoqYVal):
-            print(val.getZero())
-            print(val.getOne())
+            print('zero: ', val.getZero())
+            print('one: ', val.getOne())
     #print(post_sim_state['test'])
 
 simulate_circuit(number_of_input_qubits, parseTree)
