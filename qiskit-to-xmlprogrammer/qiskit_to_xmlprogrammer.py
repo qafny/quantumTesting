@@ -30,11 +30,11 @@ os.environ["PATH"] += os.pathsep + r"C:\Program Files\Graphviz\bin"
 supportedGates = ['h','x','y','z','s','sdg','t','tdg','ry','rz','u','cx','cz']
 ignoredGates = ['measure']
 
-def decomposeToGates(qc, optimiseCircuit):
+def decomposeToGates(qc, optimiseCircuit, gateSetToUse):
     # Unoptimised circuits are more readable.
     if optimiseCircuit:
-        return transpile(qc, basis_gates=supportedGates + ignoredGates)
-    return transpile(qc, basis_gates=supportedGates + ignoredGates, optimization_level=0)
+        return transpile(qc, basis_gates=gateSetToUse + ignoredGates)
+    return transpile(qc, basis_gates=gateSetToUse + ignoredGates, optimization_level=0)
    
 class QCtoXMLProgrammer:
     def __init__(self):
@@ -48,6 +48,7 @@ class QCtoXMLProgrammer:
         showDecomposedCircuit=False,
         showInputCircuit=True,
         emit_xml=True,
+        gateSetToUse = supportedGates
     ):
         print()
         if circuitName is not None:
@@ -62,7 +63,7 @@ class QCtoXMLProgrammer:
             print()
 
 
-        qc = decomposeToGates(qc, optimiseCircuit)
+        qc = decomposeToGates(qc, optimiseCircuit, gateSetToUse)
         if showDecomposedCircuit:
             print("Decomposed Circuit:")
             print(qc.draw())

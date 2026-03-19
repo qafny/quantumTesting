@@ -14,11 +14,11 @@ number_of_input_qubits = 3
 testGate = AndGate(num_variable_qubits=number_of_input_qubits)
 qc = QuantumCircuit(QuantumRegister(4))
 qc.append(testGate, [0,1,2,3])
-transpiled_circuit = generate_preset_pass_manager(basis_gates=["x", "cx", "ccx", "rz", "h"]).run(qc)
+# transpiled_circuit = generate_preset_pass_manager(basis_gates=["x", "cx", "ccx", "rz", "h"]).run(qc)
 visitor = QCtoXMLProgrammer()
 
 def get_tree():
-    new_tree = visitor.startVisit(transpiled_circuit, circuitName="Example Circuit 1", optimiseCircuit=False, showDecomposedCircuit=True)
+    new_tree = visitor.startVisit(qc, circuitName="Example Circuit 1", optimiseCircuit=False, showDecomposedCircuit=True, gateSetToUse = ["x", "cx", "ccx", "rz", "h"])
     return new_tree
 
 parseTree = get_tree()
