@@ -5,7 +5,7 @@ parent_dir = os.path.dirname(current_dir)
 sys.path.insert(0,parent_dir)
 sys.path.append(parent_dir+'/qiskit-to-xmlprogrammer')
 from AST_Scripts.simulator import CoqNVal,CoqYVal, Simulator
-from qiskit import QuantumCircuit, QuantumRegister, ClassicalRegister
+from qiskit import QuantumCircuit, QuantumRegister, ClassicalRegister, generate_preset_pass_manager
 from qiskit_to_xmlprogrammer import QCtoXMLProgrammer
 from hypothesis import given, strategies as st, assume, settings, HealthCheck
 
@@ -14,11 +14,11 @@ number_of_input_qubits = 5
 testGate = HalfAdderGate(num_state_qubits=2)
 qc = QuantumCircuit(QuantumRegister(5))
 qc.append(testGate, [0,1,2,3,4])
-
+transpiled_circuit = generate_preset_pass_manager(basis_gates=["x", "cx", "ccx", "rz", "h"]).run(qc)
 visitor = QCtoXMLProgrammer()
 
 def get_tree():
-    new_tree = visitor.startVisit(qc, circuitName="Example Circuit 1", optimiseCircuit=False, showDecomposedCircuit=True)
+    new_tree = visitor.startVisit(transpiled_circuit, circuitName="Example Circuit 1", optimiseCircuit=False, showDecomposedCircuit=True)
     return new_tree
 
 parseTree = get_tree()
@@ -36,8 +36,10 @@ def simulate_circuit(num_qubits, parse_tree, state_bits):
     #state = {"test": [CoqNVal(state_bits+[False], phase=0)]}
     environment = {"test": num_qubits}
     sim = Simulator(state, environment)
+    print('parse_tree', parse_tree)
+    print('parse_tree item', parse_tree._exps[6])
     sim.visitProgram(parseTree)
-    # TODO: validate properties for each instance
+    # TODO: validate properties for each insåtance
     post_sim_state = sim.state
     vals = post_sim_state['test']
     for val in vals:
