@@ -41,10 +41,10 @@ def test_SwapGate(state_bits):
     assert vals[1].getBit() == state_bits[0]
     for val in vals:
         if isinstance(val, CoqNVal):
-            print(val.getBit())
+            print('bit', val.getBit())
         elif isinstance(val, CoqYVal):
-            print(val.getZero())
-            print(val.getOne())
+            print('zero: ', val.getZero())
+            print('one: ', val.getOne())
 
 test_SwapGate()
 

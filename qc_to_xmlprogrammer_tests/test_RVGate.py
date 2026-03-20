@@ -1,5 +1,11 @@
 from qiskit.circuit.library import RVGate
 from qiskit import QuantumCircuit, QuantumRegister
+import sys
+import os
+current_dir = os.path.dirname(os.path.realpath(__file__))
+parent_dir = os.path.dirname(current_dir)
+sys.path.insert(0,parent_dir)
+sys.path.append(parent_dir+'/qiskit-to-xmlprogrammer')
 from AST_Scripts.simulator import CoqNVal,CoqYVal, Simulator
 from qiskit_to_xmlprogrammer import QCtoXMLProgrammer
 from hypothesis import given, strategies as st, assume, settings, HealthCheck
