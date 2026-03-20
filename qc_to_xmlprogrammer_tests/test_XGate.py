@@ -37,11 +37,13 @@ def test_simulate_circuit(num_qubits, state_bits):
     sim.visitProgram(parseTree)
     post_sim_state = sim.state
     vals = post_sim_state['test']
-    assert val[0].getBit() != state_bits[0]
+    assert vals[0].getBit() != state_bits[0]
     for val in vals:
         if isinstance(val, CoqNVal):
             print(val.getBit())
         elif isinstance(val, CoqYVal):
             print(val.getZero())
             print(val.getOne())
+
+test_simulate_circuit(number_of_input_qubits)
 
