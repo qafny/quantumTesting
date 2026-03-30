@@ -1,9 +1,9 @@
-from qiskit.circuit.library import UGate
+from qiskit.circuit.library import RVGate
 from qiskit import QuantumCircuit, QuantumRegister
 import sys
 import os
 current_dir = os.path.dirname(os.path.realpath(__file__))
-parent_dir = os.path.dirname(current_dir)
+parent_dir = os.path.dirname(os.path.dirname(current_dir))
 sys.path.insert(0,parent_dir)
 sys.path.append(parent_dir+'/qiskit-to-xmlprogrammer')
 from AST_Scripts.simulator import CoqNVal,CoqYVal, Simulator
@@ -29,7 +29,7 @@ def get_tree(qc: QuantumCircuit):
 def simulate_circuit(num_qubits, state_bits, vx, vy, vz):
     print("generated state", state_bits)
     print("vector:", vx, vy, vz)
-    testGate = UGate(vx, vy, vz)
+    testGate = RVGate(vx, vy, vz)
     qc = QuantumCircuit(QuantumRegister(number_of_input_qubits))
     qc.append(testGate, [0])   
     val = []

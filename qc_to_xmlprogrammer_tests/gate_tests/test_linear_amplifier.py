@@ -3,7 +3,7 @@ import sys
 import os
 
 current_dir = os.path.dirname(os.path.realpath(__file__))
-parent_dir = os.path.dirname(current_dir)
+parent_dir = os.path.dirname(os.path.dirname(current_dir))
 sys.path.insert(0,parent_dir)
 import numpy as np
 from AST_Scripts.XMLExpLexer import XMLExpLexer
@@ -24,7 +24,7 @@ from qiskit.visualization import dag_drawer
 import graphviz
 import os
 import sys
-from qiskit.circuit.library.arithmetic import FullAdderGate, IntegerComparatorGate
+from qiskit.circuit.library.arithmetic import FullAdderGate, LinearAmplitudeFunctionGate
 from qiskit.circuit.library import OrGate
 
 from AST_Scripts.XMLProgrammer import QXProgram, QXQID, QXCU, QXX, QXH, QXRZ, QXRY, QXRoot, QXNum
@@ -33,17 +33,34 @@ from AST_Scripts.XMLProgrammer import QXProgram, QXQID, QXCU, QXX, QXH, QXRZ, QX
 os.environ["PATH"] += os.pathsep + r"C:\Program Files\Graphviz\bin"
 
 qc = QuantumCircuit(5,5)
-linAmplitudeGate = IntegerComparatorGate(num_state_qubits=3, value=4, geq=True, label='test')
-qc.append(linAmplitudeGate, [0,1,2,3])
+linAmplitudeGate = LinearAmplitudeFunctionGate(num_state_qubits=3, slope=[3.0, 3.3], offset=[2.0, 2.2], domain=(1.0, 10.0),image=(1.1, 1.0), breakpoints=[3.0])
+qc.append(linAmplitudeGate, [0,1,2,3,4])
 qcEx1 = qc.copy()
 # -------------------------- COMPILE TO XMLPROGRAMMER --------------------------
 
 visitor = QCtoXMLProgrammer()
 
+# NOTE:: test how to run the code.
 
 def get_tree():
+    #new_tree = read_program(f"{os.path.dirname(os.path.realpath(__file__))}/mutants/mutant_38.xml")
     new_tree = visitor.startVisit(qcEx1, circuitName="Example Circuit 1", optimiseCircuit=True, showDecomposedCircuit=True)
     valid_tree = True
+
+    # try:
+    #     # Validation of the Constraints.
+    #     # Added per Dr. Li's suggestion on 11/16 to scoop out the validator behaviour out of the simulator as there can be
+    #     # programs which does not always need to follow constraints like only having 1 app tag.
+    #     validator = SimulatorValidator()
+    #     validator.visitProgram((new_tree))
+
+    #     # Non-Decreasing Recursive Fixed Point Factor Check
+    # except Exception as e:
+    #     print('\n ==============', e, '==============')
+    #     valid_tree = False
+
+    # retriever = MatchCounterRetriever()
+    # retriever.visitProgram(new_tree)
     return new_tree, valid_tree
 
 parsetree = get_tree()[0]
@@ -64,10 +81,15 @@ def simulate_circuit(num_qubits, parse_tree):
     return new_state
 
 def process_bitwise_test_cases():
+    # pt_output = read_program(f"{os.path.dirname(os.path.realpath(__file__))}/cl_adder_good.xml")
+    # print('pt_output', pt_output)
+    # print('pt_output type', type(pt_output))
     indicesOfQHX = [ind for ind, item in enumerate(parsetree._exps) if type(item) == QXH]
     for index in indicesOfQHX:
         parsetree._exps[index] = QXNum(0)
     new_state = simulate_circuit(5,parsetree)
+    # calculated = bit_array_to_int(new_state.get('ya')[0].getBits(), na)
+    # insts.append((na, expected, calculated))
 
     return new_state
 print(process_bitwise_test_cases()['test'][0].getBits())

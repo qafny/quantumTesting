@@ -1,7 +1,7 @@
 from qiskit.circuit.library import YGate
 import os, sys
 current_dir = os.path.dirname(os.path.realpath(__file__))
-parent_dir = os.path.dirname(current_dir)
+parent_dir = os.path.dirname(os.path.dirname(current_dir))
 sys.path.insert(0,parent_dir)
 sys.path.append(parent_dir+'/qiskit-to-xmlprogrammer')
 from AST_Scripts.simulator import CoqNVal,CoqYVal, Simulator

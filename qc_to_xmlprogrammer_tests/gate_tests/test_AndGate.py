@@ -1,45 +1,34 @@
-from qiskit import QuantumCircuit, transpile, QuantumRegister, ClassicalRegister
-from qiskit.circuit.library import HalfAdderGate
-from qiskit_aer import AerSimulator
+from qiskit.circuit.library import AndGate
 import os, sys
 current_dir = os.path.dirname(os.path.realpath(__file__))
-parent_dir = os.path.dirname(current_dir)
+parent_dir = os.path.dirname(os.path.dirname(current_dir))
 sys.path.insert(0,parent_dir)
 sys.path.append(parent_dir+'/qiskit-to-xmlprogrammer')
+from AST_Scripts.simulator import CoqNVal,CoqYVal, Simulator
+from qiskit import QuantumCircuit, QuantumRegister, ClassicalRegister, generate_preset_pass_manager
 from qiskit_to_xmlprogrammer import QCtoXMLProgrammer
 from hypothesis import given, strategies as st, assume, settings, HealthCheck
-from AST_Scripts.simulator import CoqNVal,CoqYVal, Simulator
-N_COUNT = 8
-qr1 = QuantumRegister(N_COUNT, 'q1')
-qr2 = QuantumRegister(N_COUNT, 'q2')
-qr3 = QuantumRegister(N_COUNT, 'q3')
-cl1 = ClassicalRegister(N_COUNT, 'c1')
-cl2 = ClassicalRegister(N_COUNT, 'c2')
-qr4 = QuantumRegister(1, 'q4')
-cl3 = ClassicalRegister(1, 'c3')
-N_COUNT = 8
 
-qc = QuantumCircuit(qr1, qr2, qr3, qr4, cl1, cl2, cl3)
-adder = HalfAdderGate(num_state_qubits=N_COUNT-1).control(1)
-for q in range(N_COUNT):
-    qc.h(qr1[q])
-for q in range(N_COUNT):
-    qc.x(qr2[0])
-    qc.append(adder, [q]+list(range(8,23)))
-
+os.environ["PATH"] += os.pathsep + r"C:\Program Files\Graphviz\bin"
+number_of_input_qubits = 3
+testGate = AndGate(num_variable_qubits=number_of_input_qubits)
+qc = QuantumCircuit(QuantumRegister(4))
+qc.append(testGate, [0,1,2,3])
+# transpiled_circuit = generate_preset_pass_manager(basis_gates=["x", "cx", "ccx", "rz", "h"]).run(qc)
 visitor = QCtoXMLProgrammer()
 
 def get_tree():
-    new_tree = visitor.startVisit(qc, circuitName="Example Circuit 1", optimiseCircuit=False, showDecomposedCircuit=True)
+    new_tree = visitor.startVisit(qc, circuitName="Example Circuit 1", optimiseCircuit=False, showDecomposedCircuit=True, gateSetToUse = ["x", "cx", "ccx", "rz", "h"])
     return new_tree
 
 parseTree = get_tree()
 
 @settings(max_examples=20, suppress_health_check=[HealthCheck.too_slow])
 @given(
-    state_bits=st.lists(st.booleans(), min_size=N_COUNT, max_size=N_COUNT),
+    state_bits=st.lists(st.booleans(), min_size=number_of_input_qubits, max_size=number_of_input_qubits),
 )
 def simulate_circuit(num_qubits, parse_tree, state_bits):
+    print('generated state', state_bits)
     val = []
     for i in range(num_qubits):
         val += [CoqNVal(state_bits[i],phase=0)]
@@ -60,4 +49,5 @@ def simulate_circuit(num_qubits, parse_tree, state_bits):
             print('one: ', val.getOne())
     #print(post_sim_state['test'])
 
-simulate_circuit(N_COUNT, parseTree)
+simulate_circuit(number_of_input_qubits, parseTree)
+

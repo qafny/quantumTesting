@@ -3,7 +3,7 @@ import sys
 import os
 
 current_dir = os.path.dirname(os.path.realpath(__file__))
-parent_dir = os.path.dirname(current_dir)
+parent_dir = os.path.dirname(os.path.dirname(current_dir))
 sys.path.insert(0,parent_dir)
 import numpy as np
 from AST_Scripts.XMLExpLexer import XMLExpLexer
@@ -24,32 +24,25 @@ from qiskit.visualization import dag_drawer
 import graphviz
 import os
 import sys
-from qiskit.circuit.library.arithmetic import FullAdderGate
-from qiskit.circuit.library import WeightedSumGate
+from qiskit.circuit.library.arithmetic import FullAdderGate, IntegerComparatorGate
+from qiskit.circuit.library import OrGate
 
 from AST_Scripts.XMLProgrammer import QXProgram, QXQID, QXCU, QXX, QXH, QXRZ, QXRY, QXRoot, QXNum
 
 # Ensure graphviz is in the PATH (for dag drawing)
 os.environ["PATH"] += os.pathsep + r"C:\Program Files\Graphviz\bin"
 
-# --------------------------- EXAMPLE CIRCUITS ---------------------------------
-
-# ----- 3: 3-Qubit GHZ
-
-qc = QuantumCircuit(6, 3)
-testGate = WeightedSumGate(3,[1,2,4])
-qc.append(testGate, [0,1,2,3,4,5])
-qcEx3 = qc.copy()
-
+qc = QuantumCircuit(5,5)
+linAmplitudeGate = IntegerComparatorGate(num_state_qubits=3, value=4, geq=True, label='test')
+qc.append(linAmplitudeGate, [0,1,2,3])
+qcEx1 = qc.copy()
 # -------------------------- COMPILE TO XMLPROGRAMMER --------------------------
 
 visitor = QCtoXMLProgrammer()
 
-# NOTE:: test how to run the code.
 
 def get_tree():
-    #new_tree = read_program(f"{os.path.dirname(os.path.realpath(__file__))}/mutants/mutant_38.xml")
-    new_tree = visitor.startVisit(qcEx3, circuitName="Example Circuit 1", optimiseCircuit=True, showDecomposedCircuit=True)
+    new_tree = visitor.startVisit(qcEx1, circuitName="Example Circuit 1", optimiseCircuit=True, showDecomposedCircuit=True)
     valid_tree = True
     return new_tree, valid_tree
 
@@ -57,9 +50,9 @@ parsetree = get_tree()[0]
 
 from hypothesis import given, strategies as st, assume, settings, HealthCheck
 
-def simulate_circuit(num_qubits, parse_tree, first_qubit):
+def simulate_circuit(num_qubits, parse_tree):
     state = dict(
-        {"test": [CoqNVal([first_qubit]+([False] * (num_qubits-1)), phase=0)]
+        {"test": [CoqNVal([False]+([False] * (num_qubits-1)), phase=0)]
          })
     environment = dict(
         {"xa": num_qubits
@@ -70,20 +63,11 @@ def simulate_circuit(num_qubits, parse_tree, first_qubit):
     new_state = simulator.state
     return new_state
 
-@given(first_qubit = st.sampled_from([True, False]))
-def test_bitwise_test_cases(first_qubit):
-    # pt_output = read_program(f"{os.path.dirname(os.path.realpath(__file__))}/cl_adder_good.xml")
-    # print('pt_output', pt_output)
-    # print('pt_output type', type(pt_output))
+def process_bitwise_test_cases():
     indicesOfQHX = [ind for ind, item in enumerate(parsetree._exps) if type(item) == QXH]
     for index in indicesOfQHX:
         parsetree._exps[index] = QXNum(0)
-    new_state = simulate_circuit(4,parsetree, first_qubit)
-    # calculated = bit_array_to_int(new_state.get('ya')[0].getBits(), na)
-    # insts.append((na, expected, calculated))
-    print(new_state['test'][0].getBits())
-    if (new_state['test'][0].getBits()[0] == new_state['test'][0].getBits()[1] == new_state['test'][0].getBits()[2]):
-        assert True
-    else:
-        assert False
-test_bitwise_test_cases()
+    new_state = simulate_circuit(5,parsetree)
+
+    return new_state
+print(process_bitwise_test_cases()['test'][0].getBits())

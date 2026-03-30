@@ -1,41 +1,46 @@
-from qiskit.circuit.library import RYGate
-import os, sys
+from qiskit.circuit.library import HamiltonianGate
+from qiskit import QuantumCircuit, QuantumRegister
+import sys
+import os
 current_dir = os.path.dirname(os.path.realpath(__file__))
-parent_dir = os.path.dirname(current_dir)
+parent_dir = os.path.dirname(os.path.dirname(current_dir))
 sys.path.insert(0,parent_dir)
 sys.path.append(parent_dir+'/qiskit-to-xmlprogrammer')
 from AST_Scripts.simulator import CoqNVal,CoqYVal, Simulator
-from qiskit import QuantumCircuit, QuantumRegister, ClassicalRegister
 from qiskit_to_xmlprogrammer import QCtoXMLProgrammer
 from hypothesis import given, strategies as st, assume, settings, HealthCheck
+import numpy as np
 
-os.environ["PATH"] += os.pathsep + r"C:\Program Files\Graphviz\bin"
+H = np.array([[1, 0],
+            [0, -1]])
+time = 0.5
+testGate = HamiltonianGate(H, time)
 number_of_input_qubits = 1
+qc = QuantumCircuit(QuantumRegister(number_of_input_qubits))
+qc.append(testGate, [0])
 
 visitor = QCtoXMLProgrammer()
 
-def get_tree(qc: QuantumCircuit):
-    new_tree = visitor.startVisit(qc, circuitName="Example Circuit 1", optimiseCircuit=False, showDecomposedCircuit=True)
+def get_tree():
+    new_tree = visitor.startVisit(qc, circuitName="Qiskit Circuit Hamiltonian gate", optimiseCircuit=False, showDecomposedCircuit=True)
     return new_tree
+
+parseTree = get_tree()
 
 @settings(max_examples=20, suppress_health_check=[HealthCheck.too_slow])
 @given(
     state_bits=st.lists(st.booleans(), min_size=number_of_input_qubits, max_size=number_of_input_qubits),
-    rotation_angle=st.floats(min_value=0, max_value=2*3.14, allow_nan=False)
 )
-def simulate_circuit(num_qubits, state_bits, rotation_angle):
+def simulate_circuit(num_qubits, parse_tree, state_bits):
     print('generated state', state_bits)
-    print('rotation_angle', rotation_angle)
-    testGate = RYGate(rotation_angle)
-    qc = QuantumCircuit(QuantumRegister(number_of_input_qubits))
-    qc.append(testGate, [0])
     val = []
     for i in range(num_qubits):
         val += [CoqNVal(state_bits[i],phase=0)]
+    val += [CoqNVal(False, phase=0)]
     state = {"test": val}
     environment = {"test": num_qubits}
     sim = Simulator(state, environment)
-    sim.visitProgram(get_tree(qc))
+    sim.visitProgram(parseTree)
     post_sim_state = sim.state
     vals = post_sim_state['test']
     for val in vals:
@@ -45,5 +50,4 @@ def simulate_circuit(num_qubits, state_bits, rotation_angle):
             print(val.getZero())
             print(val.getOne())
 
-simulate_circuit(number_of_input_qubits)
-
+simulate_circuit(number_of_input_qubits, parseTree)

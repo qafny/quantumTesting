@@ -1,34 +1,43 @@
-from qiskit import QuantumCircuit
+from qiskit import QuantumCircuit, transpile, QuantumRegister, ClassicalRegister
+from qiskit.circuit.library import HalfAdderGate
+from qiskit_aer import AerSimulator
 import os, sys
 current_dir = os.path.dirname(os.path.realpath(__file__))
-parent_dir = os.path.dirname(current_dir)
+parent_dir = os.path.dirname(os.path.dirname(current_dir))
 sys.path.insert(0,parent_dir)
 sys.path.append(parent_dir+'/qiskit-to-xmlprogrammer')
 from qiskit_to_xmlprogrammer import QCtoXMLProgrammer
 from hypothesis import given, strategies as st, assume, settings, HealthCheck
 from AST_Scripts.simulator import CoqNVal,CoqYVal, Simulator
+N_COUNT = 8
+qr1 = QuantumRegister(N_COUNT, 'q1')
+qr2 = QuantumRegister(N_COUNT, 'q2')
+qr3 = QuantumRegister(N_COUNT, 'q3')
+cl1 = ClassicalRegister(N_COUNT, 'c1')
+cl2 = ClassicalRegister(N_COUNT, 'c2')
+qr4 = QuantumRegister(1, 'q4')
+cl3 = ClassicalRegister(1, 'c3')
+N_COUNT = 8
 
-number_of_input_qubits = 4
-
-U = QuantumCircuit(number_of_input_qubits)
-
-U.swap(2, 3)
-U.swap(1, 2)
-U.swap(0, 1)
+qc = QuantumCircuit(qr1, qr2, qr3, qr4, cl1, cl2, cl3)
+adder = HalfAdderGate(num_state_qubits=N_COUNT-1).control(1)
+for q in range(N_COUNT):
+    qc.h(qr1[q])
+for q in range(N_COUNT):
+    qc.x(qr2[0])
+    qc.append(adder, [q]+list(range(8,23)))
 
 visitor = QCtoXMLProgrammer()
 
 def get_tree():
-    new_tree = visitor.startVisit(U, circuitName="Example Circuit 1", optimiseCircuit=False, showDecomposedCircuit=True)
+    new_tree = visitor.startVisit(qc, circuitName="Example Circuit 1", optimiseCircuit=False, showDecomposedCircuit=True)
     return new_tree
-
-parseTree = get_tree()
 
 parseTree = get_tree()
 
 @settings(max_examples=20, suppress_health_check=[HealthCheck.too_slow])
 @given(
-    state_bits=st.lists(st.booleans(), min_size=number_of_input_qubits, max_size=number_of_input_qubits),
+    state_bits=st.lists(st.booleans(), min_size=N_COUNT, max_size=N_COUNT),
 )
 def simulate_circuit(num_qubits, parse_tree, state_bits):
     val = []
@@ -51,4 +60,4 @@ def simulate_circuit(num_qubits, parse_tree, state_bits):
             print('one: ', val.getOne())
     #print(post_sim_state['test'])
 
-simulate_circuit(number_of_input_qubits, parseTree)
+simulate_circuit(N_COUNT, parseTree)

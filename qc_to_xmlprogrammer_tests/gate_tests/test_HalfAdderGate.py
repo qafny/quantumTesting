@@ -1,24 +1,24 @@
-from qiskit.circuit.library import AndGate
+from qiskit.circuit.library import HalfAdderGate
 import os, sys
 current_dir = os.path.dirname(os.path.realpath(__file__))
-parent_dir = os.path.dirname(current_dir)
+parent_dir = os.path.dirname(os.path.dirname(current_dir))
 sys.path.insert(0,parent_dir)
 sys.path.append(parent_dir+'/qiskit-to-xmlprogrammer')
 from AST_Scripts.simulator import CoqNVal,CoqYVal, Simulator
-from qiskit import QuantumCircuit, QuantumRegister, ClassicalRegister, generate_preset_pass_manager
+from qiskit import QuantumCircuit, QuantumRegister, ClassicalRegister, generate_preset_pass_manager, transpile
 from qiskit_to_xmlprogrammer import QCtoXMLProgrammer
 from hypothesis import given, strategies as st, assume, settings, HealthCheck
 
 os.environ["PATH"] += os.pathsep + r"C:\Program Files\Graphviz\bin"
-number_of_input_qubits = 3
-testGate = AndGate(num_variable_qubits=number_of_input_qubits)
-qc = QuantumCircuit(QuantumRegister(4))
-qc.append(testGate, [0,1,2,3])
-# transpiled_circuit = generate_preset_pass_manager(basis_gates=["x", "cx", "ccx", "rz", "h"]).run(qc)
+number_of_input_qubits = 5
+testGate = HalfAdderGate(num_state_qubits=2)
+qc = QuantumCircuit(QuantumRegister(5))
+qc.append(testGate, [0,1,2,3,4])
+# transpiled_circuit = transpile(qc, basis_gates=['cx', 'ccx', 'x', 'h'], optimization_level=3)
 visitor = QCtoXMLProgrammer()
 
 def get_tree():
-    new_tree = visitor.startVisit(qc, circuitName="Example Circuit 1", optimiseCircuit=False, showDecomposedCircuit=True, gateSetToUse = ["x", "cx", "ccx", "rz", "h"])
+    new_tree = visitor.startVisit(qc, circuitName="Example Circuit 1", optimiseCircuit=False, showDecomposedCircuit=True, gateSetToUse = ['cx', 'ccx', 'x', 'h'])
     return new_tree
 
 parseTree = get_tree()
@@ -32,21 +32,22 @@ def simulate_circuit(num_qubits, parse_tree, state_bits):
     val = []
     for i in range(num_qubits):
         val += [CoqNVal(state_bits[i],phase=0)]
-    val += [CoqNVal(False, phase=0)]
     state = {"test": val}
     #state = {"test": [CoqNVal(state_bits+[False], phase=0)]}
-    environment = {"test": num_qubits + 1}
+    environment = {"test": num_qubits}
     sim = Simulator(state, environment)
+    print('parse_tree', parse_tree)
+    print('parse_tree item', parse_tree._exps[6])
     sim.visitProgram(parseTree)
     # TODO: validate properties for each instance
     post_sim_state = sim.state
     vals = post_sim_state['test']
     for val in vals:
         if isinstance(val, CoqNVal):
-            print('bit', val.getBit())
+            print(val.getBit())
         elif isinstance(val, CoqYVal):
-            print('zero: ', val.getZero())
-            print('one: ', val.getOne())
+            print(val.getZero())
+            print(val.getOne())
     #print(post_sim_state['test'])
 
 simulate_circuit(number_of_input_qubits, parseTree)

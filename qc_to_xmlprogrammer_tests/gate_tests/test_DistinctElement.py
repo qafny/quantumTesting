@@ -4,7 +4,7 @@ from qiskit.circuit.library import HalfAdderGate
 from qiskit_aer import AerSimulator
 import os, sys
 current_dir = os.path.dirname(os.path.realpath(__file__))
-parent_dir = os.path.dirname(current_dir)
+parent_dir = os.path.dirname(os.path.dirname(current_dir))
 sys.path.insert(0,parent_dir)
 sys.path.append(parent_dir+'/qiskit-to-xmlprogrammer')
 from qiskit_to_xmlprogrammer import QCtoXMLProgrammer

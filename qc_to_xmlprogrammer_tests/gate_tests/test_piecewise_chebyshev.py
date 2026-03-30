@@ -3,7 +3,7 @@ import sys
 import os
 
 current_dir = os.path.dirname(os.path.realpath(__file__))
-parent_dir = os.path.dirname(current_dir)
+parent_dir = os.path.dirname(os.path.dirname(current_dir))
 sys.path.insert(0,parent_dir)
 import numpy as np
 from AST_Scripts.XMLExpLexer import XMLExpLexer
@@ -24,17 +24,16 @@ from qiskit.visualization import dag_drawer
 import graphviz
 import os
 import sys
-from qiskit.circuit.library.arithmetic import FullAdderGate, LinearAmplitudeFunctionGate
+from qiskit.circuit.library.arithmetic import FullAdderGate, PiecewiseChebyshevGate
 from qiskit.circuit.library import OrGate
-
 from AST_Scripts.XMLProgrammer import QXProgram, QXQID, QXCU, QXX, QXH, QXRZ, QXRY, QXRoot, QXNum
 
 # Ensure graphviz is in the PATH (for dag drawing)
 os.environ["PATH"] += os.pathsep + r"C:\Program Files\Graphviz\bin"
 
-qc = QuantumCircuit(5,5)
-linAmplitudeGate = LinearAmplitudeFunctionGate(num_state_qubits=3, slope=[3.0, 3.3], offset=[2.0, 2.2], domain=(1.0, 10.0),image=(1.1, 1.0), breakpoints=[3.0])
-qc.append(linAmplitudeGate, [0,1,2,3,4])
+qc = QuantumCircuit(8,5)
+linAmplitudeGate = PiecewiseChebyshevGate(f_x=3.0, num_state_qubits=6, degree=3,breakpoints=[2], label = 'test')
+qc.append(linAmplitudeGate, [0,1,2,3,4,5,6,7])
 qcEx1 = qc.copy()
 # -------------------------- COMPILE TO XMLPROGRAMMER --------------------------
 
@@ -87,7 +86,7 @@ def process_bitwise_test_cases():
     indicesOfQHX = [ind for ind, item in enumerate(parsetree._exps) if type(item) == QXH]
     for index in indicesOfQHX:
         parsetree._exps[index] = QXNum(0)
-    new_state = simulate_circuit(5,parsetree)
+    new_state = simulate_circuit(8,parsetree)
     # calculated = bit_array_to_int(new_state.get('ya')[0].getBits(), na)
     # insts.append((na, expected, calculated))
 

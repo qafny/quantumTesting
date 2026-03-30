@@ -3,7 +3,7 @@ import sys
 import os
 
 current_dir = os.path.dirname(os.path.realpath(__file__))
-parent_dir = os.path.dirname(current_dir)
+parent_dir = os.path.dirname(os.path.dirname(current_dir))
 sys.path.insert(0,parent_dir)
 import numpy as np
 from AST_Scripts.XMLExpLexer import XMLExpLexer
@@ -24,17 +24,23 @@ from qiskit.visualization import dag_drawer
 import graphviz
 import os
 import sys
-from qiskit.circuit.library.arithmetic import FullAdderGate, PiecewiseChebyshevGate
-from qiskit.circuit.library import OrGate
+from qiskit.circuit.library.arithmetic import FullAdderGate
+from qiskit.circuit.library import WeightedSumGate
+
 from AST_Scripts.XMLProgrammer import QXProgram, QXQID, QXCU, QXX, QXH, QXRZ, QXRY, QXRoot, QXNum
 
 # Ensure graphviz is in the PATH (for dag drawing)
 os.environ["PATH"] += os.pathsep + r"C:\Program Files\Graphviz\bin"
 
-qc = QuantumCircuit(8,5)
-linAmplitudeGate = PiecewiseChebyshevGate(f_x=3.0, num_state_qubits=6, degree=3,breakpoints=[2], label = 'test')
-qc.append(linAmplitudeGate, [0,1,2,3,4,5,6,7])
-qcEx1 = qc.copy()
+# --------------------------- EXAMPLE CIRCUITS ---------------------------------
+
+# ----- 3: 3-Qubit GHZ
+
+qc = QuantumCircuit(6, 3)
+testGate = WeightedSumGate(3,[1,2,4])
+qc.append(testGate, [0,1,2,3,4,5])
+qcEx3 = qc.copy()
+
 # -------------------------- COMPILE TO XMLPROGRAMMER --------------------------
 
 visitor = QCtoXMLProgrammer()
@@ -43,32 +49,17 @@ visitor = QCtoXMLProgrammer()
 
 def get_tree():
     #new_tree = read_program(f"{os.path.dirname(os.path.realpath(__file__))}/mutants/mutant_38.xml")
-    new_tree = visitor.startVisit(qcEx1, circuitName="Example Circuit 1", optimiseCircuit=True, showDecomposedCircuit=True)
+    new_tree = visitor.startVisit(qcEx3, circuitName="Example Circuit 1", optimiseCircuit=True, showDecomposedCircuit=True)
     valid_tree = True
-
-    # try:
-    #     # Validation of the Constraints.
-    #     # Added per Dr. Li's suggestion on 11/16 to scoop out the validator behaviour out of the simulator as there can be
-    #     # programs which does not always need to follow constraints like only having 1 app tag.
-    #     validator = SimulatorValidator()
-    #     validator.visitProgram((new_tree))
-
-    #     # Non-Decreasing Recursive Fixed Point Factor Check
-    # except Exception as e:
-    #     print('\n ==============', e, '==============')
-    #     valid_tree = False
-
-    # retriever = MatchCounterRetriever()
-    # retriever.visitProgram(new_tree)
     return new_tree, valid_tree
 
 parsetree = get_tree()[0]
 
 from hypothesis import given, strategies as st, assume, settings, HealthCheck
 
-def simulate_circuit(num_qubits, parse_tree):
+def simulate_circuit(num_qubits, parse_tree, first_qubit):
     state = dict(
-        {"test": [CoqNVal([False]+([False] * (num_qubits-1)), phase=0)]
+        {"test": [CoqNVal([first_qubit]+([False] * (num_qubits-1)), phase=0)]
          })
     environment = dict(
         {"xa": num_qubits
@@ -79,16 +70,20 @@ def simulate_circuit(num_qubits, parse_tree):
     new_state = simulator.state
     return new_state
 
-def process_bitwise_test_cases():
+@given(first_qubit = st.sampled_from([True, False]))
+def test_bitwise_test_cases(first_qubit):
     # pt_output = read_program(f"{os.path.dirname(os.path.realpath(__file__))}/cl_adder_good.xml")
     # print('pt_output', pt_output)
     # print('pt_output type', type(pt_output))
     indicesOfQHX = [ind for ind, item in enumerate(parsetree._exps) if type(item) == QXH]
     for index in indicesOfQHX:
         parsetree._exps[index] = QXNum(0)
-    new_state = simulate_circuit(8,parsetree)
+    new_state = simulate_circuit(4,parsetree, first_qubit)
     # calculated = bit_array_to_int(new_state.get('ya')[0].getBits(), na)
     # insts.append((na, expected, calculated))
-
-    return new_state
-print(process_bitwise_test_cases()['test'][0].getBits())
+    print(new_state['test'][0].getBits())
+    if (new_state['test'][0].getBits()[0] == new_state['test'][0].getBits()[1] == new_state['test'][0].getBits()[2]):
+        assert True
+    else:
+        assert False
+test_bitwise_test_cases()

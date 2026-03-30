@@ -1,28 +1,26 @@
 from qiskit import QuantumCircuit, transpile, QuantumRegister, ClassicalRegister
+from qiskit.circuit.library import IntegerComparator
 from qiskit_aer import AerSimulator
 import os, sys
 current_dir = os.path.dirname(os.path.realpath(__file__))
-parent_dir = os.path.dirname(current_dir)
+parent_dir = os.path.dirname(os.path.dirname(current_dir))
 sys.path.insert(0,parent_dir)
 sys.path.append(parent_dir+'/qiskit-to-xmlprogrammer')
 from qiskit_to_xmlprogrammer import QCtoXMLProgrammer
 from hypothesis import given, strategies as st, assume, settings, HealthCheck
 from AST_Scripts.simulator import CoqNVal,CoqYVal, Simulator
-
-N_COUNT = 60
+N_COUNT = 8
 
 qr1 = QuantumRegister(N_COUNT, 'q1')
 qr2 = QuantumRegister(N_COUNT, 'q2')
-cl1 = ClassicalRegister(N_COUNT, 'c1')
-cl2 = ClassicalRegister(N_COUNT, 'c2')
-qr3 = QuantumRegister(1, 'q3')
-cl3 = ClassicalRegister(1, 'c3')
+cl1 = ClassicalRegister(1, 'c1')
 
-qc = QuantumCircuit(qr1, qr2, qr3, cl1, cl2, cl3)
+qc = QuantumCircuit(qr1, qr2, cl1)
+comparer = IntegerComparator(num_state_qubits=(N_COUNT), value=111, geq=False)
 for q in range(N_COUNT):
     qc.h(qr1[q])
-for q in range(N_COUNT):
-    qc.cry(theta=(q/N_COUNT), control_qubit=qr1[q], target_qubit= qr3[0])
+qc.append(comparer, range(comparer.num_qubits))
+qc.measure(qr2[0], cl1[0])
 
 visitor = QCtoXMLProgrammer()
 
@@ -31,7 +29,6 @@ def get_tree():
     return new_tree
 
 parseTree = get_tree()
-
 
 @settings(max_examples=20, suppress_health_check=[HealthCheck.too_slow])
 @given(
