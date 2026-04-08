@@ -1,36 +1,29 @@
-from antlr4 import InputStream, CommonTokenStream
-import sys
 import os
+import sys
 
 current_dir = os.path.dirname(os.path.realpath(__file__))
 parent_dir = os.path.dirname(os.path.dirname(current_dir))
-sys.path.insert(0,parent_dir)
-import numpy as np
-from AST_Scripts.XMLExpLexer import XMLExpLexer
-from AST_Scripts.XMLExpParser import XMLExpParser
-from AST_Scripts.ProgramTransformer import ProgramTransformer
-from AST_Scripts.ValidatorProgramVisitors import SimulatorValidator
-from AST_Scripts.Retrievers import MatchCounterRetriever
-from AST_Scripts.simulator import CoqNVal, CoqQVal, CoqYVal, Simulator, bit_array_to_int, to_binary_arr
-import math
-import qiskit
-sys.path.append(parent_dir+'/qiskit-to-xmlprogrammer')
-from qiskit_to_xmlprogrammer import QCtoXMLProgrammer
-from qiskit import transpile
-from qiskit import QuantumCircuit, QuantumRegister, ClassicalRegister
-from qiskit.converters import circuit_to_dag
-from qiskit.dagcircuit import DAGInNode, DAGOpNode, DAGNode, DAGOutNode
-from qiskit.visualization import dag_drawer
-import graphviz
-import os
-import sys
-from qiskit.circuit.library.arithmetic import FullAdderGate
-from qiskit.circuit.library import OrGate
+sys.path.insert(0, parent_dir)
+sys.path.append(parent_dir + "/qiskit-to-xmlprogrammer")
+sys.path.insert(0, os.path.join(parent_dir, "qc_to_xmlprogrammer_tests", "framework"))
 
-from AST_Scripts.XMLProgrammer import QXProgram, QXQID, QXCU, QXX, QXH, QXRZ, QXRY, QXRoot, QXNum
+from hypothesis import given, strategies as st
+from qiskit import QuantumCircuit
+
+from AST_Scripts.XMLProgrammer import QXH, QXNum
+
+from test_framework import (
+    compile_to_parse_tree,
+    print_register_state,
+    run_simulation,
+    setup_project_paths,
+)
 
 # Ensure graphviz is in the PATH (for dag drawing)
 os.environ["PATH"] += os.pathsep + r"C:\Program Files\Graphviz\bin"
+
+# Keep project path setup consistent.
+setup_project_paths()
 
 # ----- 3: 3-Qubit GHZ
 
@@ -42,48 +35,31 @@ qc.measure([0,1,2], [0,1,2])
 qcEx3 = qc.copy()
 
 # -------------------------- COMPILE TO XMLPROGRAMMER --------------------------
-
-visitor = QCtoXMLProgrammer()
-
-# NOTE:: test how to run the code.
-
-def get_tree():
-    #new_tree = read_program(f"{os.path.dirname(os.path.realpath(__file__))}/mutants/mutant_38.xml")
-    new_tree = visitor.startVisit(qcEx3, circuitName="Example Circuit 1", optimiseCircuit=True, showDecomposedCircuit=True)
-
-    return new_tree
-
-parsetree = get_tree()
-
-from hypothesis import given, strategies as st, assume, settings, HealthCheck
-
-def simulate_circuit(num_qubits, parse_tree, first_qubit):
-    val = []
-    val += [CoqNVal(first_qubit, phase=0)]
-    for i in range(num_qubits-1):
-        val += [CoqNVal(False,phase=0)]
-    state = {"test": val}
-    environment = {"test": num_qubits}
-
-    simulator = Simulator(state, environment)
-    simulator.visitProgram(parse_tree)
-    new_state = simulator.state
-    return new_state
+qcEx3_nom = qcEx3.remove_final_measurements(inplace=False)
+parsetree = compile_to_parse_tree(
+    qcEx3_nom,
+    circuit_name="Example Circuit 1",
+    optimise_circuit=True,
+    show_decomposed_circuit=True,
+    gate_set_to_use=["x", "cx", "ccx", "rz", "h"],
+)
 
 @given(first_qubit = st.sampled_from([True, False]))
 def test_bitwise_test_cases(first_qubit):
     indicesOfQHX = [ind for ind, item in enumerate(parsetree._exps) if type(item) == QXH]
     for index in indicesOfQHX:
         parsetree._exps[index] = QXNum(0)
-    new_state = simulate_circuit(3,parsetree, first_qubit)
-    vals = new_state['test']
+
+    state_bits = [first_qubit, False, False]
+    new_state = run_simulation(
+        parsetree,
+        state_bits,
+        register_name="test",
+        include_output_qubit=False,
+    )
+    vals = new_state["test"]
     assert vals[0].getBit() == vals[1].getBit() == vals[2].getBit()
-    for val in vals:
-        if isinstance(val, CoqNVal):
-            print(val.getBit())
-        elif isinstance(val, CoqYVal):
-            print(val.getZero())
-            print(val.getOne())
+    print_register_state(new_state, register_name="test")
     # if (new_state['test'][0].getBits()[0] == new_state['test'][0].getBits()[1] == new_state['test'][0].getBits()[2]):
     #     assert True
     # else:
