@@ -27,7 +27,7 @@ os.environ["PATH"] += os.pathsep + r"C:\Program Files\Graphviz\bin"
 
 # ------------------------- DAG TO XMLPROGRAMMER -------------------------------
 
-supportedGates = ['h','x','y','z','s','sdg','t','tdg','ry','rz','u','cx','cz']
+supportedGates = ['cx','h','s','t']
 ignoredGates = ['measure']
 
 def decomposeToGates(qc, optimiseCircuit, gateSetToUse):
@@ -45,7 +45,7 @@ class QCtoXMLProgrammer:
         qc,
         circuitName=None,
         optimiseCircuit=False,
-        showDecomposedCircuit=False,
+        showDecomposedCircuit=True,
         showInputCircuit=True,
         emit_xml=True,
         gateSetToUse = supportedGates
