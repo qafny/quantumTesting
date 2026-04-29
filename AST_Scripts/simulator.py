@@ -69,13 +69,17 @@ class CoqYVal(CoqVal):
 
     def addY(self, r):
         if len(self.r1) == 1 and len(self.r2) == 1 and self.r1[0][1] == 0 and self.r2[0][1] == 0:
-                self.r1 = [(math.cos(math.pi*r/90)*self.r1[0][0]-math.sin(math.pi*r/90)*self.r2[0][0],0)]
-                self.r2 = [(math.sin(math.pi*r/90)*self.r1[0][0]+math.cos(math.pi*r/90)*self.r2[0][0],0)]
+            a0, b0 = self.r1[0][0], self.r2[0][0]
+            cr, sr = math.cos(math.pi * r / 90), math.sin(math.pi * r / 90)
+            self.r1 = [(cr * a0 - sr * b0, 0)]
+            self.r2 = [(sr * a0 + cr * b0, 0)]
 
     def addH(self):
         if len(self.r1) == 1 and len(self.r2) == 1 and self.r1[0][1] == 0 and self.r2[0][1] == 0:
-            self.r1 = [((self.r1[0][0]+self.r2[0][0]) / math.sqrt(2),0)]
-            self.r2 = [((self.r1[0][0]-self.r2[0][0]) / math.sqrt(2),0)]
+            a0, b0 = self.r1[0][0], self.r2[0][0]
+            inv_sqrt2 = 1.0 / math.sqrt(2)
+            self.r1 = [((a0 + b0) * inv_sqrt2, 0)]
+            self.r2 = [((a0 - b0) * inv_sqrt2, 0)]
         else:
             self.r1 = simpRyPoint(divSqrt(self.r1) + divSqrt(self.r2))
             self.r2 = simpRyPoint(divSqrt(self.r1) + applyNeg(divSqrt(self.r2)))
