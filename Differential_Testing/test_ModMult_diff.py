@@ -80,8 +80,12 @@ except ImportError:
 # ═══════════════════════════════════════════════════════════════════════════
 
 GATESET_A = ["h", "s", "t", "cx"]                        # Clifford+T (Qiskit side)
-# Pipeline: {H, X, RZ, CX}; ``cx`` → ``CU { X }`` in the XML visitor.
-GATESET_B = ["h", "x", "rz", "cx"]
+# Pipeline basis.  ccx/crz are kept native so Qiskit does NOT decompose
+# Toffoli gates through H gates, which would break the classical-path Simulator.
+# cx  → QXCU { X }
+# ccx → QXCU { QXCU { X } }   (nested controlled)
+# crz → QXCU { RZ }
+GATESET_B = ["h", "x", "rz", "cx", "ccx", "crz"]
 
 
 def statevector_qiskit_a(qc: "QuantumCircuit") -> np.ndarray:

@@ -68,17 +68,16 @@ class QCtoXMLProgrammer:
             print("Decomposed Circuit:")
             print(qc.draw())
 
-        self.dag = circuit_to_dag(qc)
-
-        # Dictionary mapping Qiskit qubits to XMLProgrammer qubits
+        # Map Qiskit qubits → XMLProgrammer position indices
         self.XMLQubits = dict()
-        for i, qubit in enumerate(self.dag.qubits):
+        for i, qubit in enumerate(qc.qubits):
             self.XMLQubits[qubit] = QXNum(i)
-        self.visitedNodes = set()
+
+        # Iterate directly over qc.data — Qiskit already guarantees topological
+        # order after transpile(), so no DAG re-traversal is needed.
         self.expList = []
-        
-        for startingNode in self.dag.input_map.values():
-            self.visitNode(startingNode)
+        for instr in qc.data:
+            self.instrToXMLProgrammer(instr, qc)
 
         self.program = QXProgram(self.expList)
         print("Extracted QXProgram (AST):")
@@ -95,88 +94,78 @@ class QCtoXMLProgrammer:
         print("------------------------------------------------------------")
         return self.program
 
-    def visitNode(self, node):
-        if node in self.visitedNodes:
-            return
+    def instrToXMLProgrammer(self, instr, qc):
+        """Translate one CircuitInstruction from qc.data into XMLProgrammer AST nodes."""
+        name   = instr.operation.name
+        params = instr.operation.params
+        qubits = [self.XMLQubits[q] for q in instr.qubits]
+        exps   = []
+
+        # Single-qubit gates
+        if name == "h":
+            exps.append(QXH("test", qubits[0]))
+        elif name == "x":
+            exps.append(QXX("test", qubits[0]))
+        elif name == "y":
+            exps.append(QXRY("test", qubits[0], QXNum(90)))
+        elif name == "z":
+            exps.append(QXRZ("test", qubits[0], QXNum(180)))
+
+        # Fractional phase shifts (S, T):
+        elif name == "s":
+            exps.append(QXRZ("test", qubits[0], QXNum(90)))
+        elif name == "sdg":
+            exps.append(QXRZ("test", qubits[0], QXNum(-90)))
+        elif name == "t":
+            exps.append(QXRZ("test", qubits[0], QXNum(45)))
+        elif name == "tdg":
+            exps.append(QXRZ("test", qubits[0], QXNum(-45)))
+
+        # General rotations
+        elif name == "ry":
+            exps.append(QXRY("test", qubits[0], QXNum(params[0] * 180 / math.pi)))
+        elif name == "rz":
+            exps.append(QXRZ("test", qubits[0], QXNum(params[0] * 180 / math.pi)))
+
+        # Universal single-qubit gate U(a,b,c) = RZ(a) RY(b) RZ(c)
+        elif name == "u":
+            exps.append(QXRZ("test", qubits[0], QXNum(params[0] * 180 / math.pi)))
+            exps.append(QXRY("test", qubits[0], QXNum(params[1] * 180 / math.pi)))
+            exps.append(QXRZ("test", qubits[0], QXNum(params[2] * 180 / math.pi)))
+
+        # Controlled operations:
+        # cx  → CU(ctrl,  { X(target) })
+        # ccx → CU(ctrl0, { CU(ctrl1, { X(target) }) })  — Toffoli as nested CU
+        # cz  → CU(ctrl,  { RZ(target, 180) })
+        # crz → CU(ctrl,  { RZ(target, angle) })
+        elif name == "cx":
+            exps.append(QXCU("test", qubits[0], QXProgram([QXX("test", qubits[1])])))
+        elif name == "ccx":
+            exps.append(QXCU("test", qubits[0], QXProgram([
+                QXCU("test", qubits[1], QXProgram([QXX("test", qubits[2])]))
+            ])))
+        elif name == "cz":
+            exps.append(QXCU("test", qubits[0], QXProgram([QXRZ("test", qubits[1], QXNum(180))])))
+        elif name == "crz":
+            exps.append(QXCU("test", qubits[0], QXProgram([
+                QXRZ("test", qubits[1], QXNum(params[0] * 180 / math.pi))
+            ])))
+
+        elif name in ignoredGates:
+            pass
+
         else:
-            self.visitedNodes.add(node)
-            self.nodeToXMLProgrammer(node)
-            for successor in self.dag.successors(node): # type: ignore
-                self.visitNode(successor)
+            print("Warning: Unrecognized operation", name)
 
-
-    def nodeToXMLProgrammer(self, node):
-        if isinstance(node, DAGOpNode):
-            inputBits = [self.XMLQubits[q] for q in node.qargs]
-            exps = []
-
-            # H, X, Y, Z:
-            if node.name == "h":
-                exps.append(QXH("test", inputBits[0]))
-            elif node.name == "x":
-                exps.append(QXX("test", inputBits[0]))
-            elif node.name == "y":
-                exps.append(QXRY("test", inputBits[0], QXNum(90)))
-            elif node.name == "z":
-                exps.append(QXRZ("test", inputBits[0], QXNum(180)))
-
-            # Fractional phase shifts (S, SDG, T, TDG):
-            elif node.name == "s":
-                exps.append(QXRZ("test", inputBits[0], QXNum(90)))
-            elif node.name == "sdg":
-                exps.append(QXRZ("test", inputBits[0], QXNum(-90)))
-            elif node.name == "t":
-                exps.append(QXRZ("test", inputBits[0], QXNum(45)))
-            elif node.name == "tdg":
-                exps.append(QXRZ("test", inputBits[0], QXNum(-45)))
-
-            # General rotations (RX, RY, RZ):
-            # elif node.name == "rx":
-            #     exps.append(QXRX("rx", inputBits[0], QXNum(node.params[0]*180/math.pi)))
-            elif node.name == "ry":
-                exps.append(QXRY("test", inputBits[0], QXNum(node.params[0]*180/math.pi)))
-            elif node.name == "rz":
-                exps.append(QXRZ("test", inputBits[0], QXNum(node.params[0]*180/math.pi)))
-
-            # Universal single-qubit gate (U):
-            elif node.name == "u":
-                # U(a, b, c) = RZ(a) RY(b) RZ(c)
-                exps.append(QXRZ("test", inputBits[0], QXNum(node.params[0]*180/math.pi)))
-                exps.append(QXRY("test", inputBits[0], QXNum(node.params[1]*180/math.pi)))
-                exps.append(QXRZ("test", inputBits[0], QXNum(node.params[2]*180/math.pi)))
-
-            # Controlled operations (CX, CZ):
-            elif node.name == "cx":
-                exps.append(QXCU("test", inputBits[0], QXProgram([QXX("test", inputBits[1])])))
-            elif node.name == "cz":
-                exps.append(QXCU("test", inputBits[0], QXProgram([QXRZ("test", inputBits[1], QXNum(180))])))
-            
-            elif node.name in ignoredGates:
-                pass
-
-            else:
-                print("Warning: Unrecognized operation ", node.name)
-
-            # Turn the extracted operation into an expression, and add it to
-            # the list of expressions
-            for exp in exps:
+        # Validate that any rotation angle is a concrete number (not an unbound parameter)
+        for exp in exps:
+            if type(exp) in [QXRY, QXRZ]:
+                try:
+                    float(exp.num().num())
+                except Exception as e:
+                    raise TypeError(
+                        f"Unbound parameter in gate '{name}': angle={exp.angle}. "
+                        "Bind all parameters before compiling to XMLProgrammer."
+                    )
+            self.expList.append(exp)
                 
-
-                # Check if the QXNum is actually a number. This is important for
-                # parameterised circuits, sunce otherwise we get compiled cases such as
-                # QXRY(id=ry, v=QXQID(id=None), angle=57.29577951308232*θ[0]).
-                # if there is an error, we raise it here
-
-   
-                if type(exp) in [QXRY, QXRZ]:
-                    try:
-                        float(exp.num().num())
-                    except Exception as e:
-                        raise TypeError("Error: An unset external parameter in a parameterised circuit was found. From gate: " + str(node.name) + " with angle: " + str(exp.angle) + ". Please bind all parameters before compiling to XMLProgrammer.")
-
-                self.expList.append(exp)
-
-            
-            
-
-
