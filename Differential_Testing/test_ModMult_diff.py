@@ -277,6 +277,122 @@ def circuit_modadder_2bit() -> "QuantumCircuit":
     for i in range(n): qc.swap(a[i], m[i])
     return qc
 
+def circuit_x_mask(n: int, mask: int) -> "QuantumCircuit":
+    """
+    Apply X to every qubit where mask has bit 1.
+    """
+    qc = QuantumCircuit(n)
+    for i in range(n):
+        if (mask >> i) & 1:
+            qc.x(i)
+    return qc
+
+def circuit_cx_chain(n: int) -> "QuantumCircuit":
+    """
+    Chain of CX gates: q0 controls q1, q1 controls q2, etc.
+    """
+    qc = QuantumCircuit(n)
+    for i in range(n - 1):
+        qc.cx(i, i + 1)
+    return qc
+
+def circuit_cx_fanout(n: int) -> "QuantumCircuit":
+    """
+    q0 controls every other qubit.
+    If q0=1, all targets flip.
+    """
+    qc = QuantumCircuit(n)
+    for i in range(1, n):
+        qc.cx(0, i)
+    return qc
+
+
+def circuit_swap_neighbors(n: int) -> "QuantumCircuit":
+    """
+    Swap neighboring pairs: (0,1), (2,3), ...
+    """
+    qc = QuantumCircuit(n)
+    for i in range(0, n - 1, 2):
+        qc.swap(i, i + 1)
+    return qc
+
+
+def circuit_ccx_chain(n: int = 5) -> "QuantumCircuit":
+    """
+    Small chain of Toffoli gates.
+    Requires at least 3 qubits.
+    """
+    qc = QuantumCircuit(n)
+    for i in range(n - 2):
+        qc.ccx(i, i + 1, i + 2)
+    return qc
+
+
+def circuit_crz_phase(n: int = 2, theta: float = 0.5) -> "QuantumCircuit":
+    """
+    Controlled RZ phase example.
+    Good for testing CRZ handling in the XMLProgrammer/Simulator path.
+    """
+    qc = QuantumCircuit(n)
+    qc.crz(theta, 0, 1)
+    return qc
+
+def circuit_boolean_formula_3q() -> "QuantumCircuit":
+    """
+    Computes q2 ^= q0 AND q1.
+    Equivalent to one Toffoli.
+    """
+    qc = QuantumCircuit(3)
+    qc.ccx(0, 1, 2)
+    return qc
+
+
+def circuit_boolean_mixed_4q() -> "QuantumCircuit":
+    """
+    Mixed reversible logic:
+      q2 ^= q0
+      q3 ^= q1
+      q3 ^= q0 AND q2
+    """
+    qc = QuantumCircuit(4)
+    qc.cx(0, 2)
+    qc.cx(1, 3)
+    qc.ccx(0, 2, 3)
+    return qc
+
+
+def circuit_incrementer_3bit() -> "QuantumCircuit":
+    """
+    Increment a 3-bit register by 1 modulo 8.
+
+    Ripple logic:
+      flip high bits conditionally, then low bit.
+    """
+    qc = QuantumCircuit(3)
+    qc.ccx(0, 1, 2) # if q0 and q1 are 1, q2 toggles.
+    qc.cx(0, 1) # if q0 is 1, q1 toggles
+    qc.x(0)
+
+    return qc
+
+def circuit_decrementer_3bit() -> "QuantumCircuit":
+    """
+    Decrement a 3-bit register by 1 modulo 8.
+    This is the inverse of the incrementer.
+    """
+    return circuit_incrementer_3bit().inverse()
+
+
+def circuit_controlled_x_block(n: int = 4) -> "QuantumCircuit":
+    """
+    One flag qubit controls several target flips.
+    Similar to conditional subtract/add skeletons.
+    """
+    qc = QuantumCircuit(n)
+    flag = 0
+    for target in range(1, n):
+        qc.cx(flag, target)
+    return qc
 
 # ═══════════════════════════════════════════════════════════════════════════
 # Section 3 — Differential test runner
@@ -648,6 +764,31 @@ def main():
     r = run_basis_sweep("modadder 2-bit", qc_ma)
     print(r)
     results.append(r)
+
+    # ── Additional examples ──────────────────────
+    print("\n" + "─" * 70)
+    print("Additional examples  [Qiskit A vs our Simulator B]")
+    print("─" * 70)
+
+    extra_blocks = [
+        ("X mask n=5 mask=0b10101", circuit_x_mask(5, 0b10101)),
+        ("CX chain n=4", circuit_cx_chain(4)),
+        ("CX fanout n=6", circuit_cx_fanout(6)),
+        ("Neighbor SWAP n=6", circuit_swap_neighbors(6)),
+        ("CCX chain n=5", circuit_ccx_chain(5)),
+        ("Boolean formula 3q", circuit_boolean_formula_3q()),
+        ("Boolean mixed 4q", circuit_boolean_mixed_4q()),
+        ("Incrementer 3-bit", circuit_incrementer_3bit()),
+        ("Decrementer 3-bit", circuit_decrementer_3bit()),
+        ("Controlled-X block n=5", circuit_controlled_x_block(5)),
+        ("CRZ phase theta=0.5", circuit_crz_phase(2, 0.5)),
+    ]
+
+    for name, qc in extra_blocks:
+        t_gate_section_report(qc, name)
+        r = run_basis_sweep(name, qc)
+        print(r)
+        results.append(r)
 
     # ── Hypothesis sweep (commented out) ─────────────────────────────────
     # run_hypothesis_tests()
