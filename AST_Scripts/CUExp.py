@@ -1,13 +1,13 @@
-import ast
+import qetast
 
 
-class VariableDeclarationCollector(ast.NodeVisitor):
+class VariableDeclarationCollector(qetast.NodeVisitor):
     def __init__(self):
         self.variable_declarations = []
 
     def visit_Assign(self, node):
         for target in node.targets:
-            if isinstance(target, ast.Name):
+            if isinstance(target, qetast.Name):
                 variable_name = target.id
                 if variable_name[0].isdigit():
                     variable_name = f"_{variable_name}"
@@ -16,12 +16,12 @@ class VariableDeclarationCollector(ast.NodeVisitor):
         self.generic_visit(node)
 
 
-class CUCollector(ast.NodeVisitor):
+class CUCollector(qetast.NodeVisitor):
     def __init__(self):
         self.cu_instances = []
 
     def visit_Call(self, node):
-        if isinstance(node.func, ast.Name) and node.func.id == 'CU':
+        if isinstance(node.func, qetast.Name) and node.func.id == 'CU':
             position = generate_ocaml_code_for_expression(node.args[0])
             inner_exp = generate_ocaml_code_for_expression(node.args[1])
             self.cu_instances.append((position, inner_exp))
@@ -42,16 +42,16 @@ def generate_ocaml_code(cu_instances, variable_declarations):
 
 
 def generate_ocaml_code_for_expression(node):
-    if isinstance(node, ast.BinOp):
+    if isinstance(node, qetast.BinOp):
         left = generate_ocaml_code_for_expression(node.left)
-        op = ast.get_op_symbol(node.op)
+        op = qetast.get_op_symbol(node.op)
         right = generate_ocaml_code_for_expression(node.right)
         return f"({left} {op} {right})"
-    elif isinstance(node, ast.Name):
+    elif isinstance(node, qetast.Name):
         if node.id[0].isdigit():
             return f"_{node.id}"
         return node.id
-    elif isinstance(node, ast.Num):
+    elif isinstance(node, qetast.Num):
         return str(node.n)
     else:
         # Handle other cases as needed
@@ -67,7 +67,7 @@ CU(3, 5)
 CU(2, 2)
 """
 
-tree = ast.parse(python_code)
+tree = qetast.parse(python_code)
 
 variable_collector = VariableDeclarationCollector()
 variable_collector.visit(tree)

@@ -157,6 +157,7 @@ class QCtoXMLProgrammer:
         else:
             print("Warning: Unrecognized operation", name)
 
+        # TODO: Write post parser processors for this
         # Validate that any rotation angle is a concrete number (not an unbound parameter)
         for exp in exps:
             if type(exp) in [QXRY, QXRZ]:
