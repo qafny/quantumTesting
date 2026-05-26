@@ -6,15 +6,15 @@ from qiskit import QuantumCircuit, transpile
 from parser.qiskit import QiskitASTParser
 
 
-def transpile_qiskit_circuit(qc: QuantumCircuit, gate_set: List[str], ignored_gate_set: List[str] = [], should_optimize: bool = False) -> QuantumCircuit:
+def transpile_qiskit_circuit(qc: QuantumCircuit, gate_set: List[str], should_optimize: bool = False) -> QuantumCircuit:
     if should_optimize:
-        return transpile(qc, basis_gates = gate_set + ignored_gate_set)
+        return transpile(qc, basis_gates = gate_set)
 
-    return transpile(qc, basis_gates = gate_set + ignored_gate_set, optimization_level=0)
+    return transpile(qc, basis_gates = gate_set, optimization_level=0)
 
 
-def parse_qiskit_circuit(qc: QuantumCircuit, gate_set: List[str], ignored_gate_set: List[str] = []) -> QuantumCircuit:
-    tqc: QuantumCircuit = transpile_qiskit_circuit(qc, gate_set, ignored_gate_set)
+def parse_qiskit_circuit(qc: QuantumCircuit, gate_set: List[str]) -> QuantumCircuit:
+    tqc: QuantumCircuit = transpile_qiskit_circuit(qc, gate_set)
 
     ast_parser = QiskitASTParser(tqc)
     return ast_parser.parse()
