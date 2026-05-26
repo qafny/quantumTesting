@@ -25,8 +25,6 @@ class QiskitASTParser:
                 return [QXH(qubits[0].ID())]
             case "x":
                 return [QXX(qubits[0].ID())]
-            case "y":
-                return [QXRY(qubits[0].ID(), QXConstant(90))]
             case "z":
                 return [QXRZ(qubits[0].ID(), QXConstant(180))]
             case "s":
@@ -37,20 +35,18 @@ class QiskitASTParser:
                 return [QXRZ(qubits[0].ID(), QXConstant(45))]
             case "tdg":
                 return [QXRZ(qubits[0].ID(), QXConstant(-45))]
-            case "ry":
-                return [QXRY(qubits[0].ID(), QXConstant(params[0] * 180 / math.pi))]
             case "rz":
                 return [QXRZ(qubits[0].ID(), QXConstant(params[0] * 180 / math.pi))]
-            case "u":
-                return [
-                    QXRZ(qubits[0].ID(), QXConstant(params[0] * 180 / math.pi)),
-                    QXRY(qubits[0].ID(), QXConstant(params[1] * 180 / math.pi)),
-                    QXRZ(qubits[0].ID(), QXConstant(params[2] * 180 / math.pi)),
-                ]
             case "cx":
                 return [
                     QXCU(qubits[0].ID(), QXProgram([
                         QXX(qubits[1].ID())
+                    ]))
+                ]
+            case "crz":
+                return [
+                    QXCU(qubits[0].ID(), QXProgram([
+                        QXRZ(qubits[1].ID(), QXConstant(params[0] * 180 / math.pi)),
                     ]))
                 ]
             case "ccx":
@@ -61,16 +57,84 @@ class QiskitASTParser:
                         ]))
                     ]))
                 ]
-            case "cz":
+            case "ccrz":
                 return [
                     QXCU(qubits[0].ID(), QXProgram([
-                        QXRZ(qubits[1].ID(), QXConstant(180)),
+                        QXCU(qubits[1].ID(), QXProgram([
+                            QXRZ(qubits[2].ID(), QXConstant(params[0] * 180 / math.pi)),
+                        ]))
                     ]))
                 ]
-            case "crz":
+            case "cccx":
                 return [
                     QXCU(qubits[0].ID(), QXProgram([
-                        QXRZ(qubits[1].ID(), QXConstant(params[0] * 180 / math.pi)),
+                        QXCU(qubits[1].ID(), QXProgram([
+                            QXCU(qubits[2].ID(), QXProgram([
+                                QXX(qubits[3].ID()),
+                            ]))
+                        ]))
+                    ]))
+                ]
+            case "cccrz":
+                return [
+                    QXCU(qubits[0].ID(), QXProgram([
+                        QXCU(qubits[1].ID(), QXProgram([
+                            QXCU(qubits[2].ID(), QXProgram([
+                                QXRZ(qubits[3].ID(), QXConstant(params[0] * 180 / math.pi)),
+                            ]))
+                        ]))
+                    ]))
+                ]
+            case "ccccx":
+                return [
+                    QXCU(qubits[0].ID(), QXProgram([
+                        QXCU(qubits[1].ID(), QXProgram([
+                            QXCU(qubits[2].ID(), QXProgram([
+                                QXCU(qubits[3].ID(), QXProgram([
+                                    QXX(qubits[4].ID()),
+                                ]))
+                            ]))
+                        ]))
+                    ]))
+                ]
+            case "ccccrz":
+                return [
+                    QXCU(qubits[0].ID(), QXProgram([
+                        QXCU(qubits[1].ID(), QXProgram([
+                            QXCU(qubits[2].ID(), QXProgram([
+                                QXCU(qubits[3].ID(), QXProgram([
+                                    QXRZ(qubits[4].ID(), QXConstant(params[0] * 180 / math.pi)),
+                                ]))
+                            ]))
+                        ]))
+                    ]))
+                ]
+            case "cccccx":
+                return [
+                    QXCU(qubits[0].ID(), QXProgram([
+                        QXCU(qubits[1].ID(), QXProgram([
+                            QXCU(qubits[2].ID(), QXProgram([
+                                QXCU(qubits[3].ID(), QXProgram([
+                                    QXCU(qubits[4].ID(), QXProgram([
+                                        QXX(qubits[5].ID()),
+                                    ]))
+                                ]))
+                            ]))
+                        ]))
+                    ]))
+                ]
+            case "cccccrz":
+                return [
+                    QXCU(qubits[0].ID(), QXProgram([
+                        QXCU(qubits[1].ID(), QXProgram([
+                            QXCU(qubits[2].ID(), QXProgram([
+                                QXCU(qubits[3].ID(), QXProgram([
+                                    QXCU(qubits[4].ID(), QXProgram([
+                                        QXRZ(qubits[5].ID(), QXConstant(params[0] * 180 / math.pi)),
+                                    ]))
+                                ]))
+                            ]))
+                        ]))
                     ]))
                 ]
             case "measure":
