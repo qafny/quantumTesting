@@ -1,8 +1,8 @@
 from qetast.nodes import QXProgram, QXH, QXCU
-from qetast.program import QETProgramGenerator
+from qetast.program import QETASTGenerator
 
 
-class PrecedingHadamardEliminationProcessor(QETProgramGenerator):
+class PrecedingHadamardEliminationProcessor(QETASTGenerator):
 
     def __init__(self):
         self.is_program_not_root: bool = False
@@ -34,7 +34,7 @@ class PrecedingHadamardEliminationProcessor(QETProgramGenerator):
         return retval
 
 
-class SucceedingHadamardEliminationProcessor(QETProgramGenerator):
+class SucceedingHadamardEliminationProcessor(QETASTGenerator):
 
     def __init__(self):
         self.is_program_not_root: bool = False
