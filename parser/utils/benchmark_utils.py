@@ -1,10 +1,11 @@
 import json
 import os
 import importlib
+import traceback
 from typing import Dict
 
 
-def get_default_parameters(circuit_info: Dict):
+def get_default_parameters(benchmark_folder: str, circuit_info: Dict):
     params = {}
     param_info = circuit_info.get('parameters', {})
 
@@ -13,23 +14,28 @@ def get_default_parameters(circuit_info: Dict):
             continue
 
         default = param_data.get('default')
-        annotation = param_data.get('annotation', '')
+        annotation = param_data.get('annotation')
 
         if default is None:
-            if 'int' in str(annotation):
+            if annotation is None:
+                argument_loader = param_data.get('argument_loader')
+                argument_identifier = param_data.get('argument_identifier')
+
+                if argument_loader is not None and argument_identifier is not None:
+                    argument_loader_file_path = os.path.join(benchmark_folder, argument_loader)
+                    if os.path.exists(argument_loader_file_path):
+                        namespace = {}
+                        with open(argument_loader_file_path, "r") as argument_loader:
+                            exec(argument_loader.read(), namespace)
+
+                        params[param_name] = namespace.get(argument_identifier)
+            elif 'int' in str(annotation):
                 if 'num_qubits' in param_name or 'num_state_qubits' in param_name or 'num_variable_qubits' in param_name:
                     params[param_name] = 2
                 elif 'reps' in param_name:
                     params[param_name] = 1
                 else:
                     params[param_name] = 2
-            elif 'list' in str(annotation) or 'Sequence' in str(annotation):
-                continue
-            elif 'str' in str(annotation):
-                if default is not None:
-                    params[param_name] = default
-            else:
-                continue
         else:
             params[param_name] = default
 
@@ -53,7 +59,7 @@ def read_benchmark(benchmark_folder: str):
             module = importlib.import_module(module_path)
             circuit_class = getattr(module, class_name)
 
-            params = get_default_parameters(circuit_info)
+            params = get_default_parameters(benchmark_folder, circuit_info)
             circuit = circuit_class(**params)
 
             base_classes = [b.__name__ for b in circuit_class.__bases__]
@@ -65,6 +71,7 @@ def read_benchmark(benchmark_folder: str):
             circuits.append(circuit)
 
         except:
+            traceback.print_exc()
             # TODO: Temporary fix. Remove this
             pass
 
