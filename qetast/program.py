@@ -1,4 +1,4 @@
-from qetast.nodes import QXRoot, QXProgram, QXQubit, QXConstant, QXH, QXX, QXRY, QXRZ, QXCU
+from qetast.nodes import QXRoot, QXProgram, QXQubit, QXConstant, QXH, QXX, QXRZ, QXCU
 from qetast.base import AbstractASTVisitor
 from qetast.nodes import QXQubit, QXConstant, QXQGate
 
@@ -20,8 +20,6 @@ class QETASTVisitor(AbstractASTVisitor):
             return self.visitH(node)
         elif isinstance(node, QXX):
             return self.visitX(node)
-        elif isinstance(node, QXRY):
-            return self.visitRY(node)
         elif isinstance(node, QXRZ):
             return self.visitRZ(node)
         elif isinstance(node, QXCU):
@@ -56,9 +54,6 @@ class QETASTVisitor(AbstractASTVisitor):
     def visitX(self, node: QXX):
         return True
 
-    def visitRY(self, node: QXRY):
-        return node.phase().accept(self)
-
     def visitRZ(self, node: QXRZ):
         return node.phase().accept(self)
 
@@ -66,7 +61,7 @@ class QETASTVisitor(AbstractASTVisitor):
         return node.program().accept(self)
 
 
-class QETProgramGenerator(QETASTVisitor):
+class QETASTGenerator(QETASTVisitor):
 
     def visitRoot(self, node: QXRoot):
         program = node.program().accept(self)
@@ -96,10 +91,6 @@ class QETProgramGenerator(QETASTVisitor):
 
     def visitX(self, node: QXX):
         return QXX(node.qubit(), node.name()).instance(node.get_id())
-
-    def visitRY(self, node: QXRY):
-        phase = node.phase().accept(self)
-        return QXRY(node.qubit(), phase, node.name()).instance(node.get_id())
 
     def visitRZ(self, node: QXRZ):
         phase = node.phase().accept(self)

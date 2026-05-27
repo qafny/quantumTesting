@@ -1,6 +1,6 @@
 import math
 from qiskit import QuantumCircuit
-from qetast.nodes import QXRoot, QXH, QXX, QXRY, QXRZ, QXCU
+from qetast.nodes import QXRoot, QXH, QXX, QXRZ, QXCU
 from qetast.program import QETASTVisitor
 
 
@@ -41,27 +41,6 @@ class QuantumCircuitPrinter(QETASTVisitor):
             # TODO: Add support for more than two control gates (qiskit does not support beyond ccx)
             kwargs = self.prepare_controlled_gate_kwargs(node.qubit())
             getattr(self.qc, self.c["prefix"] + "x")(**kwargs)
-        return True
-
-    def visitRY(self, node: QXRY):
-        if self.c["prefix"] == "":
-            match node.phase().value():
-                case 90:
-                    self.qc.y(int(node.qubit()))
-                case _:
-                    _theta = node.phase().value() * math.pi / 180
-                    self.qc.ry(theta = _theta, qubit = int(node.qubit()))
-        else:
-            # TODO: Add support for more than one control gate (qiskit does not support beyond cy)
-            kwargs = self.prepare_controlled_gate_kwargs(node.qubit())
-
-            match node.phase().value():
-                case 90:
-                    getattr(self.qc, self.c["prefix"] + "y")(control_qubit = self.c["qubits"][0], target_qubit = int(node.qubit()))
-                case _:
-                    kwargs["theta"] = node.phase().value() * math.pi / 180
-                    getattr(self.qc, self.c["prefix"] + "ry")(**kwargs)
-
         return True
 
     def visitRZ(self, node: QXRZ):

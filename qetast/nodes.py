@@ -121,7 +121,7 @@ class QXH(QXQGate):
     def __init__(self, qubit_idx: str, name: str = None):
         super().__init__(qubit_idx, name = name)
 
-    def accept(self, visitor : AbstractASTVisitor):
+    def accept(self, visitor: AbstractASTVisitor):
         return visitor.visitH(self)
 
 
@@ -132,19 +132,6 @@ class QXX(QXQGate):
 
     def accept(self, visitor: AbstractASTVisitor):
         return visitor.visitX(self)
-
-
-class QXRY(QXQGate):
-
-    def __init__(self, qubit_idx: str, phase: QXConstant, name: str = None):
-        super().__init__(qubit_idx, name = name)
-        self._phase = phase
-
-    def accept(self, visitor: AbstractASTVisitor):
-        return visitor.visitRY(self)
-
-    def phase(self):
-        return self._phase
 
 
 class QXRZ(QXQGate):

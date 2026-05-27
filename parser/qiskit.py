@@ -2,7 +2,7 @@ import math
 from typing import List
 from qiskit import QuantumCircuit
 from qiskit.circuit import CircuitInstruction
-from qetast.nodes import QXQubit, QXH, QXX, QXRY, QXConstant, QXRZ, QXCU, QXProgram, QXRoot
+from qetast.nodes import QXQubit, QXH, QXX, QXConstant, QXRZ, QXCU, QXProgram, QXRoot
 
 
 class QiskitASTParser:
