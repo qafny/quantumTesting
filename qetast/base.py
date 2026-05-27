@@ -36,10 +36,6 @@ class AbstractASTVisitor(ABC):
         pass
 
     @abstractmethod
-    def visitRY(self, ctx):
-        pass
-
-    @abstractmethod
     def visitRZ(self, ctx):
         pass
 

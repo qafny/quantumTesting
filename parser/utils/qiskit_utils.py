@@ -3,18 +3,29 @@ import os
 from typing import List
 from matplotlib import pyplot as plt
 from qiskit import QuantumCircuit, transpile
+from qiskit.circuit import StandardEquivalenceLibrary
+from qiskit.transpiler import Target
+
+from evaluators.basis import GateSetBasis
 from parser.qiskit import QiskitASTParser
 
 
-def transpile_qiskit_circuit(qc: QuantumCircuit, gate_set: List[str], should_optimize: bool = False) -> QuantumCircuit:
-    if should_optimize:
-        return transpile(qc, basis_gates = gate_set)
+def transpile_qiskit_circuit(qc: QuantumCircuit, basis: GateSetBasis, optimization_level: int = 0) -> QuantumCircuit:
+    target = Target()
 
-    return transpile(qc, basis_gates = gate_set, optimization_level=0)
+    for gate, props in basis.get_gate_set():
+        target.add_instruction(gate, props)
+
+    for gate, props, gate_name in basis.get_custom_gate_definitions():
+        target.add_instruction(gate, props, name = gate_name)
+
+    transpiled_qc = transpile(qc, target = target, optimization_level = optimization_level)
+
+    return transpiled_qc
 
 
-def parse_qiskit_circuit(qc: QuantumCircuit, gate_set: List[str]) -> QuantumCircuit:
-    tqc: QuantumCircuit = transpile_qiskit_circuit(qc, gate_set)
+def parse_qiskit_circuit(qc: QuantumCircuit, basis: GateSetBasis) -> QuantumCircuit:
+    tqc: QuantumCircuit = transpile_qiskit_circuit(qc, basis)
 
     ast_parser = QiskitASTParser(tqc)
     return ast_parser.parse()
