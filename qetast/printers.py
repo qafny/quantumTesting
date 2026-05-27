@@ -72,7 +72,7 @@ class QuantumCircuitPrinter(QETASTVisitor):
                     getattr(self.qc, self.c["prefix"] + "sdg")(**kwargs)
                 # TODO: Check for no controlled t and tdg gates
                 case _:
-                    kwargs["phi"] = node.phase().value() * math.pi / 180
+                    kwargs["theta"] = node.phase().value() * math.pi / 180
                     getattr(self.qc, self.c["prefix"] + "rz")(**kwargs)
 
         return True
