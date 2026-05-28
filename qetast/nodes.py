@@ -4,7 +4,7 @@ from typing import List
 from qetast.base import AbstractASTVisitor
 
 
-class QXTop:
+class QXNode:
 
     def __init__(self):
         self.uid = str(id(self)) + str(time.time())
@@ -33,7 +33,7 @@ class QXTop:
         return result
 
 
-class QXExp(QXTop):
+class QXExp(QXNode):
 
     def __init__(self, name: str):
         super().__init__()
@@ -46,7 +46,7 @@ class QXExp(QXTop):
         return self._name
 
 
-class QXQubit(QXTop):
+class QXQubit(QXNode):
 
     def __init__(self, idx: str):
         super().__init__()
@@ -60,7 +60,7 @@ class QXQubit(QXTop):
         return self._idx
 
 
-class QXConstant(QXTop):
+class QXConstant(QXNode):
 
     def __init__(self, value: float):
         super().__init__()
@@ -73,7 +73,7 @@ class QXConstant(QXTop):
         return self._value
 
 
-class QXRoot(QXTop):
+class QXRoot(QXNode):
 
     def __init__(self, program: QXProgram, qubits: List[QXQubit]):
         super().__init__()
@@ -90,7 +90,7 @@ class QXRoot(QXTop):
         return self._qubits
 
 
-class QXProgram(QXTop):
+class QXProgram(QXNode):
 
     def __init__(self, exps: List[QXExp]):
         super().__init__()
@@ -158,3 +158,16 @@ class QXCU(QXQGate):
 
     def program(self):
         return self._program
+
+
+class QXMarkedNode(QXNode):
+
+    def __init__(self, elem: QXNode):
+        super().__init__()
+        self._elem = elem
+
+    def accept(self, visitor: AbstractASTVisitor):
+        return visitor.visitMarkedNode(self)
+
+    def elem(self):
+        return self._elem
