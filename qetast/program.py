@@ -1,4 +1,4 @@
-from qetast.nodes import QXRoot, QXProgram, QXQubit, QXConstant, QXH, QXX, QXRZ, QXCU, QXMarkedNode
+from qetast.nodes import QXRoot, QXProgram, QXQubit, QXConstant, QXH, QXX, QXRZ, QXCU, QXMarkedNode, QXDummyNode
 from qetast.base import AbstractASTVisitor
 from qetast.nodes import QXQubit, QXConstant, QXQGate
 
@@ -26,6 +26,8 @@ class QETASTVisitor(AbstractASTVisitor):
             return self.visitCU(node)
         elif isinstance(node, QXMarkedNode):
             return self.visitMarkedNode(node)
+        elif isinstance(node, QXDummyNode):
+            return self.visitDummyNode(node)
         else:
             raise Exception(f"Unknown node: {node}")
 
@@ -64,6 +66,9 @@ class QETASTVisitor(AbstractASTVisitor):
 
     def visitMarkedNode(self, node: QXMarkedNode):
         return node.elem().accept(self)
+
+    def visitDummyNode(self, node: QXDummyNode):
+        return True
 
 
 class QETASTGenerator(QETASTVisitor):
@@ -107,3 +112,6 @@ class QETASTGenerator(QETASTVisitor):
 
     def visitMarkedNode(self, node: QXMarkedNode):
         return QXMarkedNode(node.elem().accept()).instance(node.get_id())
+
+    def visitDummyNode(self, node: QXDummyNode):
+        return QXDummyNode().instance(node.get_id())

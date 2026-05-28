@@ -171,3 +171,12 @@ class QXMarkedNode(QXNode):
 
     def elem(self):
         return self._elem
+
+
+class QXDummyNode(QXNode):
+
+    def __init__(self):
+        super().__init__()
+
+    def accept(self, visitor: AbstractASTVisitor):
+        return visitor.visitDummyNode(self)
