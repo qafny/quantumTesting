@@ -12,33 +12,37 @@ class AbstractASTVisitor(ABC):
         pass
 
     @abstractmethod
-    def visitProgram(self, ctx):
+    def visitProgram(self, node):
         pass
 
     @abstractmethod
-    def visitQubit(self, ctx):
+    def visitQubit(self, node):
         pass
 
     @abstractmethod
-    def visitConstant(self, ctx):
+    def visitConstant(self, node):
         pass
 
     @abstractmethod
-    def visitQGate(self, ctx):
+    def visitQGate(self, node):
         pass
 
     @abstractmethod
-    def visitH(self, ctx):
+    def visitH(self, node):
         pass
 
     @abstractmethod
-    def visitX(self, ctx):
+    def visitX(self, node):
         pass
 
     @abstractmethod
-    def visitRZ(self, ctx):
+    def visitRZ(self, node):
         pass
 
     @abstractmethod
-    def visitCU(self, ctx):
+    def visitCU(self, node):
+        pass
+
+    @abstractmethod
+    def visitMarkedNode(self, node):
         pass
