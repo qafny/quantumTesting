@@ -2,7 +2,8 @@ import parser.utils.benchmark_utils as benchmark_utils
 from evaluators.basis import QiskitBasis
 from parser.utils import qiskit_utils
 from qetast.printers import QuantumCircuitPrinter
-from qetast.processors import PrecedingHadamardEliminationProcessor, SucceedingHadamardEliminationProcessor
+from qetast.markers import PrefixedHadamardGatesMarker, SuffixedHadamardGatesMarker
+from qetast.processors import MarkedNodeEliminator
 from qetast.simulators import QETSimulator
 from qetast.values import CoqNVal
 
@@ -21,13 +22,20 @@ qiskit_utils.visualize_qiskit_circuit(qc, title="Input QC")
 
 ast = qiskit_utils.parse_qiskit_circuit(qc, QiskitBasis())
 
-procs = [
-    PrecedingHadamardEliminationProcessor(),
-    SucceedingHadamardEliminationProcessor(),
+pre_markers = [
+    PrefixedHadamardGatesMarker(),
+    SuffixedHadamardGatesMarker(),
 ]
 
-for ctr in procs:
-    ast = ctr.visitRoot(ast)
+for marker in pre_markers:
+    ast = marker.visitRoot(ast)
+
+pre_elims = [
+    MarkedNodeEliminator(),
+]
+
+for elim in pre_elims:
+    ast = elim.visitRoot(ast)
 
 printer = QuantumCircuitPrinter()
 printer.visitRoot(ast)
