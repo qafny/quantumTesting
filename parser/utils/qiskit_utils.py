@@ -8,6 +8,7 @@ from qiskit.transpiler import Target
 
 from evaluators.basis import GateSetBasis
 from parser.qiskit import QiskitASTParser
+from qetast.nodes import QXRoot
 
 
 def transpile_qiskit_circuit(qc: QuantumCircuit, basis: GateSetBasis, optimization_level: int = 0) -> QuantumCircuit:
@@ -24,7 +25,7 @@ def transpile_qiskit_circuit(qc: QuantumCircuit, basis: GateSetBasis, optimizati
     return transpiled_qc
 
 
-def parse_qiskit_circuit(qc: QuantumCircuit, basis: GateSetBasis) -> QuantumCircuit:
+def parse_qiskit_circuit(qc: QuantumCircuit, basis: GateSetBasis) -> QXRoot:
     tqc: QuantumCircuit = transpile_qiskit_circuit(qc, basis)
 
     ast_parser = QiskitASTParser(tqc)
