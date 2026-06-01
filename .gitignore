@@ -1,6 +1,5 @@
 .hypothesis/
-AST_Scripts/__pycache__/
-qiskit-to-xmlprogrammer/__pycache__/
+support/qiskit-to-xmlprogrammer/__pycache__/
 *.aux
 *.cache
 *.glob
