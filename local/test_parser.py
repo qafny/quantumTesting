@@ -1,5 +1,5 @@
 import parser.utils.qiskit_utils as qiskit_utils
-from evaluators.basis import QiskitBasis
+from evaluators.basis import QETGateSetBasis
 from qetast.markers import PrefixedHadamardGatesMarker, SuffixedHadamardGatesMarker
 from qetast.printers import QuantumCircuitPrinter
 from qetast.processors import MarkedNodeEliminator
@@ -9,7 +9,7 @@ benchmark_path = "benchmarks/custom/ghz"
 qc = qiskit_utils.read_qiskit_custom_benchmark(benchmark_path)
 qiskit_utils.visualize_qiskit_circuit(qc, title="Input QC")
 
-ast = qiskit_utils.parse_qiskit_circuit(qc, QiskitBasis())
+ast = qiskit_utils.parse_qiskit_circuit(qc, QETGateSetBasis())
 
 pre_markers = [
     PrefixedHadamardGatesMarker(),
