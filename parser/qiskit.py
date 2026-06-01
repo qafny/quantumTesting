@@ -2,7 +2,7 @@ import math
 from typing import List
 from qiskit import QuantumCircuit
 from qiskit.circuit import CircuitInstruction
-from qetast.nodes import QXQubit, QXH, QXX, QXConstant, QXRZ, QXCU, QXProgram, QXRoot
+from qetast.nodes import QXQubit, QXH, QXX, QXConstant, QXRZ, QXCU, QXProgram, QXRoot, QXMeasure
 
 
 class QiskitASTParser:
@@ -138,7 +138,10 @@ class QiskitASTParser:
                     ]))
                 ]
             case "measure":
-                return []
+                # TODO: Is it the same to measure qubits individually and measure them together in qiskit?
+                return [
+                    QXMeasure(qubit.ID()) for qubit in qubits
+                ]
 
         return None
 

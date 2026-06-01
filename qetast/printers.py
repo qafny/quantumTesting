@@ -1,6 +1,6 @@
 import math
 from qiskit import QuantumCircuit
-from qetast.nodes import QXRoot, QXH, QXX, QXRZ, QXCU
+from qetast.nodes import QXRoot, QXH, QXX, QXRZ, QXCU, QXMeasure
 from qetast.program import QETASTVisitor
 
 
@@ -8,6 +8,8 @@ class QuantumCircuitPrinter(QETASTVisitor):
 
     def __init__(self):
         self.qc: QuantumCircuit = None
+
+        self.cbit_count = 0
 
         self.c = self.c = {
             "prefix": "",
@@ -86,3 +88,44 @@ class QuantumCircuitPrinter(QETASTVisitor):
         self.c["qubits"] = self.c["qubits"][:-1]
 
         return retval
+
+    def visitMeasure(self, node: QXMeasure):
+        self.qc.measure(int(node.qubit()), self.cbit_count)
+        self.cbit_count += 1
+
+        return True
+
+
+class TSimPrinter(QETASTVisitor):
+
+    def __init__(self):
+        self.tsim_program = ""
+        self.c_qubit = ""
+
+    def visitH(self, node: QXH):
+        self.tsim_program += f"H {node.qubit()}\n"
+        return True
+
+    def visitX(self, node: QXX):
+        if self.c_qubit != "":
+            self.tsim_program += f"CNOT {self.c_qubit} {node.qubit()}\n"
+
+        return True
+
+    def visitRZ(self, node: QXRZ):
+        if node.phase() == 90:
+            self.tsim_program += f"S {node.qubit()}\n"
+        elif node.phase() == 45:
+            self.tsim_program += f"T {node.qubit()}\n"
+
+        return True
+
+    def visitCU(self, node: QXCU):
+        self.c_qubit = node.qubit()
+        retval = node.program().accept(self)
+        self.c_qubit = ""
+
+        return retval
+
+    def visitMeasure(self, node: QXMeasure):
+        self.tsim_program += f"M {node.qubit()}\n"

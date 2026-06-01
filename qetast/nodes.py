@@ -160,6 +160,15 @@ class QXCU(QXQGate):
         return self._program
 
 
+class QXMeasure(QXQGate):
+    
+    def __init__(self, qubit_idx: str, name: str = None):
+        super().__init__(qubit_idx, name)
+
+    def accept(self, visitor: AbstractASTVisitor):
+        return visitor.visitMeasure(self)
+
+
 class QXMarkedNode(QXNode):
 
     def __init__(self, elem: QXNode):
