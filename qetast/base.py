@@ -44,6 +44,10 @@ class AbstractASTVisitor(ABC):
         pass
 
     @abstractmethod
+    def visitMeasure(self, node):
+        pass
+
+    @abstractmethod
     def visitMarkedNode(self, node):
         pass
 

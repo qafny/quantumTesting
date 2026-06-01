@@ -1,7 +1,7 @@
 from typing import List, Dict, Tuple
 from qiskit import QuantumCircuit
-from qiskit.circuit import Parameter, Gate
-from qiskit.circuit.library import RZGate, C3XGate, C4XGate, XGate, HGate, CXGate, CRZGate, CCXGate
+from qiskit.circuit import Parameter, Gate, Measure
+from qiskit.circuit.library import RZGate, C3XGate, C4XGate, XGate, HGate, CXGate, CRZGate, CCXGate, TGate, SGate
 
 
 class GateSetBasis:
@@ -20,7 +20,7 @@ class GateSetBasis:
         return self.custom_gate_definitions
 
 
-class QiskitBasis(GateSetBasis):
+class QETGateSetBasis(GateSetBasis):
 
     '''
     Since there are no props for the custom gates, it assumes ideal simulation. However, if we need proper
@@ -29,12 +29,12 @@ class QiskitBasis(GateSetBasis):
     '''
 
     def __init__(self):
-        super(QiskitBasis, self).__init__(basis = [
+        super(QETGateSetBasis, self).__init__(basis = [
             (HGate(), None),
             (XGate(), None),
             (RZGate(Parameter("Phi")), None),
             (CXGate(), None),
-            (CRZGate(Parameter("Phi")), None),
+            (CRZGate(Parameter("Theta")), None),
             (CCXGate(), None),
         ])
 
@@ -111,7 +111,13 @@ class QiskitBasis(GateSetBasis):
         self.add_custom_gate(gate, None, "cccccrz")
 
 
-class TSimBasisGates(GateSetBasis):
+class CliffordTGateSetBasis(GateSetBasis):
 
     def __init__(self):
-        super(TSimBasisGates, self).__init__(basis = ["h", "s", "cx", "t"])
+        super(CliffordTGateSetBasis, self).__init__(basis = [
+            (HGate(), None),
+            (SGate(), None),
+            (CXGate(), None),
+            (TGate(), None),
+            (Measure(), None)
+        ])
