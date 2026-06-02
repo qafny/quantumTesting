@@ -1,11 +1,8 @@
 import json
 import os
-from typing import List
 from matplotlib import pyplot as plt
 from qiskit import QuantumCircuit, transpile
-from qiskit.circuit import StandardEquivalenceLibrary
 from qiskit.transpiler import Target
-
 from evaluators.basis import GateSetBasis
 from parser.qiskit import QiskitASTParser
 from qetast.nodes import QXRoot
