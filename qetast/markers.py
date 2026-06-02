@@ -1,4 +1,4 @@
-from qetast.nodes import QXH, QXMarkedNode, QXProgram, QXCU
+from qetast.nodes import QXH, QXMarkedNode, QXProgram, QXCU, QXMeasure
 from qetast.program import QETASTGenerator
 
 
@@ -62,3 +62,9 @@ class SuffixedHadamardGatesMarker(QETASTGenerator):
             return QXMarkedNode(node)
         else:
             return super(SuffixedHadamardGatesMarker, self).visitH(node)
+
+
+class MeasureGateMarker(QETASTGenerator):
+
+    def visitMeasure(self, node: QXMeasure):
+        return QXMarkedNode(node)

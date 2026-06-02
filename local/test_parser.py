@@ -1,6 +1,6 @@
 import parser.utils.qiskit_utils as qiskit_utils
 from evaluators.basis import QETGateSetBasis
-from qetast.markers import PrefixedHadamardGatesMarker, SuffixedHadamardGatesMarker
+from qetast.markers import PrefixedHadamardGatesMarker, SuffixedHadamardGatesMarker, MeasureGateMarker
 from qetast.printers import QuantumCircuitPrinter
 from qetast.processors import MarkedNodeEliminator
 
@@ -14,6 +14,7 @@ ast = qiskit_utils.parse_qiskit_circuit(qc, QETGateSetBasis())
 pre_markers = [
     PrefixedHadamardGatesMarker(),
     SuffixedHadamardGatesMarker(),
+    MeasureGateMarker(),
 ]
 
 for marker in pre_markers:
