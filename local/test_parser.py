@@ -1,21 +1,29 @@
 import parser.utils.qiskit_utils as qiskit_utils
 from evaluators.basis import QETGateSetBasis
+from local.test_benchmark import pre_markers
 from qetast.markers import PrefixedHadamardGatesMarker, SuffixedHadamardGatesMarker, MeasureGateMarker
 from qetast.printers import QuantumCircuitPrinter
 from qetast.processors import MarkedNodeEliminator
+from qetast.simulators import QETSimulator
+import cmath
 
-benchmark_path = "benchmarks/custom/ghz"
+benchmark_path = "benchmarks/testing/custom/oneh"
+initial_state = [
+    (1 + 0j, {"0": False})
+]
 
 qc = qiskit_utils.read_qiskit_custom_benchmark(benchmark_path)
-qiskit_utils.visualize_qiskit_circuit(qc, title="Input QC")
+# qiskit_utils.visualize_qiskit_circuit(qc, title="Input QC")
 
 ast = qiskit_utils.parse_qiskit_circuit(qc, QETGateSetBasis())
 
-pre_markers = [
-    PrefixedHadamardGatesMarker(),
-    SuffixedHadamardGatesMarker(),
-    MeasureGateMarker(),
-]
+# pre_markers = [
+#     PrefixedHadamardGatesMarker(),
+#     SuffixedHadamardGatesMarker(),
+#     MeasureGateMarker(),
+# ]
+
+pre_markers = []
 
 for marker in pre_markers:
     ast = marker.visitRoot(ast)
@@ -27,7 +35,16 @@ pre_elims = [
 for elim in pre_elims:
     ast = elim.visitRoot(ast)
 
-printer = QuantumCircuitPrinter()
-printer.visitRoot(ast)
 
-qiskit_utils.visualize_qiskit_circuit(printer.qc, title="Output QC")
+simulator = QETSimulator(initial_state)
+simulator.visitRoot(ast)
+
+0 = 00
+1 = 01
+2 = 10
+3 = 11
+
+# printer = QuantumCircuitPrinter()
+# printer.visitRoot(ast)
+
+# qiskit_utils.visualize_qiskit_circuit(printer.qc, title="Output QC")
