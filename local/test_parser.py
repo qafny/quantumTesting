@@ -39,11 +39,6 @@ for elim in pre_elims:
 simulator = QETSimulator(initial_state)
 simulator.visitRoot(ast)
 
-0 = 00
-1 = 01
-2 = 10
-3 = 11
-
 # printer = QuantumCircuitPrinter()
 # printer.visitRoot(ast)
 
