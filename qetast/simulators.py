@@ -87,7 +87,7 @@ class QETSimulator(QETASTVisitor):
                 tmp = self.state
                 self.state = [it[i]]
                 node.program().accept(self)
-                re.append(self.state)
+                re.extend(self.state)
                 self.state = tmp
             else:
                 re.append(it[i])
