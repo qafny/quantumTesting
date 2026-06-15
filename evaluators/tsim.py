@@ -1,23 +1,25 @@
 import math
 from typing import Dict
 import numpy as np
+from qiskit import QuantumCircuit
 from tsim import Circuit
 from evaluators.base import BaseEvaluator
+from evaluators.basis import CliffordTGateSetBasis
 from qetast.nodes import QXRoot
 from qetast.printers import TSimPrinter
 
 
 class TSimEvaluator(BaseEvaluator):
 
-    def __init__(self, root: QXRoot):
-        super(TSimEvaluator).__init__()
+    def __init__(self, qc: QuantumCircuit):
+        super(TSimEvaluator, self).__init__(qc, CliffordTGateSetBasis())
         self.u: np.ndarray = None
 
-        self.setup_unitary(root)
+        self.setup_unitary()
 
-    def setup_unitary(self, root: QXRoot):
+    def setup_unitary(self):
         tsim_printer = TSimPrinter()
-        tsim_printer.visitRoot(root)
+        tsim_printer.visitRoot(self.get_circuit_ast())
 
         tsim_src = tsim_printer.tsim_program
 

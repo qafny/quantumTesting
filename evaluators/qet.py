@@ -1,6 +1,7 @@
 from typing import Dict, List
+from qiskit import QuantumCircuit
 from evaluators.base import BaseEvaluator
-from qetast.nodes import QXRoot
+from evaluators.basis import QETGateSetBasis
 from qetast.simulators import QETSimulator
 
 
@@ -41,14 +42,13 @@ def get_system_state_from_qubits(qubit_states: Dict[str, bool]):
 
 class QETEvaluator(BaseEvaluator):
 
-    def __init__(self, root: QXRoot):
-        super(QETEvaluator, self).__init__()
-        self.root = root
+    def __init__(self, qc: QuantumCircuit):
+        super(QETEvaluator, self).__init__(qc, QETGateSetBasis())
 
     def evaluate(self, ins: Dict[str, bool]):
         initial_state = get_system_state_from_qubits(ins)
 
         simulator = QETSimulator(initial_state)
-        simulator.visitRoot(self.root)
+        simulator.visitRoot(self.ast)
 
         return simulator.state

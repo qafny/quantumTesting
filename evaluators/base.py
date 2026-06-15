@@ -1,20 +1,28 @@
 from abc import ABC, abstractmethod
-
-from parser.qiskit import QiskitASTParser
+from typing import Dict
+from qiskit import QuantumCircuit
+from evaluators.basis import GateSetBasis
+from parser.utils.qiskit_utils import parse_qiskit_circuit
 from qetast.nodes import QXRoot
 
 
 class BaseEvaluator(ABC):
 
-    def __init__(self):
-        self._state = None
+    def __init__(self, qc: QuantumCircuit, gateset_basis: GateSetBasis):
+        self._qc: QuantumCircuit = qc
+        self._gateset_basis: GateSetBasis = gateset_basis
 
-    def set_state(self, state):
-        self._state = state
+        self.ast: QXRoot = parse_qiskit_circuit(self._qc, self._gateset_basis)
 
-    def get_state(self):
-        return self._state
+    def get_circuit(self):
+        return self._qc
+
+    def get_gateset_basis(self):
+        return self._gateset_basis
+
+    def get_circuit_ast(self):
+        return self.ast
 
     @abstractmethod
-    def evaluate(self, *args, **kwargs):
+    def evaluate(self, ins: Dict[str, bool]):
         pass
