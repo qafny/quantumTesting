@@ -1,5 +1,5 @@
 from qiskit import QuantumCircuit
 
 
-qc = QuantumCircuit(1)
+qc = QuantumCircuit(2)
 qc.h(0)
