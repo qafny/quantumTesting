@@ -102,6 +102,13 @@ class TSimPrinter(QETASTVisitor):
         self.tsim_program = ""
         self.c_qubit = ""
 
+    def visitRoot(self, node: QXRoot):
+        retval = super(TSimPrinter, self).visitRoot(node)
+        for qubit in node.qubits():
+            self.tsim_program += f"I {qubit.ID()}\n"
+
+        return retval
+
     def visitH(self, node: QXH):
         self.tsim_program += f"H {node.qubit()}\n"
         return True
