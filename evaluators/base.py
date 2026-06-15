@@ -16,5 +16,5 @@ class BaseEvaluator(ABC):
         return self._state
 
     @abstractmethod
-    def evaluate(self, root: QXRoot, *args, **kwargs):
+    def evaluate(self, *args, **kwargs):
         pass
