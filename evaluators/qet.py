@@ -1,44 +1,54 @@
-from typing import Dict
+from typing import Dict, List
 from evaluators.base import BaseEvaluator
-from qetast.markers import PrefixedHadamardGatesMarker, SuffixedHadamardGatesMarker, AllHadamardGatesMarker
 from qetast.nodes import QXRoot
-from qetast.processors import MarkedNodeEliminator
+from qetast.simulators import QETSimulator
+
+
+def create_state_from_bitvals(bitvals: List):
+    state = {}
+    for idx in range(len(bitvals)):
+        state[str(idx)] = bitvals[idx]
+
+    return state
+
+
+def generate_basis_states(bitvals: list, bstates: List[Dict], i: int):
+    if i == len(bitvals) - 1:
+        bitvals[i] = True
+        bstates.append(create_state_from_bitvals(bitvals))
+
+        bitvals[i] = False
+        bstates.append(create_state_from_bitvals(bitvals))
+    else:
+        bitvals[i] = True
+        generate_basis_states(bitvals, bstates, i + 1)
+
+        bitvals[i] = False
+        generate_basis_states(bitvals, bstates, i + 1)
+
+
+def get_system_state_from_qubits(qubit_states: Dict[str, bool]):
+    system_state = [(1 + 0j, qubit_states)]
+
+    basis_states = []
+    generate_basis_states([False] * len(qubit_states), basis_states, 0)
+    for basis_state in basis_states:
+        if basis_state != qubit_states:
+            system_state.append((0 + 0j, basis_state))
+
+    return system_state
 
 
 class QETEvaluator(BaseEvaluator):
 
-    PRE_MARKERS = [
-        PrefixedHadamardGatesMarker(),
-        SuffixedHadamardGatesMarker(),
-    ]
+    def __init__(self, root: QXRoot):
+        super(QETEvaluator, self).__init__()
+        self.root = root
 
-    PRE_ELIMINATORS = [
-        MarkedNodeEliminator(),
-    ]
+    def evaluate(self, ins: Dict[str, bool]):
+        initial_state = get_system_state_from_qubits(ins)
 
-    def __init__(self):
-        # TODO: Save evaluation results and such
-        pass
+        simulator = QETSimulator(initial_state)
+        simulator.visitRoot(self.root)
 
-    def apply_pre_markers(self, root: QXRoot):
-        for marker in self.PRE_MARKERS:
-            root = marker.visitRoot(root)
-
-        return root
-
-    def apply_pre_eliminators(self, root: QXRoot):
-        for eliminator in self.PRE_ELIMINATORS:
-            root = eliminator.visitRoot(root)
-
-        return root
-
-    def apply_mark_middle_hadamards(self, root: QXRoot):
-        ah_marker = AllHadamardGatesMarker()
-        return ah_marker.visitRoot(root)
-
-    def evaluate(self, root: QXRoot, state0: Dict, env0: Dict):
-        uroot = self.apply_pre_markers(root)
-        uroot = self.apply_pre_eliminators(uroot)
-
-        # Partitioned Evaluation
-        uroot = self.apply_mark_middle_hadamards(uroot)
+        return simulator.state
