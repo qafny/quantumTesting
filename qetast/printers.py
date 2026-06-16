@@ -120,9 +120,9 @@ class TSimPrinter(QETASTVisitor):
         return True
 
     def visitRZ(self, node: QXRZ):
-        if node.phase() == 90:
+        if node.phase().value() == 90:
             self.tsim_program += f"S {node.qubit()}\n"
-        elif node.phase() == 45:
+        elif node.phase().value() == 45:
             self.tsim_program += f"T {node.qubit()}\n"
 
         return True
