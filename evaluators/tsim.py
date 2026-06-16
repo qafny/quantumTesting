@@ -48,8 +48,16 @@ class TSimEvaluator(BaseEvaluator):
 
         state = []
         for idx, amp in np.ndenumerate(arr_out):
-            if np.isclose(amp, 0):
-                amp = 0 + 0j
+            if np.isclose(amp.real, 0):
+                if np.isclose(amp.imag, 0):
+                    amp = 0 + 0j
+                else:
+                    amp = complex(0, amp.imag)
+            elif np.isclose(amp.real, 1):
+                if np.isclose(amp.imag, 0):
+                    amp = 1 + 0j
+                else:
+                    amp = complex(1, amp.imag)
             else:
                 amp = complex(amp)
 
@@ -59,7 +67,6 @@ class TSimEvaluator(BaseEvaluator):
             sd = {}
             for i, bs in enumerate(frmtr_str.format(idx[0])):
                 sd[str(i)] = True if bs == "1" else False
-
 
             state.append((amp, sd))
 
