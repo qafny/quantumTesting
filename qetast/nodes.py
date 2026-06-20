@@ -75,10 +75,11 @@ class QXConstant(QXNode):
 
 class QXRoot(QXNode):
 
-    def __init__(self, program: QXProgram, qubits: List[QXQubit]):
+    def __init__(self, program: QXProgram, qubits: List[QXQubit], global_phase: float = 0.0):
         super().__init__()
         self._program = program
         self._qubits = qubits
+        self._global_phase = global_phase
 
     def accept(self, visitor: AbstractASTVisitor):
         return visitor.visitRoot(self)
@@ -88,6 +89,9 @@ class QXRoot(QXNode):
 
     def qubits(self):
         return self._qubits
+
+    def global_phase(self):
+        return self._global_phase
 
 
 class QXProgram(QXNode):

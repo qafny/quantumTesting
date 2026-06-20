@@ -26,17 +26,17 @@ class QiskitASTParser:
             case "x":
                 return [QXX(qubits[0].ID())]
             case "z":
-                return [QXRZ(qubits[0].ID(), QXConstant(180))]
+                return [QXRZ(qubits[0].ID(), QXConstant(math.pi))]
             case "s":
-                return [QXRZ(qubits[0].ID(), QXConstant(90))]
+                return [QXRZ(qubits[0].ID(), QXConstant(math.pi / 2))]
             case "sdg":
-                return [QXRZ(qubits[0].ID(), QXConstant(-90))]
+                return [QXRZ(qubits[0].ID(), QXConstant(-math.pi / 2))]
             case "t":
-                return [QXRZ(qubits[0].ID(), QXConstant(45))]
+                return [QXRZ(qubits[0].ID(), QXConstant(math.pi / 4))]
             case "tdg":
-                return [QXRZ(qubits[0].ID(), QXConstant(-45))]
+                return [QXRZ(qubits[0].ID(), QXConstant(-math.pi / 4))]
             case "rz":
-                return [QXRZ(qubits[0].ID(), QXConstant(params[0] * 180 / math.pi))]
+                return [QXRZ(qubits[0].ID(), QXConstant(params[0]))]
             case "cx":
                 return [
                     QXCU(qubits[0].ID(), QXProgram([
@@ -46,7 +46,7 @@ class QiskitASTParser:
             case "crz":
                 return [
                     QXCU(qubits[0].ID(), QXProgram([
-                        QXRZ(qubits[1].ID(), QXConstant(params[0] * 180 / math.pi)),
+                        QXRZ(qubits[1].ID(), QXConstant(params[0])),
                     ]))
                 ]
             case "ccx":
@@ -61,7 +61,7 @@ class QiskitASTParser:
                 return [
                     QXCU(qubits[0].ID(), QXProgram([
                         QXCU(qubits[1].ID(), QXProgram([
-                            QXRZ(qubits[2].ID(), QXConstant(params[0] * 180 / math.pi)),
+                            QXRZ(qubits[2].ID(), QXConstant(params[0])),
                         ]))
                     ]))
                 ]
@@ -80,7 +80,7 @@ class QiskitASTParser:
                     QXCU(qubits[0].ID(), QXProgram([
                         QXCU(qubits[1].ID(), QXProgram([
                             QXCU(qubits[2].ID(), QXProgram([
-                                QXRZ(qubits[3].ID(), QXConstant(params[0] * 180 / math.pi)),
+                                QXRZ(qubits[3].ID(), QXConstant(params[0])),
                             ]))
                         ]))
                     ]))
@@ -103,7 +103,7 @@ class QiskitASTParser:
                         QXCU(qubits[1].ID(), QXProgram([
                             QXCU(qubits[2].ID(), QXProgram([
                                 QXCU(qubits[3].ID(), QXProgram([
-                                    QXRZ(qubits[4].ID(), QXConstant(params[0] * 180 / math.pi)),
+                                    QXRZ(qubits[4].ID(), QXConstant(params[0])),
                                 ]))
                             ]))
                         ]))
@@ -130,7 +130,7 @@ class QiskitASTParser:
                             QXCU(qubits[2].ID(), QXProgram([
                                 QXCU(qubits[3].ID(), QXProgram([
                                     QXCU(qubits[4].ID(), QXProgram([
-                                        QXRZ(qubits[5].ID(), QXConstant(params[0] * 180 / math.pi)),
+                                        QXRZ(qubits[5].ID(), QXConstant(params[0])),
                                     ]))
                                 ]))
                             ]))
@@ -154,4 +154,6 @@ class QiskitASTParser:
 
         qubits = [qubit for _, qubit in self.qc_mapping.items()]
 
-        return QXRoot(QXProgram(exps), qubits)
+        global_phase = self.qc.global_phase
+
+        return QXRoot(QXProgram(exps), qubits, global_phase)
