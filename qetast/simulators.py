@@ -52,8 +52,7 @@ class QETSimulator(QETASTVisitor):
                 tmp.append((math.sqrt(2)/2 * x, cupdate_dict(y, {idx: True})))
                 tmp.append((math.sqrt(2)/2 * x, cupdate_dict(y, {idx: False})))
 
-        tmp = merge(tmp)
-        self.state = tmp
+        self.state = merge(tmp)
         return True
 
     def visitX(self, node: QXX):
@@ -69,9 +68,9 @@ class QETSimulator(QETASTVisitor):
         tmp = []
         for (x, y) in self.state:
             if y.get(idx):
-                tmp.append((x * cmath.exp(1j * phase), y))
+                tmp.append((x * cmath.exp(1j * phase / 2), y))
             else:
-                tmp.append((x, y))
+                tmp.append((x * cmath.exp(-1j * phase / 2), y))
 
         self.state = tmp
 
