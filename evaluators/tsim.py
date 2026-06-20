@@ -1,3 +1,4 @@
+import cmath
 import math
 from typing import Dict
 import numpy as np
@@ -5,8 +6,8 @@ from qiskit import QuantumCircuit
 from tsim import Circuit
 from evaluators.base import BaseEvaluator
 from evaluators.basis import CliffordTGateSetBasis
-from qetast.nodes import QXRoot
 from qetast.printers import TSimPrinter
+import evaluators.utils as eval_utils
 
 
 class TSimEvaluator(BaseEvaluator):
@@ -23,8 +24,11 @@ class TSimEvaluator(BaseEvaluator):
 
         tsim_src = tsim_printer.tsim_program
 
+        ## TODO: Maybe find how to add global phase to TSim program?
+        phi = self.get_circuit_ast().global_phase()
+
         circuit = Circuit(tsim_src)
-        self.u = circuit.to_matrix()
+        self.u = cmath.exp(1j * phi) * circuit.to_matrix()
 
     def evaluate(self, ins: Dict[str, bool]):
         tmp = [0] * len(ins)
@@ -48,18 +52,7 @@ class TSimEvaluator(BaseEvaluator):
 
         state = []
         for idx, amp in np.ndenumerate(arr_out):
-            if np.isclose(amp.real, 0):
-                if np.isclose(amp.imag, 0):
-                    amp = 0 + 0j
-                else:
-                    amp = complex(0, amp.imag)
-            elif np.isclose(amp.real, 1):
-                if np.isclose(amp.imag, 0):
-                    amp = 1 + 0j
-                else:
-                    amp = complex(1, amp.imag)
-            else:
-                amp = complex(amp)
+            amp = eval_utils.zcomplex(amp)
 
             c = int(math.log2(arr_out.shape[0]))
             frmtr_str = "{:0" + str(c) + "b}"
