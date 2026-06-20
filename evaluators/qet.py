@@ -3,6 +3,7 @@ from qiskit import QuantumCircuit
 from evaluators.base import BaseEvaluator
 from evaluators.basis import QETGateSetBasis
 from qetast.simulators import QETSimulator
+import evaluators.utils as eval_utils
 
 
 def create_state_from_bitvals(bitvals: List):
@@ -51,4 +52,9 @@ class QETEvaluator(BaseEvaluator):
         simulator = QETSimulator(initial_state)
         simulator.visitRoot(self.ast)
 
-        return simulator.state
+        state = []
+        for (amp, sd) in simulator.state:
+            amp = eval_utils.zcomplex(amp)
+            state.append((amp, sd))
+
+        return state
