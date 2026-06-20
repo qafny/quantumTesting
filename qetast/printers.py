@@ -47,35 +47,32 @@ class QuantumCircuitPrinter(QETASTVisitor):
 
     def visitRZ(self, node: QXRZ):
         if self.c["prefix"] == "":
-            match node.phase().value():
-                case 180:
-                    self.qc.z(int(node.qubit()))
-                case 90:
-                    self.qc.s(int(node.qubit()))
-                case -90:
-                    self.qc.sdg(int(node.qubit()))
-                case 45:
-                    self.qc.t(int(node.qubit()))
-                case -45:
-                    self.qc.tdg(int(node.qubit()))
-                case _:
-                    _phi = node.phase().value() * math.pi / 180
-                    self.qc.rz(phi=_phi, qubit=int(node.qubit()))
+            if node.phase().value() == math.pi:
+                self.qc.z(int(node.qubit()))
+            elif node.phase().value() == math.pi / 2:
+                self.qc.s(int(node.qubit()))
+            elif node.phase().value() == - math.pi / 2:
+                self.qc.sdg(int(node.qubit()))
+            elif node.phase().value() == math.pi / 4:
+                self.qc.t(int(node.qubit()))
+            elif node.phase().value() == - math.pi / 4:
+                self.qc.tdg(int(node.qubit()))
+            else:
+                _phi = node.phase().value()
+                self.qc.rz(phi=_phi, qubit=int(node.qubit()))
         else:
             # TODO: Add support for more than two control gates (qiskit does not support beyond ccG); G = Gate
             kwargs = self.prepare_controlled_gate_kwargs(node.qubit())
 
-            match node.phase().value():
-                case 180:
-                    getattr(self.qc, self.c["prefix"] + "z")(**kwargs)
-                case 90:
-                    getattr(self.qc, self.c["prefix"] + "s")(**kwargs)
-                case -90:
-                    getattr(self.qc, self.c["prefix"] + "sdg")(**kwargs)
-                # TODO: Check for no controlled t and tdg gates
-                case _:
-                    kwargs["theta"] = node.phase().value() * math.pi / 180
-                    getattr(self.qc, self.c["prefix"] + "rz")(**kwargs)
+            if node.phase().value() == math.pi:
+                getattr(self.qc, self.c["prefix"] + "z")(**kwargs)
+            elif node.phase().value() == math.pi / 2:
+                getattr(self.qc, self.c["prefix"] + "s")(**kwargs)
+            elif node.phase().value() == - math.pi / 2:
+                getattr(self.qc, self.c["prefix"] + "sdg")(**kwargs)
+            else:
+                kwargs["theta"] = node.phase().value() * math.pi / 180
+                getattr(self.qc, self.c["prefix"] + "rz")(**kwargs)
 
         return True
 
@@ -120,9 +117,9 @@ class TSimPrinter(QETASTVisitor):
         return True
 
     def visitRZ(self, node: QXRZ):
-        if node.phase().value() == 90:
+        if node.phase().value() == math.pi / 2:
             self.tsim_program += f"S {node.qubit()}\n"
-        elif node.phase().value() == 45:
+        elif node.phase().value() == math.pi / 4:
             self.tsim_program += f"T {node.qubit()}\n"
 
         return True
