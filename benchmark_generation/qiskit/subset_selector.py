@@ -140,5 +140,5 @@ if __name__ == "__main__":
         print(f"  - {circuit.get('class_name')} ({circuit.get('module')})")
     
     # Save subset
-    with open('../../benchmarks/real/circuits.json', 'w') as f:
+    with open('../../support/circuits.json', 'w') as f:
         json.dump(subset, f, indent=2)
