@@ -1,0 +1,54 @@
+{
+  "type": "custom",
+  "description": "Two Qubit-Single Gate Testing Programs on Qiskit",
+  "circuits": {
+    "oneh": {
+      "circuit_file": "oneh.py",
+      "circuit_name": "qc",
+      "inputs": {
+        "type": "generator",
+        "class_name": "CompleteInputSpaceGenerator",
+        "module": "generators.inputs",
+        "kwargs": {
+          "qubits_count": 2
+        }
+      }
+    },
+    "onecu": {
+      "circuit_file": "onecu.py",
+      "circuit_name": "qc",
+      "inputs": {
+        "type": "generator",
+        "class_name": "CompleteInputSpaceGenerator",
+        "module": "generators.inputs",
+        "kwargs": {
+          "qubits_count": 2
+        }
+      }
+    },
+    "onerz": {
+      "circuit_file": "onerz.py",
+      "circuit_name": "qc",
+      "inputs": {
+        "type": "generator",
+        "class_name": "CompleteInputSpaceGenerator",
+        "module": "generators.inputs",
+        "kwargs": {
+          "qubits_count": 2
+        }
+      }
+    },
+    "onex": {
+      "circuit_file": "onex.py",
+      "circuit_name": "qc",
+      "inputs": {
+        "type": "generator",
+        "class_name": "CompleteInputSpaceGenerator",
+        "module": "generators.inputs",
+        "kwargs": {
+          "qubits_count": 2
+        }
+      }
+    }
+  }
+}
