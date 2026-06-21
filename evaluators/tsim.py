@@ -1,4 +1,5 @@
 import cmath
+import logging
 import math
 from typing import Dict
 import numpy as np
@@ -13,24 +14,39 @@ import evaluators.utils as eval_utils
 class TSimEvaluator(BaseEvaluator):
 
     def __init__(self, qc: QuantumCircuit):
+        logging.info("Initializing TSimEvaluator")
         super(TSimEvaluator, self).__init__(qc, CliffordTGateSetBasis())
         self.u: np.ndarray = None
 
+        logging.info("Building up the Unitary for TSim")
         self.setup_unitary()
+        logging.info("Finished Building up the Unitary for TSim")
+
+        logging.info("Finished Initializing TSimEvaluator")
+
+    @staticmethod
+    def get_identifier():
+        return "tsim"
 
     def setup_unitary(self):
+        logging.info("Converting to a TSim Program")
         tsim_printer = TSimPrinter()
         tsim_printer.visitRoot(self.get_circuit_ast())
+        logging.info("Finished Converting to a TSim Program")
 
         tsim_src = tsim_printer.tsim_program
 
         ## TODO: Maybe find how to add global phase to TSim program?
         phi = self.get_circuit_ast().global_phase()
 
+        logging.info("Transforming to the Unitary")
         circuit = Circuit(tsim_src)
         self.u = cmath.exp(1j * phi) * circuit.to_matrix()
+        logging.info("Finished Transforming to the Unitary")
 
     def evaluate(self, ins: Dict[str, bool]):
+        logging.info("Evaluating using TSimEvaluator")
+
         tmp = [0] * len(ins)
         for idx, bval in ins.items():
             tmp[int(idx)] = bval
@@ -62,5 +78,7 @@ class TSimEvaluator(BaseEvaluator):
                 sd[str(i)] = True if bs == "1" else False
 
             state.append((amp, sd))
+
+        logging.info("Finished Evaluating using TSimEvaluator")
 
         return state

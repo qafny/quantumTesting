@@ -1,3 +1,4 @@
+import logging
 from abc import ABC, abstractmethod
 from typing import Dict
 from qiskit import QuantumCircuit
@@ -12,16 +13,29 @@ class BaseEvaluator(ABC):
         self._qc: QuantumCircuit = qc
         self._gateset_basis: GateSetBasis = gateset_basis
 
-        self.ast: QXRoot = parse_qiskit_circuit(self._qc, self._gateset_basis)
+        logging.info("Parsing Circuit")
+        tqc, ast = parse_qiskit_circuit(self._qc, self._gateset_basis)
+        logging.info("Finished Parsing Circuit")
 
-    def get_circuit(self):
+        self._tqc: QuantumCircuit = qc
+        self._ast: QXRoot = ast
+
+    @staticmethod
+    @abstractmethod
+    def get_identifier() -> str:
+        pass
+
+    def get_circuit(self) -> QuantumCircuit:
         return self._qc
 
-    def get_gateset_basis(self):
+    def get_parsed_circuit(self) -> QuantumCircuit:
+        return self._tqc
+
+    def get_gateset_basis(self) -> GateSetBasis:
         return self._gateset_basis
 
-    def get_circuit_ast(self):
-        return self.ast
+    def get_circuit_ast(self) -> QXRoot:
+        return self._ast
 
     @abstractmethod
     def evaluate(self, ins: Dict[str, bool]):
