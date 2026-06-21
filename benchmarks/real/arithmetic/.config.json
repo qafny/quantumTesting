@@ -1,0 +1,23 @@
+{
+  "type": "library",
+  "description": "Arithmetic Quantum Programs",
+  "circuits": {
+    "hrs_cumulative_multiplier": {
+      "class_name": "HRSCumulativeMultiplier",
+      "module": "qiskit.circuit.library",
+      "kwargs": {
+        "num_state_qubits": 3,
+        "num_result_qubits": 6
+      },
+      "inputs": {
+        "type": "generator",
+        "class_name": "RandomInputGenerator",
+        "module": "generators.inputs",
+        "kwargs": {
+          "qubits_count": 9,
+          "ins_count": 1
+        }
+      }
+    }
+  }
+}
