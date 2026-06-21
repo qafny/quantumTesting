@@ -11,6 +11,7 @@ class BaseQiskitBenchmark(ABC):
 
     def __init__(self, benchmark_folder: str):
         self._benchmark_folder = benchmark_folder
+        self.config = None
 
     def get_benchmark_folder(self) -> str:
         return self._benchmark_folder
@@ -23,9 +24,49 @@ class BaseQiskitBenchmark(ABC):
     def get_qiskit_circuits(self) -> Dict[str, QuantumCircuit]:
         pass
 
-    @abstractmethod
+    def get_inputs_from_info(self, circuit_info: Dict[str, Any]) -> List[Dict[str, bool]]:
+        inputs_info = circuit_info.get("inputs", None)
+        if inputs_info is not None:
+            inputs_type = inputs_info.get("type", None)
+            if inputs_type is not None:
+                match inputs_type:
+                    case "generator":
+                        module_path = inputs_info.get("module", None)
+                        class_name = inputs_info.get("class_name", None)
+                        kwargs = inputs_info.get("kwargs", None)
+                        module = importlib.import_module(module_path)
+                        generator_class: type[BaseInputGenerator] = getattr(module, class_name)
+                        generator = generator_class(**kwargs)
+
+                        return generator.generate()
+                    case "custom":
+                        inputs_file = inputs_info.get("inputs_file", None)
+                        inputs_name = inputs_info.get("inputs_name", None)
+
+                        namespace = {}
+                        inputs_file_path = f"{self.get_benchmark_folder()}/{inputs_file}"
+                        with open(inputs_file, "r") as file:
+                            exec(file.read(), namespace)
+
+                        return namespace.get(inputs_name)
+                    case _:
+                        raise Exception(f"Invalid inputs configuration in config file at {self.get_benchmark_folder()}")
+            else:
+                raise Exception(f"Inputs type not found in config file at {self.get_benchmark_folder()}")
+        else:
+            raise Exception(f"Inputs not found in config file at {self.get_benchmark_folder()}")
+
     def get_inputs(self) -> Dict[str, List[Dict[str, bool]]]:
-        pass
+        circuits_info = self.config.get("circuits", None)
+        if circuits_info is not None:
+            inputs = {}
+            for circuit_id, circuit_info in circuits_info.items():
+                input_list: List[Dict[str, bool]] = self.get_inputs_from_info(circuit_info)
+                inputs[circuit_id] = input_list
+
+            return inputs
+        else:
+            raise Exception(f"Circuits not found in config file at {self.get_benchmark_folder()}")
 
 
 class LibraryQiskitBenchmark(BaseQiskitBenchmark):
@@ -80,46 +121,54 @@ class LibraryQiskitBenchmark(BaseQiskitBenchmark):
         else:
             raise Exception(f"Circuits not found in config file at {self.get_benchmark_folder()}")
 
-    def get_inputs_from_info(self, circuit_info: Dict[str, Any]) -> List[Dict[str, bool]]:
-        inputs_info = circuit_info.get("inputs", None)
-        if inputs_info is not None:
-            inputs_type = inputs_info.get("type", None)
-            if inputs_type is not None:
-                match inputs_type:
-                    case "generator":
-                        module_path = inputs_info.get("module", None)
-                        class_name = inputs_info.get("class_name", None)
-                        kwargs = inputs_info.get("kwargs", None)
-                        module = importlib.import_module(module_path)
-                        generator_class: type[BaseInputGenerator] = getattr(module, class_name)
-                        generator = generator_class(**kwargs)
 
-                        return generator.generate()
-                    case "custom":
-                        inputs_file = inputs_info.get("inputs_file", None)
-                        inputs_name = inputs_info.get("inputs_name", None)
+class CustomQiskitBenchmark(BaseQiskitBenchmark):
 
-                        namespace = {}
-                        with open(inputs_file, "r") as file:
-                            exec(file.read(), namespace)
+    def __init__(self, benchmark_folder: str):
+        super(CustomQiskitBenchmark, self).__init__(benchmark_folder)
+        self._init_benchmark()
 
-                        return namespace.get(inputs_name)
-                    case _:
-                        raise Exception(f"Invalid inputs configuration in config file at {self.get_benchmark_folder()}")
-            else:
-                raise Exception(f"Inputs type not found in config file at {self.get_benchmark_folder()}")
-        else:
-            raise Exception(f"Inputs not found in config file at {self.get_benchmark_folder()}")
+    @staticmethod
+    def is_custom_benchmark(benchmark_folder: str):
+        config_file_path = os.path.join(benchmark_folder, ".config.json")
+        if not os.path.exists(config_file_path):
+            return False
 
+        with open(config_file_path, "r") as config_file:
+            config = json.load(config_file)
 
-    def get_inputs(self) -> Dict[str, List[Dict[str, bool]]]:
+        return config.get("type", "") == "custom"
+
+    def _init_benchmark(self):
+        config_file_path = os.path.join(self.get_benchmark_folder(), ".config.json")
+        if not os.path.exists(config_file_path):
+            raise Exception(f"Config file not found at {config_file_path}")
+
+        with open(config_file_path, "r") as config_file:
+            self.config = json.load(config_file)
+
+    def get_type(self) -> str:
+        return self.config.get("type", None)
+
+    def get_circuit_from_info(self, circuit_info: Dict[str, Any]) -> QuantumCircuit:
+        circuit_file = circuit_info.get("circuit_file", None)
+        circuit_name = circuit_info.get("circuit_name", None)
+
+        namespace = {}
+        circuit_path = f"{self.get_benchmark_folder()}/{circuit_file}"
+        with open(circuit_path, "r") as file:
+            exec(file.read(), namespace)
+
+        return namespace.get(circuit_name)
+
+    def get_qiskit_circuits(self) -> Dict[str, QuantumCircuit]:
         circuits_info = self.config.get("circuits", None)
         if circuits_info is not None:
-            inputs = {}
+            circuits = {}
             for circuit_id, circuit_info in circuits_info.items():
-                input_list: List[Dict[str, bool]] = self.get_inputs_from_info(circuit_info)
-                inputs[circuit_id] = input_list
+                circuit: QuantumCircuit = self.get_circuit_from_info(circuit_info)
+                circuits[circuit_id] = circuit
 
-            return inputs
+            return circuits
         else:
             raise Exception(f"Circuits not found in config file at {self.get_benchmark_folder()}")

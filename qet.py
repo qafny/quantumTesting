@@ -5,7 +5,7 @@ from typing import List, Dict, Any
 from qiskit import QuantumCircuit
 from comparators.base import BaseComparator
 from evaluators.base import BaseEvaluator
-from readers.benchmarks import LibraryQiskitBenchmark
+from readers.benchmarks import LibraryQiskitBenchmark, CustomQiskitBenchmark
 import helpers.argparsing as helper_args
 from writers.csv import ComparatorOutputCSVWriter
 from writers.evaluators import EvaluatorParsedCircuitWriter
@@ -27,9 +27,11 @@ def run_qet(run_id: str, base_out_dir: str, benchmark_path: str, comparator_id: 
 
     if LibraryQiskitBenchmark.is_library_benchmark(benchmark_path):
         benchmark = LibraryQiskitBenchmark(benchmark_path)
+    elif CustomQiskitBenchmark.is_custom_benchmark(benchmark_path):
+        benchmark = CustomQiskitBenchmark(benchmark_path)
 
-        circuits: Dict[str, QuantumCircuit] = benchmark.get_qiskit_circuits()
-        inputs: Dict[str, List[Dict[str, bool]]] = benchmark.get_inputs()
+    circuits: Dict[str, QuantumCircuit] = benchmark.get_qiskit_circuits()
+    inputs: Dict[str, List[Dict[str, bool]]] = benchmark.get_inputs()
 
     logging.info(f"Read Circuits Count: {len(circuits)}")
     logging.info(f"Read Inputs Count: {len(inputs)}")
@@ -46,10 +48,10 @@ def run_qet(run_id: str, base_out_dir: str, benchmark_path: str, comparator_id: 
         logging.info(f"Testing Circuit: {circuit_id}")
 
         circuit = circuits[circuit_id]
-        inputs = inputs[circuit_id]
+        circuit_inputs = inputs[circuit_id]
 
         evaluators: List[BaseEvaluator] = [evaluator_class(circuit) for evaluator_class in evaluator_classes]
-        comparator: BaseComparator = comparator_class(evaluators, inputs)
+        comparator: BaseComparator = comparator_class(evaluators, circuit_inputs)
 
         logging.info("Storing Parsed Circuits")
         for evaluator in evaluators:
