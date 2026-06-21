@@ -33,7 +33,7 @@ class EvaluatorParsedCircuitWriter(BaseWriter):
             "evaluator": evaluator.get_identifier(),
             "gate_set": self.get_gateset_representation(evaluator.get_gateset_basis()),
             "num_qubits": evaluator.get_parsed_circuit().num_qubits,
-            "gates_count": evaluator.get_parsed_circuit().size(),
+            "gates_count": evaluator.get_parsed_circuit().depth(),
         }
 
         props_path = f"{qpy_path}.json"
