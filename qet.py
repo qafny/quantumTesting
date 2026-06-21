@@ -29,6 +29,8 @@ def run_qet(run_id: str, base_out_dir: str, benchmark_path: str, comparator_id: 
         benchmark = LibraryQiskitBenchmark(benchmark_path)
     elif CustomQiskitBenchmark.is_custom_benchmark(benchmark_path):
         benchmark = CustomQiskitBenchmark(benchmark_path)
+    else:
+        raise Exception(f"Benchmark {benchmark_path} is not found/not supported")
 
     circuits: Dict[str, QuantumCircuit] = benchmark.get_qiskit_circuits()
     inputs: Dict[str, List[Dict[str, bool]]] = benchmark.get_inputs()
