@@ -1,4 +1,4 @@
-from typing import List, Dict
+from typing import List, Dict, Tuple
 
 
 def gen_qubit_states(states: List[List[bool]], cstate: List[bool], idx: int):
@@ -49,3 +49,34 @@ def get_system_state_from_qubits(qubit_states: Dict[str, bool]):
             system_state.append((0 + 0j, basis_state))
 
     return system_state
+
+
+def convert_state_to_amp_qet(state: List[Tuple[complex, Dict[str, bool]]]):
+    lc = ""
+    for amp, sd in state:
+        lsd = ["0"] * len(sd)
+        for sidx, bval in sd.items():
+            idx = int(sidx)
+            lsd[idx] = "1" if bval else "0"
+
+        qet = "".join(lsd)
+        qet = f"|{qet}>"
+
+        lc += f"{str(amp)}{qet} + "
+
+    lc = lc[:-3]
+    return lc
+
+
+def compare_two_states(s1: List[Tuple[complex, Dict[str, bool]]], s2: List[Tuple[complex, Dict[str, bool]]]):
+    for (amp1, sd1) in s1:
+        eq = False
+        for (amp2, sd2) in s2:
+            if sd1 == sd2:
+                eq = amp1 == amp2
+                break
+
+        if not eq:
+            return False
+
+    return True
