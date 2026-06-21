@@ -1,5 +1,8 @@
 import json
+import logging
 import os
+from typing import Tuple
+
 from matplotlib import pyplot as plt
 from qiskit import QuantumCircuit, transpile
 from qiskit.transpiler import Target
@@ -22,11 +25,17 @@ def transpile_qiskit_circuit(qc: QuantumCircuit, basis: GateSetBasis, optimizati
     return transpiled_qc
 
 
-def parse_qiskit_circuit(qc: QuantumCircuit, basis: GateSetBasis) -> QXRoot:
+def parse_qiskit_circuit(qc: QuantumCircuit, basis: GateSetBasis) -> Tuple[QuantumCircuit, QXRoot]:
+    logging.info("Transpiling Qiskit Circuit")
     tqc: QuantumCircuit = transpile_qiskit_circuit(qc, basis)
+    logging.info("Finished Transpiling Qiskit Circuit")
+    logging.debug(f"tqc qubit count = {tqc.num_qubits}, tqc gates count = {tqc.size()}")
 
+    logging.info("Parsing AST from the Transpiled Circuit")
     ast_parser = QiskitASTParser(tqc)
-    return ast_parser.parse()
+    ast = ast_parser.parse()
+    logging.info("Finished Parsing AST from the Transpiled Circuit")
+    return tqc, ast
 
 
 def read_qiskit_circuit(filename: str, circuit_name: str) -> QuantumCircuit:
