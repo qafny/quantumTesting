@@ -3,7 +3,7 @@ from abc import ABC, abstractmethod
 from typing import Dict
 from qiskit import QuantumCircuit
 from evaluators.basis import GateSetBasis
-from parser.utils.qiskit_utils import parse_qiskit_circuit
+from helpers.qiskit import parse_qiskit_circuit
 from qetast.nodes import QXRoot
 
 

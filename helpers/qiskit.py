@@ -1,9 +1,5 @@
-import json
 import logging
-import os
 from typing import Tuple
-
-from matplotlib import pyplot as plt
 from qiskit import QuantumCircuit, transpile
 from qiskit.transpiler import Target
 from evaluators.basis import GateSetBasis
@@ -36,37 +32,3 @@ def parse_qiskit_circuit(qc: QuantumCircuit, basis: GateSetBasis) -> Tuple[Quant
     ast = ast_parser.parse()
     logging.info("Finished Parsing AST from the Transpiled Circuit")
     return tqc, ast
-
-
-def read_qiskit_circuit(filename: str, circuit_name: str) -> QuantumCircuit:
-    namespace = {}
-    with open(filename, "r") as file:
-        exec(file.read(), namespace)
-
-    return namespace.get(circuit_name)
-
-
-def read_qiskit_custom_benchmark(benchmark_folder: str) -> QuantumCircuit:
-    config_file_path = os.path.join(benchmark_folder, ".config.json")
-    if not os.path.exists(config_file_path):
-        raise Exception(f"Config file not found at {config_file_path}")
-
-    with open(config_file_path, "r") as config_file:
-        config = json.load(config_file)
-
-    circuit_file_name = config.get("circuit_file", None)
-    circuit_name = config.get("circuit_name", None)
-
-    if circuit_name is not None:
-        if circuit_name is not None:
-            circuit_file_path = os.path.join(benchmark_folder, circuit_file_name)
-            return read_qiskit_circuit(circuit_file_path, circuit_name)
-        else:
-            raise Exception(f"No circuit_name found in config file at {config_file_path}")
-    else:
-        raise Exception(f"Circuit file not found in the config at {config_file_path}")
-
-
-def visualize_qiskit_circuit(qc: QuantumCircuit, title: str):
-    qc.draw(output="mpl")
-    plt.show(title=title)
