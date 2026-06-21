@@ -1,4 +1,5 @@
+import numpy as np
 
 
 def zcomplex(c: complex) -> complex:
-    return complex(round(c.real), round(c.imag))
+    return complex(np.round(c.real, decimals=8), np.round(c.imag, decimals=8))
