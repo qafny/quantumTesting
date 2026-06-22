@@ -13,7 +13,7 @@ from writers.evaluators import EvaluatorParsedCircuitWriter
 
 def parser_generator():
     parser = argparse.ArgumentParser(description="QET: Differential Testing of Quantum Programs across Target Platforms")
-    parser.add_argument('--bench_path', type=str, default="benchmarks/real/arithmetic", help="Path to the Benchmark Folder")
+    parser.add_argument('--bench_path', type=str, default="benchmarks/arithmetic", help="Path to the Benchmark Folder")
     parser.add_argument("--comp", type=str, default="spa", help="The comparator to use. Defaults to Simple Pairwise State Comparator")
     parser.add_argument("--evals", nargs='+', default=["qet", "tsim"], help="List of evaluators to run")
     parser.add_argument("--log", type=int, default=logging.DEBUG, help="Logging Level")
