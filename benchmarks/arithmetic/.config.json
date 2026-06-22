@@ -14,7 +14,7 @@
         "class_name": "RandomInputGenerator",
         "module": "generators.inputs",
         "kwargs": {
-          "qubits_count": 9,
+          "qubits_count": 13,
           "ins_count": 1
         }
       }
