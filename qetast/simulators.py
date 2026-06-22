@@ -1,8 +1,8 @@
 import cmath
 import copy
 import math
-from typing import Dict
-from qetast.nodes import QXH, QXRZ, QXX, QXCU
+from typing import Dict, List, Tuple
+from qetast.nodes import QXH, QXRZ, QXX, QXCU, QXRoot
 from qetast.program import QETASTVisitor
 from qetast.values import CoqNVal, CoqYVal, exchange
 
@@ -37,8 +37,17 @@ def cupdate_dict(d: dict, u: dict) -> dict:
 
 class QETSimulator(QETASTVisitor):
 
-    def __init__(self, state: list[tuple[complex, dict]]):
+    def __init__(self, state: List[Tuple[complex, Dict[str, bool]]]):
         self.state = state
+
+    def visitRoot(self, node: QXRoot):
+        retval = super(QETSimulator, self).visitRoot(node)
+
+        phi = node.global_phase()
+        for i in range(len(self.state)):
+            self.state[i] = (cmath.exp(1j * phi) * self.state[i][0], self.state[i][1])
+
+        return retval
 
     def visitH(self, node: QXH):
         idx = node.qubit()
