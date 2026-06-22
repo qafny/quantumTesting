@@ -21,6 +21,8 @@ class QiskitASTParser:
         qubits: List[QXQubit] = [self.qc_mapping[qubit] for qubit in instruction.qubits]
 
         match gate:
+            ## TODO: Not urgent, but maybe introduce new nodes for all the gates below as the gates such as S introduces
+            ## a global phase to the program.
             case "h":
                 return [QXH(qubits[0].ID())]
             case "x":
