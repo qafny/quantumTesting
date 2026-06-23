@@ -1,22 +1,170 @@
-# Quantum Testing Framework
-You'll likely want to create a virtual environment for the packages. See instructions here on creating, activating, and deactivating the virtual environment: https://docs.python.org/3/library/venv.html
+# QET: Quantum Effective Testing
 
-As of now these are the packages to include in the venv:\
-antlr4-python3-runtime 4.9.2\
-dill                   0.4.0\
-exceptiongroup         1.3.0\
-graphviz               0.21\
-hypothesis             6.145.1\
-numpy                  2.2.6\
-pip                    25.3\
-qiskit                 2.2.1\
-rustworkx              0.17.1\
-scipy                  1.15.3\
-setuptools             57.4.0\
-sortedcontainers       2.4.0\
-stevedore              5.5.0\
-typing_extensions      4.15.0\
+## Adding a Benchmark Program
 
-Once you have the virtual enrionment set up, you can run the files in `qiskit-to-xmlprogrammer` with `python3 qiskit-to-xmlprogrammer/example_circuits.py` and similar commands for library_circuits.py and qiskit_to_xmlprogrammer.py\
-We are currently working on getting two test files in `xml_benchmarks` running; you can run them with `python3 xml_benchmarks/test_cl_adder_property.py`
-and `python3 xml_benchmarks/test_rz_adder_property.py` although they currently resuslt in Python errors
+QET performs differential testing on different target platforms for quantum programs. In this regard, the quantum programs provided as input for QET must be defined as benchmarks. Refer to the `benchmarks/` directory for the current collection of benchmark programs.
+
+The following instructions explain how to add a new benchmark program to QET.
+
+### Step 1: Create a Benchmark Directory
+
+Create a new directory with an appropriate name inside the `benchmarks/` directory. While benchmarks can be stored elsewhere, it is strongly recommended that benchmark programs intended to be part of the standard QET benchmark suite be organized under the `benchmarks/` directory.
+
+### Step 2: Create the Configuration File
+
+Create a file named `.config.json` inside the benchmark directory. The filename must match exactly, including the leading dot (`.`).
+
+### Step 3: Define the Benchmark
+
+Define the benchmark in the `.config.json` file according to the type of benchmark being added.
+
+#### Library-Based Benchmarks
+
+If the benchmark is based on a Qiskit library circuit or a community circuit, use the following configuration template with `"type": "library"`:
+
+```json
+{
+  "type": "library",
+  "description": "benchmark_description",
+  "circuits": {
+    "circuit_1": {
+      "class_name": "circuit_class_name",
+      "module": "circuit_package_name",
+      "kwargs": {
+        "kwarg_1": "kwarg_value_1",
+         ...
+      },
+      "inputs": {
+        "type": "input_generator_type",
+        "class_name": "input_generator_class_name",
+        "module": "input_generator_package_name",
+        "kwargs": {
+          "kwarg_1": "kwarg_value_1",
+           ...
+        }
+      }
+    },
+    "circuit_2": ...
+  }
+}
+```
+
+#### Custom Qiskit Benchmarks
+
+If the benchmark is implemented as a custom Qiskit program, use the following configuration template with `"type": "custom"`:
+
+```json
+{
+  "type": "custom",
+  "description": "benchmark_description",
+  "circuits": {
+    "circuit_1": {
+      "circuit_file": "circuit_file_name.py",
+      "circuit_name": "circuit_variable_identifier",
+      "inputs": {
+        "type": "input_generator_type",
+        "class_name": "input_generator_class_name",
+        "module": "input_generator_package_name",
+        "kwargs": {
+          "kwarg_1": "kwarg_value_1",
+           ...
+        }
+      }
+    },
+    "circuit_2": ...
+  }
+}
+```
+
+### Input Generation
+
+In the configurations above, inputs to the programs may be generated using either a built-in input generator or a custom input-generation script.
+
+#### Using a Built-In Input Generator
+
+If you intend to use an input generator provided by QET (see the `generators.input` module), use the following configuration with `"type": "generator"`:
+
+```json
+{
+  "..."
+  "inputs": {
+    "type": "generator",
+    "class_name": "input_generator_class_name",
+    "module": "input_generator_package_name",
+    "kwargs": {
+      "kwarg_1": "kwarg_value_1",
+       ...
+    }
+  },
+  "..."
+}
+```
+
+#### Using a Custom Input Generator
+
+If you intend to implement a custom input-generation strategy, use the following configuration with `"type": "custom"`. The referenced file must be located in the same directory as the `.config.json` file.
+
+```json
+{
+  "..."
+  "inputs": {
+    "type": "custom",
+    "inputs_file": "input_generator_file_name.py",
+    "inputs_name": "input_generator_variable_identifier"
+  },
+  "..."
+}
+```
+
+## Setup and Run QET
+
+It is highly recommended to use PyCharm to set up the project, as it automates many of the steps described below.
+
+**Recommended Python Version:** Python 3.14
+
+QET may or may not work with earlier Python versions.
+
+### 1. Create a Virtual Environment
+
+It is recommended to create a virtual environment for the project. Refer to the official Python documentation for instructions on creating, activating, and deactivating virtual environments:
+
+https://docs.python.org/3/library/venv.html
+
+### 2. Install Dependencies
+
+After creating and activating the virtual environment, install the required dependencies. For the complete list of dependencies, refer to `requirements.txt`.
+
+Run the following command:
+
+```bash
+pip install -r requirements.txt
+```
+
+### 3. Run QET
+
+The main entry point for QET is `qet.py`.
+
+To run QET, select or define a benchmark and execute:
+
+```bash
+python qet.py --bench_path=benchmarks/arithmetic --comp=spa --out=.outputs --evals qet tsim
+```
+
+## Parameter Definitions
+
+- `bench_path`: Path to the benchmark directory. This directory must contain a `.config.json` file.
+- `evals`: List of evaluators to use. Include `qet` for `QETSimulator` and `tsim` for QuEra's TSim Sampler. By default, both evaluators are used.
+- `comp`: Comparator used for result comparison. For pairwise comparison, use `spa`. The default comparator is `spa` (`Simple Pairwise Comparator`).
+- `out`: Output directory. The default value is `.output`. Ensure that this directory is excluded from version control.
+- `log`: Logging level. The default value is `logging.DEBUG`.
+
+## Important Notes
+
+If you use PyCharm, the virtual environment setup and dependency installation steps are largely automated.
+
+Instead of running QET from the command line, you can create a Run Configuration with:
+
+- The working directory set to the repository root.
+- The desired command-line arguments specified in the configuration.
+
+This approach is often more convenient during development and debugging.
