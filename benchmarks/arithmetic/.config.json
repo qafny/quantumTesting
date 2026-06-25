@@ -10,13 +10,12 @@
         "num_result_qubits": 6
       },
       "inputs": {
-        "type": "generator",
-        "class_name": "RandomInputGenerator",
-        "module": "generators.inputs",
-        "kwargs": {
-          "qubits_count": 13,
-          "ins_count": 1
-        }
+        "type": "json",
+        "inputs_file": "paired_io_inputs.json"
+      },
+      "outputs": {
+        "type": "json",
+        "outputs_file": "paired_io_outputs.json"
       }
     }
   }
