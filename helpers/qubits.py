@@ -1,3 +1,4 @@
+import copy
 from typing import List, Dict, Tuple
 
 
@@ -86,15 +87,15 @@ def compare_two_states(s1: List[Tuple[complex, Dict[str, bool]]], s2: List[Tuple
 def merge_system_state(s: List[Tuple[complex, Dict[str, bool]]]):
     i = 0
     re = []
-    while i < len(y):
-        re.append(y[i])
+    while i < len(s):
+        re.append(s[i])
 
         j = i + 1
-        while j < len(y):
-            if re[-1][1] == y[j][1]:
-                amp = re[-1][0] + y[j][0]
+        while j < len(s):
+            if re[-1][1] == s[j][1]:
+                amp = re[-1][0] + s[j][0]
                 re[-1] = (amp, re[-1][1])
-                del y[j]
+                del s[j]
                 j -= 1
 
             j += 1
@@ -102,3 +103,8 @@ def merge_system_state(s: List[Tuple[complex, Dict[str, bool]]]):
         i += 1
 
     return re
+
+
+def cupdate_system_state(s: dict, u: dict) -> dict:
+    ud = copy.deepcopy(s)
+    return ud | u

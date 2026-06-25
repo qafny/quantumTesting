@@ -1,15 +1,9 @@
 import cmath
-import copy
 import math
 from typing import Dict, List, Tuple
-from qetast.nodes import QXH, QXRZ, QXX, QXCU, QXRoot, QXProgram
+from qetast.nodes import QXH, QXRZ, QXX, QXCU, QXRoot
 from qetast.program import QETASTVisitor
 import helpers.qubits as helper_qubits
-
-
-def cupdate_dict(d: dict, u: dict) -> dict:
-    ud = copy.deepcopy(d)
-    return ud | u
 
 
 class QETSimulator(QETASTVisitor):
@@ -32,18 +26,18 @@ class QETSimulator(QETASTVisitor):
         tmp = []
         for (x, y) in self.state:
             if y.get(idx):
-                tmp.append((- math.sqrt(2)/2 * x, cupdate_dict(y, {idx: True})))
-                tmp.append((math.sqrt(2)/2 * x, cupdate_dict(y, {idx: False})))
+                tmp.append((- math.sqrt(2) / 2 * x, helper_qubits.cupdate_system_state(y, {idx: True})))
+                tmp.append((math.sqrt(2) / 2 * x, helper_qubits.cupdate_system_state(y, {idx: False})))
             else:
-                tmp.append((math.sqrt(2)/2 * x, cupdate_dict(y, {idx: True})))
-                tmp.append((math.sqrt(2)/2 * x, cupdate_dict(y, {idx: False})))
+                tmp.append((math.sqrt(2) / 2 * x, helper_qubits.cupdate_system_state(y, {idx: True})))
+                tmp.append((math.sqrt(2) / 2 * x, helper_qubits.cupdate_system_state(y, {idx: False})))
 
         self.state = helper_qubits.merge_system_state(tmp)
         return True
 
     def visitX(self, node: QXX):
         idx = node.qubit()
-        self.state = [(x, cupdate_dict(y, {idx: not y.get(idx)})) for (x,y) in self.state]
+        self.state = [(x, helper_qubits.cupdate_system_state(y, {idx: not y.get(idx)})) for (x, y) in self.state]
 
         return True
 
