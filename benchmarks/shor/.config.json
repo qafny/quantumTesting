@@ -1,0 +1,26 @@
+{
+  "type": "custom",
+  "description": "Standalone QFT-based classical adder circuit extracted from qiskit-shor. The circuit adds X = 1 to a 3-qubit quantum register using QFT, phase rotations, and inverse QFT.",
+  "circuits": {
+    "qft_adder_add_1": {
+      "circuit_file": "qft_adder_circuit.py",
+      "circuit_name": "qft_adder_circuit",
+      "inputs": {
+        "type": "generator",
+        "class_name": "CompleteInputSpaceGenerator",
+        "module": "generators.inputs",
+        "kwargs": {
+          "qubits_count": 3
+        }
+      }
+    },
+    "rc_adder_add_1": {
+      "circuit_file": "rc_adder_circuit.py",
+      "circuit_name": "rc_adder_circuit",
+      "inputs": {
+        "type": "json",
+        "inputs_file": "rc_adder_inputs.json"
+      }
+    }
+  }
+}
