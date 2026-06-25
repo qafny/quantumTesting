@@ -11,11 +11,11 @@
       },
       "inputs": {
         "type": "json",
-        "inputs_file": "paired_io_inputs.json"
+        "inputs_file": "hrscm_paired_io_inputs.json"
       },
       "outputs": {
         "type": "json",
-        "outputs_file": "paired_io_outputs.json"
+        "outputs_file": "hrscm_paired_io_outputs.json"
       }
     }
   }
