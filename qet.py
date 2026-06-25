@@ -34,6 +34,7 @@ def run_qet(run_id: str, base_out_dir: str, benchmark_path: str, comparator_id: 
 
     circuits: Dict[str, QuantumCircuit] = benchmark.get_qiskit_circuits()
     inputs: Dict[str, List[Dict[str, bool]]] = benchmark.get_inputs()
+    expected_outputs: Dict[str, List[Dict[Any, Any]]] = benchmark.get_outputs()
 
     logging.info(f"Read Circuits Count: {len(circuits)}")
     logging.info(f"Read Inputs Count: {len(inputs)}")
@@ -51,9 +52,13 @@ def run_qet(run_id: str, base_out_dir: str, benchmark_path: str, comparator_id: 
 
         circuit = circuits[circuit_id]
         circuit_inputs = inputs[circuit_id]
+        circuit_expected_outputs = expected_outputs[circuit_id]
 
         evaluators: List[BaseEvaluator] = [evaluator_class(circuit) for evaluator_class in evaluator_classes]
-        comparator: BaseComparator = comparator_class(evaluators, circuit_inputs)
+        if comparator_class.requires_expected_outputs():
+            comparator: BaseComparator = comparator_class(evaluators, circuit_inputs, circuit_expected_outputs)
+        else:
+            comparator: BaseComparator = comparator_class(evaluators, circuit_inputs)
 
         logging.info("Storing Parsed Circuits")
         for evaluator in evaluators:

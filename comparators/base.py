@@ -23,6 +23,11 @@ class BaseComparator(ABC):
     def get_inputs(self) -> List[Dict[str, bool]]:
         return self._inputs
 
+    @staticmethod
+    @abstractmethod
+    def requires_expected_outputs():
+        pass
+
     @abstractmethod
     def compare(self) -> List[Dict[Any, Any]]:
         pass

@@ -39,13 +39,16 @@ class BaseQiskitBenchmark(ABC):
                         generator = generator_class(**kwargs)
 
                         return generator.generate()
+                    case "specification":
+                        ## TODO: Write a generator to generate outputs using a specification
+                        return None
                     case "custom":
                         inputs_file = inputs_info.get("inputs_file", None)
                         inputs_name = inputs_info.get("inputs_name", None)
 
                         namespace = {}
                         inputs_file_path = f"{self.get_benchmark_folder()}/{inputs_file}"
-                        with open(inputs_file, "r") as file:
+                        with open(inputs_file_path, "r") as file:
                             exec(file.read(), namespace)
 
                         return namespace.get(inputs_name)
@@ -65,6 +68,48 @@ class BaseQiskitBenchmark(ABC):
                 inputs[circuit_id] = input_list
 
             return inputs
+        else:
+            raise Exception(f"Circuits not found in config file at {self.get_benchmark_folder()}")
+
+    def get_outputs_from_info(self, circuit_info: Dict[str, Any]) -> List[Dict[str, bool]]:
+        outputs = circuit_info.get("outputs", None)
+        if outputs is not None:
+            outputs_type = outputs.get("type", None)
+            if outputs_type is not None:
+                match outputs_type:
+                    case "specification":
+                        ## TODO: Write a generator to generate outputs using a specification
+                        return None
+                    case "custom":
+                        outputs_file = outputs.get("outputs_file", None)
+                        outputs_name = outputs.get("outputs_name", None)
+
+                        namespace = {}
+                        outputs_file_path = f"{self.get_benchmark_folder()}/{outputs_file}"
+                        with open(outputs_file_path, "r") as file:
+                            exec(file.read(), namespace)
+
+                        return namespace.get(outputs_name)
+                    case _:
+                        raise Exception(f"Invalid outputs configuration in config file at {self.get_benchmark_folder()}")
+            else:
+                raise Exception(f"Outputs type not found in config file at {self.get_benchmark_folder()}")
+        else:
+            raise Exception(f"Outputs not found in config file at {self.get_benchmark_folder()}")
+
+    def get_outputs(self) -> Dict[str, List[Dict[str, bool]]]:
+        circuits_info = self.config.get("circuits", None)
+        if circuits_info is not None:
+            outputs = {}
+            for circuit_id, circuit_info in circuits_info.items():
+                try:
+                    outputs_list: List[Dict[str, bool]] = self.get_outputs_from_info(circuit_info)
+                    outputs[circuit_id] = outputs_list
+
+                except Exception as e:
+                    outputs[circuit_id] = None
+
+            return outputs
         else:
             raise Exception(f"Circuits not found in config file at {self.get_benchmark_folder()}")
 
