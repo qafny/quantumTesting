@@ -56,11 +56,11 @@ class SimpleStatePairwiseComparator(BaseComparator):
         return outs
 
 
-class SimpleStateInputOutputComparator(BaseComparator):
+class SimpleStateExpectedOutputComparator(BaseComparator):
 
     def __init__(self, evaluators: List[BaseEvaluator], inputs: List[Dict[str, bool]], expected: List[Dict[str, bool]]):
         logging.info("Initializing SimpleStateInputOutputComparator")
-        super(SimpleStateInputOutputComparator, self).__init__(evaluators, inputs)
+        super(SimpleStateExpectedOutputComparator, self).__init__(evaluators, inputs)
         self.expected: List[Dict[str, bool]] = expected
         logging.info("Finished Initializing SimpleStateInputOutputComparator")
 

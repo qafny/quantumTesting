@@ -1,8 +1,6 @@
-from typing import List, Dict
-from qiskit import QuantumCircuit
-
+from typing import List
 from comparators.base import BaseComparator
-from comparators.simplestate import SimpleStatePairwiseComparator
+from comparators.simplestate import SimpleStatePairwiseComparator, SimpleStateExpectedOutputComparator
 from evaluators.base import BaseEvaluator
 from evaluators.qet import QETEvaluator
 from evaluators.tsim import TSimEvaluator
@@ -11,6 +9,8 @@ from evaluators.tsim import TSimEvaluator
 def parse_comparator(comparator_id: str) -> type[BaseComparator]:
     if comparator_id == SimpleStatePairwiseComparator.get_identifier():
         return SimpleStatePairwiseComparator
+    elif comparator_id == SimpleStateExpectedOutputComparator.get_identifier():
+        return SimpleStateExpectedOutputComparator
     else:
         raise Exception(f"Unknown comparator {comparator_id}")
 
