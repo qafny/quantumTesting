@@ -2,32 +2,9 @@ import cmath
 import copy
 import math
 from typing import Dict, List, Tuple
-from qetast.nodes import QXH, QXRZ, QXX, QXCU, QXRoot
+from qetast.nodes import QXH, QXRZ, QXX, QXCU, QXRoot, QXProgram
 from qetast.program import QETASTVisitor
-from qetast.values import CoqNVal, CoqYVal, exchange
-
-
-def merge_aux(x: tuple[complex, dict], y: list[tuple[complex, dict]]):
-    test = False
-    tmp = []
-    for (q, p) in y:
-        if x[1] == p:
-            test = True
-            tmp.append((x[0] + q, p))
-        else:
-            tmp.append((q, p))
-
-    return test, tmp
-
-
-def merge(y: list[tuple[complex, dict]]):
-    re = []
-    while len(y) > 0:
-        value = y.pop(0)
-        test, y = merge_aux(value, y)
-        if not test:
-            re.append(value)
-    return re
+import helpers.qubits as helper_qubits
 
 
 def cupdate_dict(d: dict, u: dict) -> dict:
@@ -61,7 +38,7 @@ class QETSimulator(QETASTVisitor):
                 tmp.append((math.sqrt(2)/2 * x, cupdate_dict(y, {idx: True})))
                 tmp.append((math.sqrt(2)/2 * x, cupdate_dict(y, {idx: False})))
 
-        self.state = merge(tmp)
+        self.state = helper_qubits.merge_system_state(tmp)
         return True
 
     def visitX(self, node: QXX):

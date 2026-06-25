@@ -81,3 +81,24 @@ def compare_two_states(s1: List[Tuple[complex, Dict[str, bool]]], s2: List[Tuple
             return False
 
     return True
+
+
+def merge_system_state(s: List[Tuple[complex, Dict[str, bool]]]):
+    i = 0
+    re = []
+    while i < len(y):
+        re.append(y[i])
+
+        j = i + 1
+        while j < len(y):
+            if re[-1][1] == y[j][1]:
+                amp = re[-1][0] + y[j][0]
+                re[-1] = (amp, re[-1][1])
+                del y[j]
+                j -= 1
+
+            j += 1
+
+        i += 1
+
+    return re
