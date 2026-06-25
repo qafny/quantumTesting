@@ -5,6 +5,7 @@ from abc import ABC, abstractmethod
 from typing import Dict, List, Any
 from qiskit import QuantumCircuit
 from generators.inputs import BaseInputGenerator
+import helpers.inputs as helper_inputs
 
 
 class BaseQiskitBenchmark(ABC):
@@ -42,12 +43,16 @@ class BaseQiskitBenchmark(ABC):
                     case "specification":
                         ## TODO: Write a generator to generate outputs using a specification
                         return None
+                    case "json":
+                        inputs_file_name = inputs_info.get("inputs_file", None)
+                        inputs_file_path = f"{self.get_benchmark_folder()}/{inputs_file_name}"
+                        return helper_inputs.read_json_file(inputs_file_path)
                     case "custom":
-                        inputs_file = inputs_info.get("inputs_file", None)
+                        inputs_file_name = inputs_info.get("inputs_file", None)
                         inputs_name = inputs_info.get("inputs_name", None)
 
                         namespace = {}
-                        inputs_file_path = f"{self.get_benchmark_folder()}/{inputs_file}"
+                        inputs_file_path = f"{self.get_benchmark_folder()}/{inputs_file_name}"
                         with open(inputs_file_path, "r") as file:
                             exec(file.read(), namespace)
 
@@ -80,12 +85,16 @@ class BaseQiskitBenchmark(ABC):
                     case "specification":
                         ## TODO: Write a generator to generate outputs using a specification
                         return None
+                    case "json":
+                        outputs_file_name = outputs.get("outputs_file", None)
+                        outputs_file_path = f"{self.get_benchmark_folder()}/{outputs_file_name}"
+                        return helper_inputs.read_json_file(outputs_file_path)
                     case "custom":
-                        outputs_file = outputs.get("outputs_file", None)
+                        outputs_file_name = outputs.get("outputs_file", None)
                         outputs_name = outputs.get("outputs_name", None)
 
                         namespace = {}
-                        outputs_file_path = f"{self.get_benchmark_folder()}/{outputs_file}"
+                        outputs_file_path = f"{self.get_benchmark_folder()}/{outputs_file_name}"
                         with open(outputs_file_path, "r") as file:
                             exec(file.read(), namespace)
 
