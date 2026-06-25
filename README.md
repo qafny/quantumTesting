@@ -86,7 +86,7 @@ If you intend to use an input generator provided by QET (see the `generators.inp
 
 ```json
 {
-  "..."
+  ...
   "inputs": {
     "type": "generator",
     "class_name": "input_generator_class_name",
@@ -96,7 +96,22 @@ If you intend to use an input generator provided by QET (see the `generators.inp
        ...
     }
   },
-  "..."
+  ...
+}
+```
+
+#### Using a JSON File as Input
+
+If you intend to use a JSON file as an input (check below for the file format), use the following configuration with `"type": "json"`:
+
+```json
+{
+  ...
+  "inputs": {
+    "type": "json",
+    "inputs_file": "input_json_file_name"
+  },
+  ...
 }
 ```
 
@@ -106,15 +121,47 @@ If you intend to implement a custom input-generation strategy, use the following
 
 ```json
 {
-  "..."
+  ...
   "inputs": {
     "type": "custom",
     "inputs_file": "input_generator_file_name.py",
     "inputs_name": "input_generator_variable_identifier"
   },
-  "..."
+  ...
 }
 ```
+
+The JSON file is expected to be in the following format.
+
+```json
+[
+  {
+    "0": true/false,
+    "1": true/false,
+    ...
+    "n": true/false
+  },
+  ...
+]
+```
+
+The file should be a list fo dictionaries. Each dictionary represents an instance of input. `n` is the number of input qubits to the circuit. Hence, each dictionary is expected to contain `n` key-value pairs representing initial qubit id-qubit value pairs.
+
+### Expected Output Generation
+
+Some comparators require the expected outputs corresponding to the generated inputs in order to evaluate correctness. In such cases, you must also provide an outputs configuration. The outputs configuration is defined in the same manner as the inputs configuration. In most cases, the configuration structure is identical, with the property name inputs replaced by outputs. For example, the following configuration defines expected outputs using a JSON-based output generator:
+
+```json
+  ...
+  "outputs": {
+    "type": "json",
+    "outputs_file": "file_name.json"
+  },
+  ...
+```
+
+Currently, the following comparators require expected outputs if used:
+- sio (Simple Output-Expected Output Comparator): Used for comparing the program output against the expected output
 
 ## Setup and Run QET
 
@@ -154,7 +201,7 @@ python qet.py --bench_path=benchmarks/arithmetic --comp=spa --out=.outputs --eva
 
 - `bench_path`: Path to the benchmark directory. This directory must contain a `.config.json` file.
 - `evals`: List of evaluators to use. Include `qet` for `QETSimulator` and `tsim` for QuEra's TSim Sampler. By default, both evaluators are used.
-- `comp`: Comparator used for result comparison. For pairwise comparison, use `spa`. The default comparator is `spa` (`Simple Pairwise Comparator`).
+- `comp`: Comparator used for result comparison. For pairwise comparison, use `spa`. For output vs. expected output comparison, use `sio`. The default comparator is `spa` (`Simple Pairwise Comparator`).
 - `out`: Output directory. The default value is `.output`. Ensure that this directory is excluded from version control.
 - `log`: Logging level. The default value is `logging.DEBUG`.
 
