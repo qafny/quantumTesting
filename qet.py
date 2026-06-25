@@ -86,7 +86,7 @@ if __name__ == "__main__":
     logging.info("Starting QET Differential Testing")
     results = run_qet(run_id, args.out, args.bench_path, args.comp, args.evals)
 
-    print(results)
+    logging.info(results)
 
     store_results(run_id, args.out, args.bench_path, results)
 
