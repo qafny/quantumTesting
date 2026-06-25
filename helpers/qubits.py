@@ -39,14 +39,15 @@ def generate_basis_states(bitvals: list, bstates: List[Dict], i: int):
         generate_basis_states(bitvals, bstates, i + 1)
 
 
-def get_system_state_from_qubits(qubit_states: Dict[str, bool]):
+def get_system_state_from_qubits(qubit_states: Dict[str, bool], include_zero_amps: bool = False):
     system_state = [(1 + 0j, qubit_states)]
 
-    basis_states = []
-    generate_basis_states([False] * len(qubit_states), basis_states, 0)
-    for basis_state in basis_states:
-        if basis_state != qubit_states:
-            system_state.append((0 + 0j, basis_state))
+    if include_zero_amps:
+        basis_states = []
+        generate_basis_states([False] * len(qubit_states), basis_states, 0)
+        for basis_state in basis_states:
+            if basis_state != qubit_states:
+                system_state.append((0 + 0j, basis_state))
 
     return system_state
 

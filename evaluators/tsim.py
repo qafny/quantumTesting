@@ -70,6 +70,10 @@ class TSimEvaluator(BaseEvaluator):
         for idx, amp in np.ndenumerate(arr_out):
             amp = eval_utils.zcomplex(amp)
 
+            # We eliminate 0 amplitude basis-kets.
+            if amp == 0:
+                continue
+
             c = int(math.log2(arr_out.shape[0]))
             frmtr_str = "{:0" + str(c) + "b}"
 

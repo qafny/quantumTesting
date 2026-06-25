@@ -29,6 +29,11 @@ class QETEvaluator(BaseEvaluator):
         state = []
         for (amp, sd) in simulator.state:
             amp = eval_utils.zcomplex(amp)
+
+            # We eliminate 0 amplitude basis-kets.
+            if amp == 0:
+                continue
+
             state.append((amp, sd))
 
         logging.info("Finished Evaluating using QETEvaluator")
