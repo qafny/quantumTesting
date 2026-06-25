@@ -5,11 +5,11 @@ from evaluators.base import BaseEvaluator
 import helpers.qubits as helper_qubits
 
 
-class SimpleStateComparator(BaseComparator):
+class SimpleStatePairwiseComparator(BaseComparator):
 
     def __init__(self, evaluators: List[BaseEvaluator], inputs: List[Dict[str, bool]]):
         logging.info("Initializing SimpleStateComparator")
-        super(SimpleStateComparator, self).__init__(evaluators, inputs)
+        super(SimpleStatePairwiseComparator, self).__init__(evaluators, inputs)
         logging.info("Finished Initializing SimpleStateComparator")
 
     @staticmethod
