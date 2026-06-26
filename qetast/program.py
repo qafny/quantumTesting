@@ -82,7 +82,7 @@ class QETASTGenerator(QETASTVisitor):
     def visitRoot(self, node: QXRoot):
         program = node.program().accept(self)
         qubits = [qubit.accept(self) for qubit in node.qubits()]
-        return QXRoot(program, qubits).instance(node.get_id())
+        return QXRoot(program, qubits, global_phase = node.global_phase()).instance(node.get_id())
 
     def visitProgram(self, node: QXProgram):
         i = 0
