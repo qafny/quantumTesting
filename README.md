@@ -202,6 +202,7 @@ python qet.py --bench_path=benchmarks/arithmetic --comp=spa --out=.outputs --eva
 - `bench_path`: Path to the benchmark directory. This directory must contain a `.config.json` file.
 - `evals`: List of evaluators to use. Include `qet` for `QETSimulator` and `tsim` for QuEra's TSim Sampler. By default, both evaluators are used.
 - `comp`: Comparator used for result comparison. For pairwise comparison, use `spa`. For output vs. expected output comparison, use `sio`. The default comparator is `spa` (`Simple Pairwise Comparator`).
+- `opt_level`: The optimization level to use for Qiskit Transpilation. Defaults to 0 (no optimization). Supports levels 0, 1, 2.
 - `out`: Output directory. The default value is `.output`. Ensure that this directory is excluded from version control.
 - `log`: Logging level. The default value is `logging.DEBUG`.
 

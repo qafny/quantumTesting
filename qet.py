@@ -18,13 +18,14 @@ def parser_generator():
     parser.add_argument('--tags', nargs='+', default=[], help="Tags for QET to represent different embedded functions. Refer to the readme.")
     parser.add_argument("--comp", type=str, default="spa", help="The comparator to use. Defaults to Simple Pairwise State Comparator")
     parser.add_argument("--evals", nargs='+', default=["qet", "tsim"], help="List of evaluators to run")
+    parser.add_argument("--opt_level", type=int, default=0, help="The optimization level to use for the qiskit transpiler. Defaults to 0")
     parser.add_argument("--log", type=int, default=logging.DEBUG, help="Logging Level")
     parser.add_argument('--out', type=str, default=".outputs", help="Path to Store the Results")
 
     return parser.parse_args()
 
 
-def run_qet(run_id: str, tags: List[str], base_out_dir: str, benchmark_path: str, comparator_id: str, evaluator_ids: List[str]):
+def run_qet(run_id: str, tags: List[str], base_out_dir: str, benchmark_path: str, comparator_id: str, evaluator_ids: List[str], qiskit_opt_level: int):
     logging.info(f"Setting Globals")
     TagProcessor().set_tags(tags = tags)
     logging.info(f"Finished Setting Globals")
@@ -60,7 +61,7 @@ def run_qet(run_id: str, tags: List[str], base_out_dir: str, benchmark_path: str
         circuit_inputs = inputs[circuit_id]
         circuit_expected_outputs = expected_outputs[circuit_id]
 
-        evaluators: List[BaseEvaluator] = [evaluator_class(circuit) for evaluator_class in evaluator_classes]
+        evaluators: List[BaseEvaluator] = [evaluator_class(circuit, qiskit_opt_level) for evaluator_class in evaluator_classes]
         if comparator_class.requires_expected_outputs():
             comparator: BaseComparator = comparator_class(evaluators, circuit_inputs, circuit_expected_outputs)
         else:
@@ -95,7 +96,7 @@ if __name__ == "__main__":
     logging.basicConfig(level=args.log)
 
     logging.info("Starting QET Differential Testing")
-    results = run_qet(run_id, args.tags, args.out, args.bench_path, args.comp, args.evals)
+    results = run_qet(run_id, args.tags, args.out, args.bench_path, args.comp, args.evals, args.opt_level)
 
     logging.info(results)
 

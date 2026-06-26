@@ -7,7 +7,7 @@ from parser.qiskit import QiskitASTParser
 from qetast.nodes import QXRoot
 
 
-def transpile_qiskit_circuit(qc: QuantumCircuit, basis: GateSetBasis, optimization_level: int = 0) -> QuantumCircuit:
+def transpile_qiskit_circuit(qc: QuantumCircuit, basis: GateSetBasis, optimization_level: int) -> QuantumCircuit:
     target = Target()
 
     for gate, props in basis.get_gate_set():
@@ -21,9 +21,9 @@ def transpile_qiskit_circuit(qc: QuantumCircuit, basis: GateSetBasis, optimizati
     return transpiled_qc
 
 
-def parse_qiskit_circuit(qc: QuantumCircuit, basis: GateSetBasis) -> Tuple[QuantumCircuit, QXRoot]:
+def parse_qiskit_circuit(qc: QuantumCircuit, basis: GateSetBasis, optimization_level: int) -> Tuple[QuantumCircuit, QXRoot]:
     logging.info("Transpiling Qiskit Circuit")
-    tqc: QuantumCircuit = transpile_qiskit_circuit(qc, basis)
+    tqc: QuantumCircuit = transpile_qiskit_circuit(qc, basis, optimization_level)
     logging.info("Finished Transpiling Qiskit Circuit")
     logging.debug(f"tqc qubit count = {tqc.num_qubits}, tqc gates count = {tqc.size()}")
 

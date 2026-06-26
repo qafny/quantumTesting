@@ -10,9 +10,9 @@ import evaluators.utils as eval_utils
 
 class QETEvaluator(BaseEvaluator):
 
-    def __init__(self, qc: QuantumCircuit):
+    def __init__(self, qc: QuantumCircuit, optimization_level: int):
         logging.info("Initializing QETEvaluator")
-        super(QETEvaluator, self).__init__(qc, QETGateSetBasis())
+        super(QETEvaluator, self).__init__(qc, QETGateSetBasis(), optimization_level)
         logging.info("Finished Initializing QETEvaluator")
 
     @staticmethod

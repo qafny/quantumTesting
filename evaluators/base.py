@@ -13,12 +13,13 @@ from qetast.processors import MarkedNodeEliminator
 
 class BaseEvaluator(ABC):
 
-    def __init__(self, qc: QuantumCircuit, gateset_basis: GateSetBasis):
+    def __init__(self, qc: QuantumCircuit, gateset_basis: GateSetBasis, optimization_level: int):
         self._qc: QuantumCircuit = qc
         self._gateset_basis: GateSetBasis = gateset_basis
+        self._optimization_level: int = optimization_level
 
         logging.info("Parsing Circuit")
-        tqc, ast = helpers_qiskit.parse_qiskit_circuit(self._qc, self._gateset_basis)
+        tqc, ast = helpers_qiskit.parse_qiskit_circuit(self._qc, self._gateset_basis, self._optimization_level)
         logging.info("Finished Parsing Circuit")
 
         logging.info("Applying Markers")
@@ -65,6 +66,9 @@ class BaseEvaluator(ABC):
 
     def get_circuit_ast(self) -> QXRoot:
         return self._ast
+
+    def get_optimization_level(self) -> int:
+        return self._optimization_level
 
     @abstractmethod
     def evaluate(self, ins: Dict[str, bool]):

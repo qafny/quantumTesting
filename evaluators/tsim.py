@@ -13,9 +13,9 @@ import evaluators.utils as eval_utils
 
 class TSimEvaluator(BaseEvaluator):
 
-    def __init__(self, qc: QuantumCircuit):
+    def __init__(self, qc: QuantumCircuit, optimization_level: int):
         logging.info("Initializing TSimEvaluator")
-        super(TSimEvaluator, self).__init__(qc, CliffordTGateSetBasis())
+        super(TSimEvaluator, self).__init__(qc, CliffordTGateSetBasis(), optimization_level)
         self.u: np.ndarray = None
 
         logging.info("Building up the Unitary for TSim")
