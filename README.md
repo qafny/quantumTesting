@@ -200,11 +200,20 @@ python qet.py --bench_path=benchmarks/arithmetic --comp=spa --out=.outputs --eva
 ## Parameter Definitions
 
 - `bench_path`: Path to the benchmark directory. This directory must contain a `.config.json` file.
+- `tags`: List of tags to use. See the end of this section for documentation.
 - `evals`: List of evaluators to use. Include `qet` for `QETSimulator` and `tsim` for QuEra's TSim Sampler. By default, both evaluators are used.
 - `comp`: Comparator used for result comparison. For pairwise comparison, use `spa`. For output vs. expected output comparison, use `sio`. The default comparator is `spa` (`Simple Pairwise Comparator`).
 - `opt_level`: The optimization level to use for Qiskit Transpilation. Defaults to 0 (no optimization). Supports levels 0, 1, 2.
 - `out`: Output directory. The default value is `.output`. Ensure that this directory is excluded from version control.
 - `log`: Logging level. The default value is `logging.DEBUG`.
+
+### Tags
+
+These tags can be included in the `tags` parameter above to define some of the global properties.
+
+- `parse_rph`: Eliminates the prefixed Hadamard gates (at the beginning of the circuit) during parsing.
+- `parse_rsh`: Eliminates the suffixed Hadamard gates (at the end of the circuit) during parsing.
+- `parse_rm`: Eliminates the measurement gates in the circuit during parsing.
 
 ## Important Notes
 
