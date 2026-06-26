@@ -73,19 +73,6 @@ class QXConstant(QXNode):
         return self._value
 
 
-class QXProgram(QXNode):
-
-    def __init__(self, exps: List[QXExp]):
-        super().__init__()
-        self._exps = exps
-
-    def accept(self, visitor: AbstractASTVisitor):
-        return visitor.visitProgram(self)
-
-    def exp(self, i: int = None):
-        return self._exps[i] if len(self._exps) > i else None
-
-
 class QXRoot(QXNode):
 
     def __init__(self, program: QXProgram, qubits: List[QXQubit], global_phase: float = 0.0):
@@ -105,6 +92,19 @@ class QXRoot(QXNode):
 
     def global_phase(self):
         return self._global_phase
+
+
+class QXProgram(QXNode):
+
+    def __init__(self, exps: List[QXExp]):
+        super().__init__()
+        self._exps = exps
+
+    def accept(self, visitor: AbstractASTVisitor):
+        return visitor.visitProgram(self)
+
+    def exp(self, i: int = None):
+        return self._exps[i] if len(self._exps) > i else None
 
 
 class QXQGate(QXExp):
