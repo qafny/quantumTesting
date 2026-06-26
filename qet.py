@@ -5,6 +5,7 @@ from typing import List, Dict, Any
 from qiskit import QuantumCircuit
 from comparators.base import BaseComparator
 from evaluators.base import BaseEvaluator
+from globals import TagProcessor
 from readers.benchmarks import LibraryQiskitBenchmark, CustomQiskitBenchmark
 import helpers.argparsing as helper_args
 from writers.csv import ComparatorOutputCSVWriter
@@ -14,6 +15,7 @@ from writers.evaluators import EvaluatorParsedCircuitWriter
 def parser_generator():
     parser = argparse.ArgumentParser(description="QET: Differential Testing of Quantum Programs across Target Platforms")
     parser.add_argument('--bench_path', type=str, default="benchmarks/arithmetic", help="Path to the Benchmark Folder")
+    parser.add_argument('--tags', nargs='+', default=[], help="Tags for QET to represent different embedded functions. Refer to the readme.")
     parser.add_argument("--comp", type=str, default="spa", help="The comparator to use. Defaults to Simple Pairwise State Comparator")
     parser.add_argument("--evals", nargs='+', default=["qet", "tsim"], help="List of evaluators to run")
     parser.add_argument("--log", type=int, default=logging.DEBUG, help="Logging Level")
@@ -22,7 +24,11 @@ def parser_generator():
     return parser.parse_args()
 
 
-def run_qet(run_id: str, base_out_dir: str, benchmark_path: str, comparator_id: str, evaluator_ids: List[str]):
+def run_qet(run_id: str, tags: List[str], base_out_dir: str, benchmark_path: str, comparator_id: str, evaluator_ids: List[str]):
+    logging.info(f"Setting Globals")
+    TagProcessor().set_tags(tags = tags)
+    logging.info(f"Finished Setting Globals")
+
     logging.info(f"Reading Benchmark: {benchmark_path}")
 
     if LibraryQiskitBenchmark.is_library_benchmark(benchmark_path):
@@ -89,7 +95,7 @@ if __name__ == "__main__":
     logging.basicConfig(level=args.log)
 
     logging.info("Starting QET Differential Testing")
-    results = run_qet(run_id, args.out, args.bench_path, args.comp, args.evals)
+    results = run_qet(run_id, args.tags, args.out, args.bench_path, args.comp, args.evals)
 
     logging.info(results)
 
