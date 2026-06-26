@@ -1,10 +1,14 @@
 import logging
 from abc import ABC, abstractmethod
-from typing import Dict
+from typing import Dict, List
 from qiskit import QuantumCircuit
 from evaluators.basis import GateSetBasis
-from helpers.qiskit import parse_qiskit_circuit
+import helpers.qiskit as helpers_qiskit
+import helpers.ast as helpers_ast
+from globals import TagProcessor
+from qetast.markers import PrefixedHadamardGatesMarker, SuffixedHadamardGatesMarker, MeasureGateMarker
 from qetast.nodes import QXRoot
+from qetast.processors import MarkedNodeEliminator
 
 
 class BaseEvaluator(ABC):
@@ -14,11 +18,36 @@ class BaseEvaluator(ABC):
         self._gateset_basis: GateSetBasis = gateset_basis
 
         logging.info("Parsing Circuit")
-        tqc, ast = parse_qiskit_circuit(self._qc, self._gateset_basis)
+        tqc, ast = helpers_qiskit.parse_qiskit_circuit(self._qc, self._gateset_basis)
         logging.info("Finished Parsing Circuit")
 
-        self._tqc: QuantumCircuit = qc
+        logging.info("Applying Markers")
+        ast = helpers_ast.get_applied_ast(ast, self._get_ast_markers())
+        logging.info("Finished Applying Markers")
+
+        logging.info("Applying Processors")
+        ast = helpers_ast.get_applied_ast(ast, self._get_ast_processors())
+        logging.info("Finished Applying Processors")
+
+        self._tqc: QuantumCircuit = tqc
         self._ast: QXRoot = ast
+
+    def _get_ast_markers(self):
+        markers = []
+
+        if TagProcessor().remove_prefixed_hadamards():
+            markers.append(PrefixedHadamardGatesMarker())
+        if TagProcessor().remove_suffixed_hadamards():
+            markers.append(SuffixedHadamardGatesMarker())
+        if TagProcessor().remove_measure():
+            markers.append(MeasureGateMarker())
+
+        return markers
+
+    def _get_ast_processors(self):
+        return [
+            MarkedNodeEliminator()
+        ]
 
     @staticmethod
     @abstractmethod
