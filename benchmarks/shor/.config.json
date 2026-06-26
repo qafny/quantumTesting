@@ -13,14 +13,38 @@
           "qubits_count": 3
         }
       }
-    },
-    "rc_adder_add_1": {
-      "circuit_file": "rc_adder_circuit.py",
-      "circuit_name": "rc_adder_circuit",
+    },  
+    "rc_adder_add_classical": {
+      "circuit_file": "rc_circuits.py",
+      "circuit_name": "rc_adder_add_classical_circuit",
       "inputs": {
         "type": "json",
-        "inputs_file": "rc_adder_inputs.json"
+        "inputs_file": "rc_adder_add_classical_inputs.json"
       }
-    }
+    },
+    "rc_adder_add_quantum": {
+      "circuit_file": "rc_circuits.py",
+      "circuit_name": "rc_adder_add_quantum_circuit",
+      "inputs": {
+        "type": "json",
+        "inputs_file": "rc_adder_add_quantum_inputs.json"
+      }
+    },
+    "rc_adder_subtract_classical": {
+      "circuit_file": "rc_circuits.py",
+      "circuit_name": "rc_adder_subtract_classical_circuit",
+      "inputs": {
+        "type": "json",
+        "inputs_file": "rc_adder_subtract_classical_inputs.json"
+      }
+    },
+    "rc_adder_subtract_quantum": {
+      "circuit_file": "rc_circuits.py",
+      "circuit_name": "rc_adder_subtract_quantum_circuit",
+      "inputs": {
+        "type": "json",
+        "inputs_file": "rc_adder_subtract_quantum_inputs.json"
+      }
+    } 
   }
 }
