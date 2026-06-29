@@ -15,3 +15,5 @@ lib/*
 .venv/
 .vscode/settings.json
 .idea/*
+venv/
+.outputs/

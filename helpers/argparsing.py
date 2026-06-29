@@ -4,6 +4,7 @@ from comparators.simplestate import SimpleStatePairwiseComparator, SimpleStateEx
 from evaluators.base import BaseEvaluator
 from evaluators.qet import QETEvaluator
 from evaluators.tsim import TSimEvaluator
+from evaluators.qucheck import QucheckEvaluator, QucheckExpectedOutputEvaluator
 
 
 def parse_comparator(comparator_id: str) -> type[BaseComparator]:
@@ -23,6 +24,10 @@ def parse_evaluators_list(evaluators_list: List[str]) -> List[type[BaseEvaluator
             evals.append(QETEvaluator)
         elif evaluator_id == TSimEvaluator.get_identifier():
             evals.append(TSimEvaluator)
+        elif evaluator_id == QucheckEvaluator.get_identifier():
+            evals.append(QucheckEvaluator)
+        elif evaluator_id == QucheckExpectedOutputEvaluator.get_identifier():
+            evals.append(QucheckExpectedOutputEvaluator)
         else:
             raise Exception(f"Unknown evaluator {evaluator_id}")
 

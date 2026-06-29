@@ -10,6 +10,7 @@ from readers.benchmarks import LibraryQiskitBenchmark, CustomQiskitBenchmark
 import helpers.argparsing as helper_args
 from writers.csv import ComparatorOutputCSVWriter
 from writers.evaluators import EvaluatorParsedCircuitWriter
+from evaluators.qucheck import QucheckEvaluator, QucheckExpectedOutputEvaluator
 
 
 def parser_generator():
@@ -59,10 +60,27 @@ def run_qet(run_id: str, tags: List[str], base_out_dir: str, benchmark_path: str
 
         circuit = circuits[circuit_id]
         circuit_inputs = inputs[circuit_id]
-        circuit_expected_outputs = expected_outputs[circuit_id]
+        circuit_expected_outputs = expected_outputs.get(circuit_id, None)
 
-        evaluators: List[BaseEvaluator] = [evaluator_class(circuit, qiskit_opt_level) for evaluator_class in evaluator_classes]
+        evaluators: List[BaseEvaluator] = []
+        for evaluator_class in evaluator_classes:
+            if evaluator_class == QucheckEvaluator:
+                # Plain Qucheck evaluator
+                evaluator = evaluator_class(circuit, qiskit_opt_level, num_inputs=10, num_measurements=2000)
+            elif evaluator_class == QucheckExpectedOutputEvaluator:
+                # Only pass expected if comparator requires it and outputs are available
+                if comparator_class.requires_expected_outputs() and circuit_expected_outputs is not None:
+                    evaluator = evaluator_class(circuit, qiskit_opt_level, expected=circuit_expected_outputs)
+                else:
+                    # Fallback to plain Qucheck
+                    evaluator = QucheckEvaluator(circuit, qiskit_opt_level, num_inputs=10, num_measurements=2000)
+            else:
+                evaluator = evaluator_class(circuit, qiskit_opt_level)
+            evaluators.append(evaluator)
+
         if comparator_class.requires_expected_outputs():
+            if circuit_expected_outputs is None:
+                logging.warning(f"Expected outputs not available for circuit {circuit_id}, comparator may fail.")
             comparator: BaseComparator = comparator_class(evaluators, circuit_inputs, circuit_expected_outputs)
         else:
             comparator: BaseComparator = comparator_class(evaluators, circuit_inputs)

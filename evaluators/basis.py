@@ -55,7 +55,7 @@ class QETGateSetBasis(GateSetBasis):
     def add_ccrz_gate(self):
         qc = QuantumCircuit(3, name = "ccrz")
         phi = Parameter("phi")
-        ccrz_gate = RZGate(phi).control(2)
+        ccrz_gate = RZGate(phi).control(2, annotated = True)
         qc.append(ccrz_gate, [0, 1, 2])
 
         gate = qc.to_gate()
@@ -71,7 +71,7 @@ class QETGateSetBasis(GateSetBasis):
     def add_cccrz_gate(self):
         qc = QuantumCircuit(4, name = "cccrz")
         phi = Parameter("phi")
-        cccrz_gate = RZGate(phi).control(3)
+        cccrz_gate = RZGate(phi).control(3, annotated = True)
         qc.append(cccrz_gate, [0, 1, 2, 3])
 
         gate = qc.to_gate()
@@ -87,7 +87,7 @@ class QETGateSetBasis(GateSetBasis):
     def add_ccccrz_gate(self):
         qc = QuantumCircuit(5, name = "ccccrz")
         phi = Parameter("phi")
-        ccccrz_gate = RZGate(phi).control(4)
+        ccccrz_gate = RZGate(phi).control(4, annotated = True)
         qc.append(ccccrz_gate, [0, 1, 2, 3, 4])
 
         gate = qc.to_gate()
@@ -95,7 +95,7 @@ class QETGateSetBasis(GateSetBasis):
 
     def add_cccccx_gate(self):
         qc = QuantumCircuit(6, name = "cccccx")
-        cccccx_gate = XGate().control(5)
+        cccccx_gate = XGate().control(5, annotated = True)
         qc.append(cccccx_gate, [0, 1, 2, 3, 4, 5])
 
         gate = qc.to_gate()
@@ -104,7 +104,7 @@ class QETGateSetBasis(GateSetBasis):
     def add_cccccrz_gate(self):
         qc = QuantumCircuit(6, name = "cccccrz")
         phi = Parameter("phi")
-        cccccrz_gate = RZGate(phi).control(5)
+        cccccrz_gate = RZGate(phi).control(5, annotated = True)
         qc.append(cccccrz_gate, [0, 1, 2, 3, 4, 5])
 
         gate = qc.to_gate()
