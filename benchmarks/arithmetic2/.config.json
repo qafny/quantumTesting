@@ -104,6 +104,102 @@
                 }
             }
         },
+        "qarithmetic_lshift": {
+            "circuit_file": "bitshift_circuits.py",
+            "circuit_name": "lshift_circuit",
+            "inputs": {
+                "type": "generator",
+                "class_name": "BoundedRandomInputGenerator",
+                "module": "generators.inputs",
+                "kwargs": {
+                    "qubits_count": 3,
+                    "ins_count": 10,
+                    "bounds": [
+                        {
+                            "start": 0,
+                            "size": 3,
+                            "min_value": 0,
+                            "max_value": 7
+                        }
+                    ]
+                }
+            }
+        },
+        "qarithmetic_rshift": {
+            "circuit_file": "bitshift_circuits.py",
+            "circuit_name": "rshift_circuit",
+            "inputs": {
+                "type": "generator",
+                "class_name": "BoundedRandomInputGenerator",
+                "module": "generators.inputs",
+                "kwargs": {
+                    "qubits_count": 3,
+                    "ins_count": 10,
+                    "bounds": [
+                        {
+                            "start": 0,
+                            "size": 3,
+                            "min_value": 0,
+                            "max_value": 7
+                        }
+                    ]
+                }
+            }
+        },
+        "qarithmetic_controlled_lshift": {
+            "circuit_file": "bitshift_circuits.py",
+            "circuit_name": "controlled_lshift_circuit",
+            "inputs": {
+                "type": "generator",
+                "class_name": "BoundedRandomInputGenerator",
+                "module": "generators.inputs",
+                "kwargs": {
+                    "qubits_count": 4,
+                    "ins_count": 10,
+                    "bounds": [
+                        {
+                            "start": 0,
+                            "size": 1,
+                            "min_value": 0,
+                            "max_value": 1
+                        },
+                        {
+                            "start": 1,
+                            "size": 3,
+                            "min_value": 0,
+                            "max_value": 7
+                        }
+                    ]
+                }
+            }
+        },
+        "qarithmetic_controlled_rshift": {
+            "circuit_file": "bitshift_circuits.py",
+            "circuit_name": "controlled_rshift_circuit",
+            "inputs": {
+                "type": "generator",
+                "class_name": "BoundedRandomInputGenerator",
+                "module": "generators.inputs",
+                "kwargs": {
+                    "qubits_count": 4,
+                    "ins_count": 10,
+                    "bounds": [
+                        {
+                            "start": 0,
+                            "size": 1,
+                            "min_value": 0,
+                            "max_value": 1
+                        },
+                        {
+                            "start": 1,
+                            "size": 3,
+                            "min_value": 0,
+                            "max_value": 7
+                        }
+                    ]
+                }
+            }
+        },
         "rc_adder_add_classical": {
             "circuit_file": "rc_circuits.py",
             "circuit_name": "rc_adder_add_classical_circuit",
