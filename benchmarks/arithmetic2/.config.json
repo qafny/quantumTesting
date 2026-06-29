@@ -1,0 +1,123 @@
+{
+    "type": "custom",
+    "description" : "ripple-carry arithmetic circuits. These implement basic addition and subtraction using primitive qiskit gates such as x, cx, and ccx.",
+    "circuits": {
+        "rc_adder_add_classical": {
+            "circuit_file": "rc_circuits.py",
+            "circuit_name": "rc_adder_add_classical_circuit",
+            "inputs": {
+                "type": "generator",
+                "class_name": "BoundedRandomInputGenerator",
+                "module": "generators.inputs",
+                "kwargs": {
+                    "qubits_count": 7,
+                    "ins_count": 10,
+                    "bounds": [
+                        {
+                            "start": 0,
+                            "size": 3,
+                            "min_value": 0,
+                            "max_value": 7
+                        }
+                    ]
+                }
+            }
+        },
+        "rc_adder_add_quantum": {
+            "circuit_file": "rc_circuits.py",
+            "circuit_name": "rc_adder_add_quantum_circuit",
+            "inputs": {
+                "type": "generator",
+                "class_name": "BoundedRandomInputGenerator",
+                "module": "generators.inputs",
+                "kwargs": {
+                    "qubits_count": 7,
+                    "ins_count": 10,
+                    "bounds": [
+                        {
+                            "start": 0,
+                            "size": 3,
+                            "min_value": 0,
+                            "max_value": 7
+                        },
+                        {
+                            "start": 3,
+                            "size": 3,
+                            "min_value": 0,
+                            "max_value": 7
+                        }
+                    ]
+                }
+            }
+        },
+        "rc_adder_subtract_classical": {
+            "circuit_file": "rc_circuits.py",
+            "circuit_name": "rc_adder_subtract_classical_circuit",
+            "inputs": {
+                "type": "generator",
+                "class_name": "BoundedRandomInputGenerator",
+                "module": "generators.inputs",
+                "kwargs": {
+                    "qubits_count": 7,
+                    "ins_count": 10,
+                    "bounds": [
+                        {
+                            "start": 0,
+                            "size": 3,
+                            "min_value": 0,
+                            "max_value": 7
+                        }
+                    ]
+                }
+            }
+        },
+        "rc_adder_subtract_quantum": {
+            "circuit_file": "rc_circuits.py",
+            "circuit_name": "rc_adder_subtract_quantum_circuit",
+            "inputs": {
+                "type": "generator",
+                "class_name": "BoundedRandomInputGenerator",
+                "module": "generators.inputs",
+                "kwargs": {
+                    "qubits_count": 7,
+                    "ins_count": 10,
+                    "bounds": [
+                        {
+                            "start": 0,
+                            "size": 3,
+                            "min_value": 0,
+                            "max_value": 7
+                        },
+                        {
+                            "start": 3,
+                            "size": 3,
+                            "min_value": 0,
+                            "max_value": 7
+                        }
+                    ]
+                }
+            }
+        },
+        "rc_adder_add_classical_modular": {
+            "circuit_file": "rc_modular_circuits.py",
+            "circuit_name": "rc_adder_add_classical_modular_circuit",
+            "inputs": {
+                "type": "generator",
+                "class_name": "BoundedRandomInputGenerator",
+                "module": "generators.inputs",
+                "kwargs": {
+                    "qubits_count": 10,
+                    "ins_count": 5,
+                    "bounds": [
+                        {
+                        "start": 0,
+                        "size": 3,
+                        "min_value": 0,
+                        "max_value": 4
+                        }
+                    ]
+                }
+            }
+        }
+    }
+}
