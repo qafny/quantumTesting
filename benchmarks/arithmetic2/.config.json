@@ -2,6 +2,108 @@
     "type": "custom",
     "description" : "ripple-carry arithmetic circuits. These implement basic addition and subtraction using primitive qiskit gates such as x, cx, and ccx.",
     "circuits": {
+        "qarithmetic_bitwise_and": {
+            "circuit_file": "bitwise_circuits.py",
+            "circuit_name": "bitwise_and_circuit",
+            "inputs": {
+                "type": "generator",
+                "class_name": "BoundedRandomInputGenerator",
+                "module": "generators.inputs",
+                "kwargs": {
+                    "qubits_count": 9,
+                    "ins_count": 10,
+                    "bounds": [
+                        {
+                            "start": 0,
+                            "size": 3,
+                            "min_value": 0,
+                            "max_value": 7
+                        },
+                        {
+                            "start": 3,
+                            "size": 3,
+                            "min_value": 0,
+                            "max_value": 7
+                        }
+                    ]
+                }
+            }
+        },
+        "qarithmetic_bitwise_or": {
+            "circuit_file": "bitwise_circuits.py",
+            "circuit_name": "bitwise_or_circuit",
+            "inputs": {
+                "type": "generator",
+                "class_name": "BoundedRandomInputGenerator",
+                "module": "generators.inputs",
+                "kwargs": {
+                    "qubits_count": 9,
+                    "ins_count": 10,
+                    "bounds": [
+                        {
+                            "start": 0,
+                            "size": 3,
+                            "min_value": 0,
+                            "max_value": 7
+                        },
+                        {
+                            "start": 3,
+                            "size": 3,
+                            "min_value": 0,
+                            "max_value": 7
+                        }
+                    ]
+                }
+            }
+        },
+        "qarithmetic_bitwise_xor": {
+            "circuit_file": "bitwise_circuits.py",
+            "circuit_name": "bitwise_xor_circuit",
+            "inputs": {
+                "type": "generator",
+                "class_name": "BoundedRandomInputGenerator",
+                "module": "generators.inputs",
+                "kwargs": {
+                    "qubits_count": 9,
+                    "ins_count": 10,
+                    "bounds": [
+                        {
+                            "start": 0,
+                            "size": 3,
+                            "min_value": 0,
+                            "max_value": 7
+                        },
+                        {
+                            "start": 3,
+                            "size": 3,
+                            "min_value": 0,
+                            "max_value": 7
+                        }
+                    ]
+                }
+            }
+        },
+        "qarithmetic_bitwise_not": {
+            "circuit_file": "bitwise_circuits.py",
+            "circuit_name": "bitwise_not_circuit",
+            "inputs": {
+                "type": "generator",
+                "class_name": "BoundedRandomInputGenerator",
+                "module": "generators.inputs",
+                "kwargs": {
+                    "qubits_count": 6,
+                    "ins_count": 10,
+                    "bounds": [
+                        {
+                            "start": 0,
+                            "size": 3,
+                            "min_value": 0,
+                            "max_value": 7
+                        }
+                    ]
+                }
+            }
+        },
         "rc_adder_add_classical": {
             "circuit_file": "rc_circuits.py",
             "circuit_name": "rc_adder_add_classical_circuit",
@@ -107,7 +209,7 @@
                 "module": "generators.inputs",
                 "kwargs": {
                     "qubits_count": 10,
-                    "ins_count": 5,
+                    "ins_count": 10,
                     "bounds": [
                         {
                         "start": 0,
@@ -118,6 +220,6 @@
                     ]
                 }
             }
-        }
+        }   
     }
 }
