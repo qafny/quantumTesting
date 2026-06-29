@@ -220,6 +220,129 @@
                     ]
                 }
             }
-        }   
+        },
+        "rc_adder_subtract_classical_modular": {
+            "circuit_file": "rc_modular_circuits.py",
+            "circuit_name": "rc_adder_subtract_classical_modular_circuit",
+            "inputs": {
+                "type": "generator",
+                "class_name": "BoundedRandomInputGenerator",
+                "module": "generators.inputs",
+                "kwargs": {
+                "qubits_count": 10,
+                "ins_count": 10,
+                "bounds": [
+                    {
+                    "start": 0,
+                    "size": 3,
+                    "min_value": 0,
+                    "max_value": 4
+                    }
+                ]
+                }
+            }
+        },
+        "rc_adder_add_quantum_modular": {
+            "circuit_file": "rc_modular_circuits.py",
+            "circuit_name": "rc_adder_add_quantum_modular_circuit",
+            "inputs": {
+                "type": "generator",
+                "class_name": "BoundedRandomInputGenerator",
+                "module": "generators.inputs",
+                "kwargs": {
+                    "qubits_count": 13,
+                    "ins_count": 25,
+                    "bounds": [
+                        {
+                            "start": 0,
+                            "size": 3,
+                            "min_value": 0,
+                            "max_value": 4
+                        },
+                        {
+                            "start": 3,
+                            "size": 3,
+                            "min_value": 0,
+                            "max_value": 4
+                        }
+                    ]
+                }
+            }
+        },
+        "rc_adder_subtract_quantum_modular": {
+            "circuit_file": "rc_modular_circuits.py",
+            "circuit_name": "rc_adder_subtract_quantum_modular_circuit",
+            "inputs": {
+                "type": "generator",
+                "class_name": "BoundedRandomInputGenerator",
+                "module": "generators.inputs",
+                "kwargs": {
+                    "qubits_count": 13,
+                    "ins_count": 25,
+                    "bounds": [
+                        {
+                            "start": 0,
+                            "size": 3,
+                            "min_value": 0,
+                            "max_value": 4
+                        },
+                        {
+                            "start": 3,
+                            "size": 3,
+                            "min_value": 0,
+                            "max_value": 4
+                        }
+                    ]
+                }
+            }
+        },
+        "rc_modular_multiplication": {
+            "circuit_file": "rc_modular_multiply.py",
+            "circuit_name": "rc_modular_multiplication_circuit",
+            "inputs": {
+                "type": "generator",
+                "class_name": "BoundedRandomInputGenerator",
+                "module": "generators.inputs",
+                "kwargs": {
+                    "qubits_count": 13,
+                    "ins_count": 10,
+                    "bounds": [
+                        {
+                            "start": 0,
+                            "size": 3,
+                            "min_value": 0,
+                            "max_value": 4
+                        }
+                    ]
+                }
+            }
+        },
+        "rc_controlled_modular_multiplication": {
+            "circuit_file": "rc_modular_multiply.py",
+            "circuit_name": "rc_controlled_modular_multiplication_circuit",
+            "inputs": {
+                "type": "generator",
+                "class_name": "BoundedRandomInputGenerator",
+                "module": "generators.inputs",
+                "kwargs": {
+                    "qubits_count": 14,
+                    "ins_count": 10,
+                    "bounds": [
+                        {
+                            "start": 0,
+                            "size": 1,
+                            "min_value": 0,
+                            "max_value": 1
+                        },
+                        {
+                            "start": 1,
+                            "size": 3,
+                            "min_value": 0,
+                            "max_value": 4
+                        }
+                    ]
+                }
+            }
+        }
     }
 }
