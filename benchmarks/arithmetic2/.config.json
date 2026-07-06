@@ -439,6 +439,114 @@
                     ]
                 }
             }
+        },
+        "qarithmetic_multiply": {
+            "circuit_file": "advanced_multiply.py",
+            "circuit_name": "multiply_circuit",
+            "inputs": {
+              "type": "generator",
+              "class_name": "BoundedRandomInputGenerator",
+              "module": "generators.inputs",
+              "kwargs": {
+                  "qubits_count": 8,
+                  "ins_count": 10,
+                  "bounds": [
+                      {
+                          "start": 0,
+                          "size": 2,
+                          "min_value": 0,
+                          "max_value": 3
+                      },
+                      {
+                          "start": 2,
+                          "size": 2,
+                          "min_value": 0,
+                          "max_value": 3
+                      }
+                  ]
+              }
+            }
+        },
+        "qarithmetic_controlled_multiply": {
+            "circuit_file": "advanced_multiply.py",
+            "circuit_name": "controlled_multiply_circuit",
+            "inputs": {
+                "type": "generator",
+                "class_name": "BoundedRandomInputGenerator",
+                "module": "generators.inputs",
+                "kwargs": {
+                    "qubits_count": 9,
+                    "ins_count": 10,
+                    "bounds": [
+                        {
+                            "start": 0,
+                            "size": 1,
+                            "min_value": 0,
+                            "max_value": 1
+                        },
+                        {
+                            "start": 1,
+                            "size": 2,
+                            "min_value": 0,
+                            "max_value": 3
+                        },
+                        {
+                            "start": 3,
+                            "size": 2,
+                            "min_value": 0,
+                            "max_value": 3
+                        }
+                    ]
+                }
+            }
+        },
+        "qarithmetic_square": {
+            "circuit_file": "advanced_multiply.py",
+            "circuit_name": "square_circuit",
+            "inputs": {
+                "type": "generator",
+                "class_name": "BoundedRandomInputGenerator",
+                "module": "generators.inputs",
+                "kwargs": {
+                    "qubits_count": 6,
+                    "ins_count": 10,
+                    "bounds": [
+                      {
+                          "start": 0,
+                          "size": 2,
+                          "min_value": 0,
+                          "max_value": 3
+                      }
+                    ]
+                }
+            }
+        },
+        "qarithmetic_divide": {
+            "circuit_file": "advanced_multiply.py",
+            "circuit_name": "divide_circuit",
+            "inputs": {
+                "type": "generator",
+                "class_name": "BoundedRandomInputGenerator",
+                "module": "generators.inputs",
+                "kwargs": {
+                    "qubits_count": 10,
+                    "ins_count": 10,
+                    "bounds": [
+                      {
+                          "start": 0,
+                          "size": 2,
+                          "min_value": 0,
+                          "max_value": 3
+                      },
+                      {
+                          "start": 6,
+                          "size": 2,
+                          "min_value": 1,
+                          "max_value": 3
+                      }
+                    ]
+                }
+            }
         }
     }
 }
