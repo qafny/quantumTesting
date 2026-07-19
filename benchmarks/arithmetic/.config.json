@@ -1,7 +1,221 @@
 {
   "type": "library",
-  "description": "Arithmetic Quantum Programs",
-  "circuits": {
+  "description": "Qiskit built-in arithmetic circuit benchmarks.",
+  "circuits": { 
+    "qiskit_cdkm_ripple_adder_fixed": {
+      "class_name": "CDKMRippleCarryAdder",
+      "module": "qiskit.circuit.library",
+      "kwargs": {
+        "num_state_qubits": 7,
+        "kind": "fixed",
+        "name": "qiskit_cdkm_ripple_adder_fixed"
+      },
+      "inputs": {
+        "type": "generator",
+        "class_name": "BoundedRandomInputGenerator",
+        "module": "generators.inputs",
+        "kwargs": {
+          "qubits_count": 15,
+          "ins_count": 10,
+          "bounds": [
+            {
+              "start": 0,
+              "size": 7,
+              "min_value": 0,
+              "max_value": 127
+            },
+            {
+              "start": 7,
+              "size": 7,
+              "min_value": 0,
+              "max_value": 127
+            }
+          ]
+        }
+      }
+    },
+    "qiskit_cdkm_ripple_adder_half": {
+      "class_name": "CDKMRippleCarryAdder",
+      "module": "qiskit.circuit.library",
+      "kwargs": {
+        "num_state_qubits": 7,
+        "kind": "half",
+        "name": "qiskit_cdkm_ripple_adder_half"
+      },
+      "inputs": {
+        "type": "generator",
+        "class_name": "BoundedRandomInputGenerator",
+        "module": "generators.inputs",
+        "kwargs": {
+          "qubits_count": 16,
+          "ins_count": 10,
+          "bounds": [
+            {
+              "start": 0,
+              "size": 7,
+              "min_value": 0,
+              "max_value": 127
+            },
+            {
+              "start": 7,
+              "size": 7,
+              "min_value": 0,
+              "max_value": 127
+            }
+          ]
+        }
+      }
+    },
+    "qiskit_integer_comparator_geq": {
+      "class_name": "IntegerComparator",
+      "module": "qiskit.circuit.library",
+      "kwargs": {
+        "num_state_qubits": 15,
+        "value": 16384,
+        "geq": true,
+        "name": "qiskit_integer_comparator_geq"
+      },
+      "inputs": {
+        "type": "generator",
+        "class_name": "BoundedRandomInputGenerator",
+        "module": "generators.inputs",
+        "kwargs": {
+          "qubits_count": 30,
+          "ins_count": 10,
+          "bounds": [
+            {
+              "start": 0,
+              "size": 15,
+              "min_value": 0,
+              "max_value": 32767
+            }
+          ]
+        }
+      }
+    },
+    "qiskit_integer_comparator_lt": {
+      "class_name": "IntegerComparator",
+      "module": "qiskit.circuit.library",
+      "kwargs": {
+        "num_state_qubits": 15,
+        "value": 16384,
+        "geq": false,
+        "name": "qiskit_integer_comparator_lt"
+      },
+      "inputs": {
+        "type": "generator",
+        "class_name": "BoundedRandomInputGenerator",
+        "module": "generators.inputs",
+        "kwargs": {
+          "qubits_count": 30,
+          "ins_count": 10,
+          "bounds": [
+            {
+              "start": 0,
+              "size": 15,
+              "min_value": 0,
+              "max_value": 32767
+            }
+          ]
+        }
+      }
+    },
+    "qiskit_vbe_ripple_adder_fixed": {
+      "class_name": "VBERippleCarryAdder",
+      "module": "qiskit.circuit.library",
+      "kwargs": {
+        "num_state_qubits": 7,
+        "kind": "fixed",
+        "name": "qiskit_vbe_ripple_adder_fixed"
+      },
+      "inputs": {
+        "type": "generator",
+        "class_name": "BoundedRandomInputGenerator",
+        "module": "generators.inputs",
+        "kwargs": {
+          "qubits_count": 20,
+          "ins_count": 10,
+          "bounds": [
+            {
+              "start": 0,
+              "size": 7,
+              "min_value": 0,
+              "max_value": 127
+            },
+            {
+              "start": 7,
+              "size": 7,
+              "min_value": 0,
+              "max_value": 127
+            }
+          ]
+        }
+      }
+    },
+    "qiskit_vbe_ripple_adder_half": {
+      "class_name": "VBERippleCarryAdder",
+      "module": "qiskit.circuit.library",
+      "kwargs": {
+        "num_state_qubits": 7,
+        "kind": "half",
+        "name": "qiskit_vbe_ripple_adder_half"
+      },
+      "inputs": {
+        "type": "generator",
+        "class_name": "BoundedRandomInputGenerator",
+        "module": "generators.inputs",
+        "kwargs": {
+          "qubits_count": 21,
+          "ins_count": 10,
+          "bounds": [
+            {
+              "start": 0,
+              "size": 7,
+              "min_value": 0,
+              "max_value": 127
+            },
+            {
+              "start": 7,
+              "size": 7,
+              "min_value": 0,
+              "max_value": 127
+            }
+          ]
+        }
+      }
+    },
+    "qiskit_vbe_ripple_adder_full": {
+      "class_name": "VBERippleCarryAdder",
+      "module": "qiskit.circuit.library",
+      "kwargs": {
+        "num_state_qubits": 7,
+        "kind": "full",
+        "name": "qiskit_vbe_ripple_adder_full"
+      },
+      "inputs": {
+        "type": "generator",
+        "class_name": "BoundedRandomInputGenerator",
+        "module": "generators.inputs",
+        "kwargs": {
+          "qubits_count": 22,
+          "ins_count": 10,
+          "bounds": [
+            {
+              "start": 0,
+              "size": 7,
+              "min_value": 0,
+              "max_value": 127
+            },
+            {
+              "start": 7,
+              "size": 7,
+              "min_value": 0,
+              "max_value": 127
+            }
+          ]
+        }
+      }
+    },
     "hrs_cumulative_multiplier": {
       "class_name": "HRSCumulativeMultiplier",
       "module": "qiskit.circuit.library",
