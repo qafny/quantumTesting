@@ -1,0 +1,130 @@
+{
+    "type": "library",
+    "description": "Qiskit built-in circuits",
+    "circuits" : {
+      "qiskit_piecewise_linear_pauli_rotations": {
+        "class_name": "PiecewiseLinearPauliRotations",
+        "module": "qiskit.circuit.library",
+        "kwargs": {
+          "num_state_qubits": 8,
+          "breakpoints": [0, 64, 128, 192],
+          "slopes": [0.1, 0.2, 0.3, 0.4],
+          "offsets": [0.0, 0.1, 0.2, 0.3],
+          "basis": "Y",
+          "name": "qiskit_piecewise_linear_pauli_rotations"
+        },
+        "inputs": {
+          "type": "generator",
+          "class_name": "BoundedRandomInputGenerator",
+          "module": "generators.inputs",
+          "kwargs": {
+            "qubits_count": 17,
+            "ins_count": 5,
+            "bounds": [
+              {
+                "start": 0,
+                "size": 8,
+                "min_value": 0,
+                "max_value": 255
+              }
+            ]
+          }
+        }
+      },
+      "qiskit_linear_amplitude_function": {
+        "class_name": "LinearAmplitudeFunction",
+        "module": "qiskit.circuit.library",
+        "kwargs": {
+          "num_state_qubits": 8,
+          "slope": 0.00390625,
+          "offset": 0.0,
+          "domain": [0, 255],
+          "image": [0, 1],
+          "rescaling_factor": 0.25,
+          "breakpoints": [0],
+          "name": "qiskit_linear_amplitude_function"
+        },
+        "inputs": {
+          "type": "generator",
+          "class_name": "BoundedRandomInputGenerator",
+          "module": "generators.inputs",
+          "kwargs": {
+            "qubits_count": 9,
+            "ins_count": 5,
+            "bounds": [
+              {
+                "start": 0,
+                "size": 8,
+                "min_value": 0,
+                "max_value": 255
+              }
+            ]
+          }
+        }
+      },
+      "qiskit_draper_qft_adder_fixed": {
+        "class_name": "DraperQFTAdder",
+        "module": "qiskit.circuit.library",
+        "kwargs": {
+          "num_state_qubits": 7,
+          "kind": "fixed",
+          "name": "qiskit_draper_qft_adder_fixed"
+        },
+        "inputs": {
+          "type": "generator",
+          "class_name": "BoundedRandomInputGenerator",
+          "module": "generators.inputs",
+          "kwargs": {
+            "qubits_count": 14,
+            "ins_count": 5,
+            "bounds": [
+              {
+                "start": 0,
+                "size": 7,
+                "min_value": 0,
+                "max_value": 127
+              },
+              {
+                "start": 7,
+                "size": 7,
+                "min_value": 0,
+                "max_value": 127
+              }
+            ]
+          }
+        }
+      },
+      "qiskit_rgqft_multiplier": {
+        "class_name": "RGQFTMultiplier",
+        "module": "qiskit.circuit.library",
+        "kwargs": {
+          "num_state_qubits": 3,
+          "num_result_qubits": 6,
+          "name": "qiskit_rgqft_multiplier"
+        },
+        "inputs": {
+          "type": "generator",
+          "class_name": "BoundedRandomInputGenerator",
+          "module": "generators.inputs",
+          "kwargs": {
+            "qubits_count": 12,
+            "ins_count": 3,
+            "bounds": [
+              {
+                "start": 0,
+                "size": 3,
+                "min_value": 0,
+                "max_value": 7
+              },
+              {
+                "start": 3,
+                "size": 3,
+                "min_value": 0,
+                "max_value": 7
+              }
+            ]
+          }
+        }
+      }
+    }
+}
