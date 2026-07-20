@@ -216,6 +216,61 @@
         }
       }
     },
+    "qiskit_linear_pauli_rotations": {
+      "class_name": "LinearPauliRotations",
+      "module": "qiskit.circuit.library",
+      "kwargs": {
+        "num_state_qubits": 15,
+        "slope": 0.5,
+        "offset": 0.0,
+        "basis": "Y",
+        "name": "qiskit_linear_pauli_rotations"
+      },
+      "inputs": {
+        "type": "generator",
+        "class_name": "BoundedRandomInputGenerator",
+        "module": "generators.inputs",
+        "kwargs": {
+          "qubits_count": 15,
+          "ins_count": 10,
+          "bounds": [
+            {
+              "start": 0,
+              "size": 15,
+              "min_value": 0,
+              "max_value": 32767
+            }
+          ]
+        }
+      }
+    },
+    "qiskit_polynomial_pauli_rotations": {
+      "class_name": "PolynomialPauliRotations",
+      "module": "qiskit.circuit.library",
+      "kwargs": {
+        "num_state_qubits": 15,
+        "coeffs": [0.0, 0.25, 0.01],
+        "basis": "Y",
+        "name": "qiskit_polynomial_pauli_rotations"
+      },
+      "inputs": {
+        "type": "generator",
+        "class_name": "BoundedRandomInputGenerator",
+        "module": "generators.inputs",
+        "kwargs": {
+          "qubits_count": 15,
+          "ins_count": 10,
+          "bounds": [
+            {
+              "start": 0,
+              "size": 15,
+              "min_value": 0,
+              "max_value": 32767
+            }
+          ]
+        }
+      }
+    },
     "hrs_cumulative_multiplier": {
       "class_name": "HRSCumulativeMultiplier",
       "module": "qiskit.circuit.library",
