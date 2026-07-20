@@ -271,6 +271,32 @@
         }
       }
     },
+    "qiskit_weighted_adder": {
+      "class_name": "WeightedAdder",
+      "module": "qiskit.circuit.library",
+      "kwargs": {
+        "num_state_qubits": 8,
+        "weights": [1, 2, 3, 4, 5, 6, 7, 8],
+        "name": "qiskit_weighted_adder"
+      },
+      "inputs": {
+        "type": "generator",
+        "class_name": "BoundedRandomInputGenerator",
+        "module": "generators.inputs",
+        "kwargs": {
+          "qubits_count": 20,
+          "ins_count": 10,
+          "bounds": [
+            {
+              "start": 0,
+              "size": 8,
+              "min_value": 0,
+              "max_value": 255
+            }
+          ]
+        }
+      }
+    },
     "hrs_cumulative_multiplier": {
       "class_name": "HRSCumulativeMultiplier",
       "module": "qiskit.circuit.library",
