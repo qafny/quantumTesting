@@ -297,6 +297,70 @@
         }
       }
     },
+    "qiskit_quadratic_form": {
+      "class_name": "QuadraticForm",
+      "module": "qiskit.circuit.library",
+      "kwargs": {
+        "num_result_qubits": 5,
+        "quadratic": [
+          [1, 0, 0, 0, 0, 0, 0, 0],
+          [0, 1, 0, 0, 0, 0, 0, 0],
+          [0, 0, 1, 0, 0, 0, 0, 0],
+          [0, 0, 0, 1, 0, 0, 0, 0],
+          [0, 0, 0, 0, 1, 0, 0, 0],
+          [0, 0, 0, 0, 0, 1, 0, 0],
+          [0, 0, 0, 0, 0, 0, 1, 0],
+          [0, 0, 0, 0, 0, 0, 0, 1]
+        ],
+        "linear": [1, 2, 1, 2, 1, 2, 1, 2],
+        "offset": 0,
+        "little_endian": true
+      },
+      "inputs": {
+        "type": "generator",
+        "class_name": "BoundedRandomInputGenerator",
+        "module": "generators.inputs",
+        "kwargs": {
+          "qubits_count": 13,
+          "ins_count": 5,
+          "bounds": [
+            {
+              "start": 0,
+              "size": 8,
+              "min_value": 0,
+              "max_value": 255
+            }
+          ]
+        }
+      }
+    },
+    "qiskit_exact_reciprocal": {
+      "class_name": "ExactReciprocal",
+      "module": "qiskit.circuit.library",
+      "kwargs": {
+        "num_state_qubits": 8,
+        "scaling": 0.25,
+        "neg_vals": false,
+        "name": "qiskit_exact_reciprocal"
+      },
+      "inputs": {
+        "type": "generator",
+        "class_name": "BoundedRandomInputGenerator",
+        "module": "generators.inputs",
+        "kwargs": {
+          "qubits_count": 9,
+          "ins_count": 5,
+          "bounds": [
+            {
+              "start": 0,
+              "size": 8,
+              "min_value": 1,
+              "max_value": 255
+            }
+          ]
+        }
+      }
+    },
     "hrs_cumulative_multiplier": {
       "class_name": "HRSCumulativeMultiplier",
       "module": "qiskit.circuit.library",
