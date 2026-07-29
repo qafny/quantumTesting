@@ -10,7 +10,7 @@ import evaluators.utils as eval_utils
 
 class QETEvaluator(BaseEvaluator):
 
-    def __init__(self, qc: QuantumCircuit, optimization_level: int):
+    def __init__(self, qc: QuantumCircuit, optimization_level: int, **kwargs):
         logging.info("Initializing QETEvaluator")
         super(QETEvaluator, self).__init__(qc, QETGateSetBasis(), optimization_level)
         logging.info("Finished Initializing QETEvaluator")

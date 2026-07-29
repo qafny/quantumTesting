@@ -13,7 +13,7 @@ import evaluators.utils as eval_utils
 
 class TSimEvaluator(BaseEvaluator):
 
-    def __init__(self, qc: QuantumCircuit, optimization_level: int):
+    def __init__(self, qc: QuantumCircuit, optimization_level: int, **kwargs):
         logging.info("Initializing TSimEvaluator")
         super(TSimEvaluator, self).__init__(qc, CliffordTGateSetBasis(), optimization_level)
         self.u: np.ndarray = None

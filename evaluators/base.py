@@ -13,7 +13,7 @@ from qetast.processors import MarkedNodeEliminator
 
 class BaseEvaluator(ABC):
 
-    def __init__(self, qc: QuantumCircuit, gateset_basis: GateSetBasis, optimization_level: int):
+    def __init__(self, qc: QuantumCircuit, gateset_basis: GateSetBasis, optimization_level: int, **kwargs):
         self._qc: QuantumCircuit = qc
         self._gateset_basis: GateSetBasis = gateset_basis
         self._optimization_level: int = optimization_level
