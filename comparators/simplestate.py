@@ -16,10 +16,6 @@ class SimpleStatePairwiseComparator(BaseComparator):
     def get_identifier() -> str:
         return "spa"
 
-    @staticmethod
-    def requires_expected_outputs() -> bool:
-        return False
-
     def compare(self) -> List[Dict[Any, Any]]:
         logging.info("Comparing using SimpleStatePairwiseComparator")
 
@@ -67,10 +63,6 @@ class SimpleStateExpectedOutputComparator(BaseComparator):
     @staticmethod
     def get_identifier() -> str:
         return "sio"
-
-    @staticmethod
-    def requires_expected_outputs() -> bool:
-        return True
 
     def compare(self) -> List[Dict[Any, Any]]:
         logging.info("Comparing using SimpleStateInputOutputComparator")
