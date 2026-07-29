@@ -145,7 +145,7 @@ The JSON file is expected to be in the following format.
 ]
 ```
 
-The file should be a list fo dictionaries. Each dictionary represents an instance of input. `n` is the number of input qubits to the circuit. Hence, each dictionary is expected to contain `n` key-value pairs representing initial qubit id-qubit value pairs.
+The file should be a list of dictionaries. Each dictionary represents an instance of input. `n` is the number of input qubits to the circuit. Hence, each dictionary is expected to contain `n` key-value pairs representing initial qubit id-qubit value pairs.
 
 ### Expected Output Generation
 
@@ -160,8 +160,27 @@ Some comparators require the expected outputs corresponding to the generated inp
   ...
 ```
 
-Currently, the following comparators require expected outputs if used:
-- sio (Simple Output-Expected Output Comparator): Used for comparing the program output against the expected output
+Currently, the following comparators require expected outputs:
+- `qsio` (Simple Output-Expected Output Comparator): Used for comparing the program output against the expected output
+
+### Testers
+
+Some comparators, such as those based on QuCheck, perform property-based testing on quantum circuits. To enable QET to support such testing, the `BaseTester` (`testers.base.BaseTester`) class should be implemented. Refer to the class documentation for implementation details.
+It is recommended to test a single aspect using a dedicated tester class. Once implemented, store the files in the same directory as your benchmark (benchmark configuration).
+
+For any circuit in the benchmark, add the testers using the following format.
+
+```json
+  ...
+  "testers": {
+    "file": "tester_file_name.py",
+    "class": "MyTesterName"
+  },
+  ...
+```
+
+Currently, the following comparators require testers:
+- `qcio` (QuCheck's Expected Properties Comparator): Used for comparing a benchmark circuit's properties against expected values
 
 ## Setup and Run QET
 
@@ -201,8 +220,15 @@ python qet.py --bench_path=benchmarks/arithmetic --comp=spa --out=.outputs --eva
 
 - `bench_path`: Path to the benchmark directory. This directory must contain a `.config.json` file.
 - `tags`: List of tags to use. See the end of this section for documentation.
-- `evals`: List of evaluators to use. Include `qet` for `QETSimulator` and `tsim` for QuEra's TSim Sampler. By default, both evaluators are used.
-- `comp`: Comparator used for result comparison. For pairwise comparison, use `spa`. For output vs. expected output comparison, use `sio`. The default comparator is `spa` (`Simple Pairwise Comparator`).
+- `evals`: List of evaluators to use. Following options are available. Include `qet` for `QETSimulator` and `tsim` for QuEra's TSim Sampler. By default, both evaluators are used.
+  - `qet`: `QETSimulator`
+  - `tsim`: QuEra's TSim Sampler
+  - `qchk`: QuCheck Evaluator
+- `comp`: Comparator used for result comparison. The default comparator is `spa` (`Simple Pairwise Comparator`). Following options are available.
+  - `spa`: For pairwise comparison of final states 
+  - `sio`: For final vs. expected state comparison
+  - `qcp`: For pairwise comparison (between different evaluators) of QuCheck's PBT.
+  - `qcio`: For QuCheck's PBT w.r.t. an expected value of a property.
 - `opt_level`: The optimization level to use for Qiskit Transpilation. Defaults to 0 (no optimization). Supports levels 0, 1, 2.
 - `out`: Output directory. The default value is `.output`. Ensure that this directory is excluded from version control.
 - `log`: Logging level. The default value is `logging.DEBUG`.
