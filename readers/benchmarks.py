@@ -6,6 +6,7 @@ from typing import Dict, List, Any
 from qiskit import QuantumCircuit
 from generators.inputs import BaseInputGenerator
 import helpers.inputs as helper_inputs
+from testers.base import BaseTester
 
 
 class BaseQiskitBenchmark(ABC):
@@ -119,6 +120,42 @@ class BaseQiskitBenchmark(ABC):
                     outputs[circuit_id] = None
 
             return outputs
+        else:
+            raise Exception(f"Circuits not found in config file at {self.get_benchmark_folder()}")
+
+    def get_tester_classes_from_info(self, circuit_info: Dict[str, Any]) -> List[BaseTester]:
+        testers = circuit_info.get("testers", None)
+        if testers is not None:
+            testers_classes = []
+
+            for tester in testers:
+                tester_file_name = tester.get("file", None)
+                tester_class_name = tester.get("class", None)
+
+                namespace = {}
+                tester_file_path = f"{self.get_benchmark_folder()}/{tester_file_name}"
+                with open(tester_file_path, "r") as file:
+                    exec(file.read(), namespace)
+
+                testers_classes.append(namespace.get(tester_class_name))
+
+            return testers_classes
+        else:
+            raise Exception(f"Outputs not found in config file at {self.get_benchmark_folder()}")
+
+    def get_tester_classes(self) -> Dict[str, List[type(BaseTester)]]:
+        circuits_info = self.config.get("circuits", None)
+        if circuits_info is not None:
+            testers = {}
+            for circuit_id, circuit_info in circuits_info.items():
+                try:
+                    testers_list: List[type(BaseTester)] = self.get_tester_classes_from_info(circuit_info)
+                    testers[circuit_id] = testers_list
+
+                except Exception as e:
+                    testers[circuit_id] = None
+
+            return testers
         else:
             raise Exception(f"Circuits not found in config file at {self.get_benchmark_folder()}")
 
