@@ -19,7 +19,7 @@ for ins in inputs:
     a = int(f"{btoi(ins["2"])}{btoi(ins["1"])}{btoi(ins["0"])}", 2)
     b = int(f"{btoi(ins["5"])}{btoi(ins["4"])}{btoi(ins["3"])}", 2)
 
-    e = a * b % (2 ^ 6)
+    e = a * b % (2 ** 6)
     eb = itob(e)
 
     expected = {
