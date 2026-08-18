@@ -1,7 +1,7 @@
 from qiskit import QuantumCircuit, QuantumRegister
 
 
-N_QUBITS = 3
+N_QUBITS = 8
 
 # ---------------------------------------------------------------------
 # These are cyclic shifts.
