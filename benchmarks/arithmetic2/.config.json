@@ -7,88 +7,49 @@
             "circuit_name": "qarithmetic_bitwise_and_circuit",
             "inputs": {
                 "type": "json",
-                "inputs_file": "bitwise_and_io_inputs.json"
+                "inputs_file": "bitwise_and_inputs.json"
             },
             "outputs": {
                 "type": "json",
-                "outputs_file": "bitwise_and_io_outputs.json"
+                "outputs_file": "bitwise_and_expected_outputs.json"
             }
         },
         "qarithmetic_bitwise_or": {
             "circuit_file": "bitwise_circuits.py",
-            "circuit_name": "bitwise_or_circuit",
+            "circuit_name": "qarithmetic_bitwise_or_circuit",
             "inputs": {
-                "type": "generator",
-                "class_name": "BoundedRandomInputGenerator",
-                "module": "generators.inputs",
-                "kwargs": {
-                    "qubits_count": 9,
-                    "ins_count": 10,
-                    "bounds": [
-                        {
-                            "start": 0,
-                            "size": 3,
-                            "min_value": 0,
-                            "max_value": 7
-                        },
-                        {
-                            "start": 3,
-                            "size": 3,
-                            "min_value": 0,
-                            "max_value": 7
-                        }
-                    ]
-                }
+                "type": "json",
+                "inputs_file": "bitwise_or_inputs.json"
+            },
+            "outputs": {
+                "type": "json",
+                "outputs_file": "bitwise_or_expected_outputs.json"
             }
         },
         "qarithmetic_bitwise_xor": {
             "circuit_file": "bitwise_circuits.py",
-            "circuit_name": "bitwise_xor_circuit",
+            "circuit_name": "qarithmetic_bitwise_xor_circuit",
             "inputs": {
-                "type": "generator",
-                "class_name": "BoundedRandomInputGenerator",
-                "module": "generators.inputs",
-                "kwargs": {
-                    "qubits_count": 9,
-                    "ins_count": 10,
-                    "bounds": [
-                        {
-                            "start": 0,
-                            "size": 3,
-                            "min_value": 0,
-                            "max_value": 7
-                        },
-                        {
-                            "start": 3,
-                            "size": 3,
-                            "min_value": 0,
-                            "max_value": 7
-                        }
-                    ]
-                }
+                "type": "json",
+                "inputs_file": "bitwise_xor_inputs.json"
+            },
+            "outputs": {
+                "type": "json",
+                "outputs_file": "bitwise_xor_expected_outputs.json"
             }
         },
         "qarithmetic_bitwise_not": {
             "circuit_file": "bitwise_circuits.py",
-            "circuit_name": "bitwise_not_circuit",
+            "circuit_name": "qarithmetic_bitwise_not_circuit",
             "inputs": {
-                "type": "generator",
-                "class_name": "BoundedRandomInputGenerator",
-                "module": "generators.inputs",
-                "kwargs": {
-                    "qubits_count": 6,
-                    "ins_count": 10,
-                    "bounds": [
-                        {
-                            "start": 0,
-                            "size": 3,
-                            "min_value": 0,
-                            "max_value": 7
-                        }
-                    ]
-                }
+                "type": "json",
+                "inputs_file": "bitwise_not_inputs.json"
+            },
+            "outputs": {
+                "type": "json",
+                "outputs_file": "bitwise_not_expected_outputs.json"
             }
-        },
+        }, 
         "qarithmetic_lshift": {
             "circuit_file": "bitshift_circuits.py",
             "circuit_name": "lshift_circuit",

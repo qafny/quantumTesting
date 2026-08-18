@@ -1,6 +1,6 @@
 from qiskit import QuantumCircuit, QuantumRegister
 
-N_QUBITS = 3
+N_QUBITS = 8
 
 # Assumption:
 #   Output register c starts as all |0>.
