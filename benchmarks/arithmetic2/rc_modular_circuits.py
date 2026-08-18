@@ -33,7 +33,7 @@ MODULUS = 5
 X_VALUE = 2
 
 N_QUBITS = math.ceil(math.log2(MODULUS))
-
+# N_QUBITS=8
 
 # ---------------------------------------------------------------------
 # Basic ripple-carry helper gates
