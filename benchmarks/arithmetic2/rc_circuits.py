@@ -1,8 +1,8 @@
 from qiskit import QuantumCircuit, QuantumRegister
 
 
-N_QUBITS = 3
-X_VALUE = 1
+N_QUBITS = 8
+X_VALUE = 9
 
 
 def maj(circuit, qa, qb, qc):
@@ -232,7 +232,7 @@ add_quantum_ripple_carry(
 #   a[0]   = carry ancilla
 #   a[1:4] = temporary x register
 # Total qubits = 7
-# ---------------------------------------------------------------------
+# -----------------------------------------------------------)----------
 
 y_subtract_classical = QuantumRegister(N_QUBITS, "y")
 a_subtract_classical = QuantumRegister(N_QUBITS + 1, "a")
