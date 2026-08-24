@@ -11,7 +11,8 @@ import helpers.argparsing as helper_args
 from testers.base import BaseTester
 from writers.csv import ComparatorOutputCSVWriter
 from writers.evaluators import EvaluatorParsedCircuitWriter
-
+from comparators.simplestate import SimpleStatePairwiseComparator, SimpleStateExpectedOutputComparator
+from comparators.qucheck import QuCheckPropertiesPairwiseComparator, QuCheckExpectedPropertiesComparator
 
 def parser_generator():
     parser = argparse.ArgumentParser(description="QET: Differential Testing of Quantum Programs across Target Platforms")
@@ -78,13 +79,21 @@ def run_qet(run_id: str, tags: List[str], base_out_dir: str, benchmark_path: str
             "evaluators": evaluators,
             "inputs": circuit_inputs,
         }
-        if expected_outputs is not None:
-            comparator_kwargs["expected"] = circuit_expected_outputs
-        if circuit_tester_classes is not None:
-            testers = []
-            for circuit_tester_class in circuit_tester_classes:
-                testers.append(circuit_tester_class(circuit))
-            comparator_kwargs["testers"] = testers
+        
+        if comparator_id == SimpleStateExpectedOutputComparator.get_identifier():
+            if circuit_expected_outputs is not None:
+                comparator_kwargs["expected"] = circuit_expected_outputs
+            else:
+                raise Exception(f"Expected outputs are required for comparator {comparator_id} but not provided for circuit {circuit_id}")
+
+        if comparator_id == QuCheckExpectedPropertiesComparator.get_identifier():
+            if circuit_tester_classes is not None:
+                testers = []
+                for circuit_tester_class in circuit_tester_classes:
+                    testers.append(circuit_tester_class(circuit))
+                comparator_kwargs["testers"] = testers
+            else:
+                raise Exception(f"Testers are required for comparator {comparator_id} but not provided for circuit {circuit_id}")
 
         comparator: BaseComparator = comparator_class(**comparator_kwargs)
 

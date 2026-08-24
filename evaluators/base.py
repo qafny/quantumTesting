@@ -9,6 +9,7 @@ from globals import TagProcessor
 from qetast.markers import PrefixedHadamardGatesMarker, SuffixedHadamardGatesMarker, MeasureGateMarker
 from qetast.nodes import QXRoot
 from qetast.processors import MarkedNodeEliminator
+from qiskit.quantum_info import Operator
 
 
 class BaseEvaluator(ABC):
@@ -69,6 +70,9 @@ class BaseEvaluator(ABC):
 
     def get_optimization_level(self) -> int:
         return self._optimization_level
+
+    def get_unitary(self):
+        return Operator(self._tqc).data
 
     @abstractmethod
     def evaluate(self, ins: Dict[str, bool]):
