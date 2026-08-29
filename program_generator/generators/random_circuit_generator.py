@@ -30,9 +30,21 @@ def generate_random_circuit(config: GenerationConfig) -> GeneratedProgram:
 
     gate_sequence: list[dict] = []
 
+    h_count = 0
+    max_h_gates = 3
+
     for gate_index in range(config.num_gates):
-        gate_name = rng.choice(generation_gates)
+        available_gates = list(generation_gates)
+        if h_count >= max_h_gates and "h" in available_gates:
+            available_gates.remove("h")
+        if not available_gates:
+            raise ValueError("No available gates left after applying H gate limit")
+
+        gate_name = rng.choice(available_gates)   
         gate_spec = get_gate_spec(gate_name)
+
+        if gate_name == "h":
+            h_count += 1
 
         record = gate_spec.apply(circuit, rng)
         record["index"] = gate_index
