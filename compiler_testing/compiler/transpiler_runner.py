@@ -12,5 +12,5 @@ def run_transpiler(
     return transpile_qiskit_circuit(
         circuit,
         basis =QETGateSetBasis(),
-        optimization_level=2
+        optimization_level=0
     )
