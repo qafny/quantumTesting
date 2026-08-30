@@ -1,4 +1,4 @@
-from generators.random_circuit_generator import generate_random_programs
+from program_generator.generators.random_circuit_generator import generate_random_programs
 
 
 def main():
@@ -8,6 +8,7 @@ def main():
         generation_gates=["cx", "x", "h", "rz"],
         n_samples=3,
         seed=42,
+        num_h_gates=0
     )
 
     for program in programs:

@@ -6,8 +6,8 @@ from .gate_registry import (
     get_gate_spec,
     validate_generation_gates,
 )
-from models.generated_program import GeneratedProgram
-from models.generation_config import GenerationConfig
+from program_generator.models.generated_program import GeneratedProgram
+from program_generator.models.generation_config import GenerationConfig
 
 
 def generate_random_circuit(config: GenerationConfig) -> GeneratedProgram:
@@ -31,7 +31,7 @@ def generate_random_circuit(config: GenerationConfig) -> GeneratedProgram:
     gate_sequence: list[dict] = []
 
     h_count = 0
-    max_h_gates = 3
+    max_h_gates = config.num_h_gates
 
     for gate_index in range(config.num_gates):
         available_gates = list(generation_gates)
@@ -64,6 +64,7 @@ def generate_random_programs(
     generation_gates: list[str],
     n_samples: int,
     seed: int,
+    num_h_gates: int | None = 3
 ) -> list[GeneratedProgram]:
     if n_samples <= 0:
         raise ValueError("n_samples must be greater than 0")
@@ -77,6 +78,7 @@ def generate_random_programs(
             generation_gates=generation_gates,
             seed=seed + sample_id,
             sample_id=sample_id,
+            num_h_gates=num_h_gates
         )
 
         programs.append(generate_random_circuit(config))

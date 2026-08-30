@@ -9,6 +9,7 @@ class GenerationConfig:
     generation_gates: Sequence[str]
     seed: int
     sample_id: int = 0
+    num_h_gates: int | None = 0
 
     def validate(self) -> None:
         if self.num_qubits <= 0:
@@ -19,3 +20,6 @@ class GenerationConfig:
 
         if not self.generation_gates:
             raise ValueError("generation_gates cannot be empty")
+
+        if (self.num_h_gates is not None and self.num_h_gates < 0):
+            raise ValueError("Number of Hadamard gates cannot be negative")

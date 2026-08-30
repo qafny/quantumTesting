@@ -26,6 +26,17 @@ def _two_qubits(circuit: QuantumCircuit, rng: random.Random) -> tuple[int, int]:
 
     return tuple(rng.sample(range(circuit.num_qubits), 2))
 
+def _mcx_qubits(circuit: QuantumCircuit, rng: random.Random, min_controls: int = 2) -> tuple[list[int], int]:
+    if circuit.num_qubits < (min_controls +1) :
+        raise ValueError(f"mcx requires at least {min_controls + 1} qubits")
+
+    max_controls = circuit.num_qubits-1
+    num_controls = rng.randint(min_controls, max_controls)
+
+    selected = rng.sample(range(circuit.num_qubits), num_controls+1)
+    controls = selected[:num_controls]
+    target = selected[-1]
+    return controls, target
 
 def _three_qubits(circuit: QuantumCircuit, rng: random.Random) -> tuple[int, int, int]:
     if circuit.num_qubits < 3:
@@ -70,6 +81,10 @@ def apply_ccx(circuit: QuantumCircuit, rng: random.Random) -> dict:
     circuit.ccx(control_0, control_1, target)
     return {"gate": "ccx", "qubits": [control_0, control_1, target], "params": []}
 
+def apply_mcx(circuit: QuantumCircuit, rng: random.Random) -> dict:
+    controls, target = _mcx_qubits(circuit, rng)
+    circuit.mcx(controls, target)
+    return {"gate":"mcx", "qubits": controls + [target], "params": [], "controls":controls, "target":target}
 
 GATE_REGISTRY: dict[str, GateSpec] = {
     "x": GateSpec("x", 1, apply_x),
@@ -78,6 +93,7 @@ GATE_REGISTRY: dict[str, GateSpec] = {
     "rz": GateSpec("rz", 1, apply_rz),
     "cx": GateSpec("cx", 2, apply_cx),
     "ccx": GateSpec("ccx", 3, apply_ccx),
+    "mcx": GateSpec("mcx", -1, apply_mcx)
 }
 
 
