@@ -2,7 +2,8 @@ from typing import List, Dict, Tuple
 from qiskit import QuantumCircuit
 from qiskit.circuit import Parameter, Gate, Measure
 from qiskit.circuit.library import RZGate, C3XGate, C4XGate, XGate, HGate, CXGate, CRZGate, CCXGate, TGate, SGate
-
+from qiskit.transpiler import InstructionProperties
+from itertools import permutations
 
 class GateSetBasis:
 
@@ -28,14 +29,29 @@ class QETGateSetBasis(GateSetBasis):
     ["h", "x", "rz", "cx", "crz", "ccx", "ccrz", "cccx", "cccrz", "cccx", "ccccrz", "cccccx", "cccccrz"]
     '''
 
+    gate_properties = {
+        "H"     : {(None): InstructionProperties(duration=3e-7, error=0.00001)},
+        "X"     : {(None): InstructionProperties(duration=1e-9, error=0.000001)},
+        "RZ"    : {(None): InstructionProperties(duration=3e-8, error=0.0001)},
+        "CX"    : {(None): InstructionProperties(duration=4e-9, error=0.00001)},
+        "CCX"   : {(None): InstructionProperties(duration=8e-9, error=0.0001)},
+        "CCCX"  : {(None): InstructionProperties(duration=16e-9, error=0.0001)},
+        "CCCCX" : {(None): InstructionProperties(duration=32e-9, error=0.0001)},
+        "CCCCCX": {(None): InstructionProperties(duration=64e-9, error=0.001)},
+        "CRZ"   : {(None): InstructionProperties(duration=9e-8, error=0.0001)},
+        "CCRZ"  : {(None): InstructionProperties(duration=27e-8, error=0.0001)},
+        "CCCRZ" : {(None): InstructionProperties(duration=81e-8, error=0.0001)},
+        "CCCCRZ": {(None): InstructionProperties(duration=243e-8, error=0.0001)},
+        "CCCCCRZ":{(None): InstructionProperties(duration=729e-8, error=0.001)},
+    }
     def __init__(self):
         super(QETGateSetBasis, self).__init__(basis = [
-            (HGate(), None),
-            (XGate(), None),
-            (RZGate(Parameter("Phi")), None),
-            (CXGate(), None),
-            (CRZGate(Parameter("Theta")), None),
-            (CCXGate(), None),
+            (HGate(), self.gate_properties["H"]),
+            (XGate(), self.gate_properties["X"]),
+            (RZGate(Parameter("Phi")), self.gate_properties["RZ"]),
+            (CXGate(), self.gate_properties["CX"]),
+            (CRZGate(Parameter("Theta")), self.gate_properties["CRZ"]),
+            (CCXGate(), self.gate_properties["CCX"]),
         ])
 
         self.add_custom_gates()
@@ -43,8 +59,8 @@ class QETGateSetBasis(GateSetBasis):
     def add_custom_gates(self):
         self.add_ccrz_gate()
 
-        self.add_cccx_gate()
         self.add_cccrz_gate()
+        self.add_cccx_gate()
 
         self.add_ccccx_gate()
         self.add_ccccrz_gate()
@@ -59,14 +75,14 @@ class QETGateSetBasis(GateSetBasis):
         qc.append(ccrz_gate, [0, 1, 2])
 
         gate = qc.to_gate()
-        self.add_custom_gate(gate, None, "ccrz")
+        self.add_custom_gate(gate, self.gate_properties["CCRZ"], "ccrz")
 
     def add_cccx_gate(self):
         qc = QuantumCircuit(4, name = "cccx")
         qc.append(C3XGate(), [0, 1, 2, 3])
 
         gate = qc.to_gate()
-        self.add_custom_gate(gate, None, "cccx")
+        self.add_custom_gate(gate, self.gate_properties["CCCX"], "cccx")
 
     def add_cccrz_gate(self):
         qc = QuantumCircuit(4, name = "cccrz")
@@ -75,14 +91,14 @@ class QETGateSetBasis(GateSetBasis):
         qc.append(cccrz_gate, [0, 1, 2, 3])
 
         gate = qc.to_gate()
-        self.add_custom_gate(gate, None, "cccrz")
+        self.add_custom_gate(gate, self.gate_properties["CCCRZ"], "cccrz")
 
     def add_ccccx_gate(self):
         qc = QuantumCircuit(5, name = "ccccx")
         qc.append(C4XGate(), [0, 1, 2, 3, 4])
 
         gate = qc.to_gate()
-        self.add_custom_gate(gate, None, "ccccx")
+        self.add_custom_gate(gate, self.gate_properties["CCCCX"], "ccccx")
 
     def add_ccccrz_gate(self):
         qc = QuantumCircuit(5, name = "ccccrz")
@@ -91,7 +107,7 @@ class QETGateSetBasis(GateSetBasis):
         qc.append(ccccrz_gate, [0, 1, 2, 3, 4])
 
         gate = qc.to_gate()
-        self.add_custom_gate(gate, None, "ccccrz")
+        self.add_custom_gate(gate, self.gate_properties["CCCCRZ"], "ccccrz")
 
     def add_cccccx_gate(self):
         qc = QuantumCircuit(6, name = "cccccx")
@@ -99,7 +115,7 @@ class QETGateSetBasis(GateSetBasis):
         qc.append(cccccx_gate, [0, 1, 2, 3, 4, 5])
 
         gate = qc.to_gate()
-        self.add_custom_gate(gate, None, "cccccx")
+        self.add_custom_gate(gate, self.gate_properties["CCCCCX"], "cccccx")
 
     def add_cccccrz_gate(self):
         qc = QuantumCircuit(6, name = "cccccrz")
@@ -108,7 +124,7 @@ class QETGateSetBasis(GateSetBasis):
         qc.append(cccccrz_gate, [0, 1, 2, 3, 4, 5])
 
         gate = qc.to_gate()
-        self.add_custom_gate(gate, None, "cccccrz")
+        self.add_custom_gate(gate, self.gate_properties["CCCCCRZ"], "cccccrz")
 
 
 class CliffordTGateSetBasis(GateSetBasis):
