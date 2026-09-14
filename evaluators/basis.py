@@ -29,20 +29,35 @@ class QETGateSetBasis(GateSetBasis):
     ["h", "x", "rz", "cx", "crz", "ccx", "ccrz", "cccx", "cccrz", "cccx", "ccccrz", "cccccx", "cccccrz"]
     '''
 
+    # gate_properties = {
+    #     "H"     : {None: InstructionProperties(duration=3e-7, error=0.00001)},
+    #     "X"     : {None: InstructionProperties(duration=1e-9, error=0.000001)},
+    #     "RZ"    : {None: InstructionProperties(duration=3e-8, error=0.0001)},
+    #     "CX"    : {None: InstructionProperties(duration=4e-9, error=0.00001)},
+    #     "CCX"   : {None: InstructionProperties(duration=8e-9, error=0.0001)},
+    #     "CCCX"  : {None: InstructionProperties(duration=16e-9, error=0.0001)},
+    #     "CCCCX" : {None: InstructionProperties(duration=32e-9, error=0.0001)},
+    #     "CCCCCX": {None: InstructionProperties(duration=64e-9, error=0.001)},
+    #     "CRZ"   : {None: InstructionProperties(duration=9e-8, error=0.0001)},
+    #     "CCRZ"  : {None: InstructionProperties(duration=27e-8, error=0.0001)},
+    #     "CCCRZ" : {None: InstructionProperties(duration=81e-8, error=0.0001)},
+    #     "CCCCRZ": {None: InstructionProperties(duration=243e-8, error=0.0001)},
+    #     "CCCCCRZ":{None: InstructionProperties(duration=729e-8, error=0.001)},
+    # }
     gate_properties = {
-        "H"     : {(None): InstructionProperties(duration=3e-7, error=0.00001)},
-        "X"     : {(None): InstructionProperties(duration=1e-9, error=0.000001)},
-        "RZ"    : {(None): InstructionProperties(duration=3e-8, error=0.0001)},
-        "CX"    : {(None): InstructionProperties(duration=4e-9, error=0.00001)},
-        "CCX"   : {(None): InstructionProperties(duration=8e-9, error=0.0001)},
-        "CCCX"  : {(None): InstructionProperties(duration=16e-9, error=0.0001)},
-        "CCCCX" : {(None): InstructionProperties(duration=32e-9, error=0.0001)},
-        "CCCCCX": {(None): InstructionProperties(duration=64e-9, error=0.001)},
-        "CRZ"   : {(None): InstructionProperties(duration=9e-8, error=0.0001)},
-        "CCRZ"  : {(None): InstructionProperties(duration=27e-8, error=0.0001)},
-        "CCCRZ" : {(None): InstructionProperties(duration=81e-8, error=0.0001)},
-        "CCCCRZ": {(None): InstructionProperties(duration=243e-8, error=0.0001)},
-        "CCCCCRZ":{(None): InstructionProperties(duration=729e-8, error=0.001)},
+        "H"     : {None: None},
+        "X"     : {None: None}, 
+        "RZ"    : {None: None},
+        "CX"    : {None: None},
+        "CCX"   : {None: None},
+        "CCCX"  : {None: None},
+        "CCCCX" : {None: None},
+        "CCCCCX": {None: None},
+        "CRZ"   : {None: None},
+        "CCRZ"  : {None: None},
+        "CCCRZ" : {None: None},
+        "CCCCRZ": {None: None},
+        "CCCCCRZ":{None: None},
     }
     def __init__(self):
         super(QETGateSetBasis, self).__init__(basis = [
