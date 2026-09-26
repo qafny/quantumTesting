@@ -4,6 +4,7 @@ from evaluators.base import BaseEvaluator
 from evaluators.basis import GateSetBasis
 from writers.base import BaseWriter
 from qiskit import qpy
+from writers.run_context import RunContext
 
 
 class EvaluatorParsedCircuitWriter(BaseWriter):
@@ -22,6 +23,8 @@ class EvaluatorParsedCircuitWriter(BaseWriter):
         return gates_str
 
     def write(self, circuit_id: str, evaluator: BaseEvaluator):
+        RunContext().update(self, circuit_id)
+
         circuit_path = f"{self.get_run_path()}/{circuit_id}"
         Path(circuit_path).mkdir(parents=True, exist_ok=True)
 

@@ -9,13 +9,40 @@ class ComparatorOutputCSVWriter(BaseWriter):
     def __init__(self, base_path: str, benchmark_path: str, run_id: str):
         super(ComparatorOutputCSVWriter, self).__init__(base_path, benchmark_path, run_id)
 
-    def write(self, comparator_outputs: Dict[str, List[Dict[str, bool]]]):
-        for circuit_id in comparator_outputs.keys():
-            circuit_path = f"{self.get_run_path()}/{circuit_id}"
-            Path(circuit_path).mkdir(parents=True, exist_ok=True)
+    @staticmethod
+    def _union_fieldnames(rows: List[Dict]) -> List[str]:
+        fieldnames: List[str] = []
+        seen = set()
+        for row in rows:
+            for k in row.keys():
+                if k not in seen:
+                    seen.add(k)
+                    fieldnames.append(k)
+        return fieldnames
 
-            csv_path = f"{circuit_path}/results.csv"
-            with open(csv_path, "w", newline="") as csvfile:
-                writer = csv.DictWriter(csvfile, comparator_outputs[circuit_id][0].keys())
-                writer.writeheader()
-                writer.writerows(comparator_outputs[circuit_id])
+    @classmethod
+    def _write_rows_to(cls, csv_path: Path, rows: List[Dict]) -> None:
+        if not rows:
+            Path(csv_path).touch()
+            return
+        fieldnames = cls._union_fieldnames(rows)
+        with open(csv_path, "w", newline="") as csvfile:
+            writer = csv.DictWriter(
+                csvfile,
+                fieldnames=fieldnames,
+                extrasaction="ignore",
+                restval="",
+            )
+            writer.writeheader()
+            writer.writerows(rows)
+
+    def write_circuit(self, circuit_id: str, rows: List[Dict]) -> str:
+        circuit_path = Path(f"{self.get_run_path()}/{circuit_id}")
+        circuit_path.mkdir(parents=True, exist_ok=True)
+        csv_path = circuit_path / "results.csv"
+        self._write_rows_to(csv_path, rows)
+        return str(csv_path)
+
+    def write(self, comparator_outputs: Dict[str, List[Dict]]):
+        for circuit_id, rows in comparator_outputs.items():
+            self.write_circuit(circuit_id, rows)
