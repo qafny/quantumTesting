@@ -6,6 +6,13 @@ from evaluators.base import BaseEvaluator
 from evaluators.qet import QETEvaluator
 from evaluators.qucheck import QuCheckEvaluator
 from evaluators.tsim import TSimEvaluator
+from evaluators.optimization import (
+    QiskitCompilerOptimizationLevelZero,
+    QiskitCompilerOptimizationLevelOne,
+    QiskitCompilerOptimizationLevelTwo,
+    QiskitCompilerOptimizationLevelThree,
+)
+from evaluators.passes import Optimize1qGatesEvaluator
 
 
 def parse_comparator(comparator_id: str) -> type[BaseComparator]:
@@ -31,6 +38,16 @@ def parse_evaluators_list(evaluators_list: List[str]) -> List[type[BaseEvaluator
             evals.append(TSimEvaluator)
         elif evaluator_id == QuCheckEvaluator.get_identifier():
             evals.append(QuCheckEvaluator)
+        elif evaluator_id == QiskitCompilerOptimizationLevelZero.get_identifier():
+            evals.append(QiskitCompilerOptimizationLevelZero)
+        elif evaluator_id == QiskitCompilerOptimizationLevelOne.get_identifier():
+            evals.append(QiskitCompilerOptimizationLevelOne)
+        elif evaluator_id == QiskitCompilerOptimizationLevelTwo.get_identifier():
+            evals.append(QiskitCompilerOptimizationLevelTwo)
+        elif evaluator_id == QiskitCompilerOptimizationLevelThree.get_identifier():
+            evals.append(QiskitCompilerOptimizationLevelThree)
+        elif evaluator_id == Optimize1qGatesEvaluator.get_identifier():
+            evals.append(Optimize1qGatesEvaluator)
         else:
             raise Exception(f"Unknown evaluator {evaluator_id}")
 

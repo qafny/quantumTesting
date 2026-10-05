@@ -31,10 +31,13 @@ class SimpleStatePairwiseComparator(BaseComparator):
 
             states = []
             for eval_idx, evaluator in enumerate(evaluators):
+                eval_label = (f"{evaluator.get_identifier()}_"
+                              f"opt{evaluator.get_optimization_level()}"
+                )
                 logging.info(f"Evaluating using ({eval_idx}) {evaluator.get_identifier()} on input ({ins_idx}) {ins}")
                 state = evaluator.evaluate(ins)
                 states.append(state)
-                out[f"state_evaluator_{eval_idx}_{evaluator.get_identifier()}"] = helper_qubits.convert_state_to_amp_qet(state)
+                out[f"state_evaluator_{eval_idx}_{eval_label}"] = helper_qubits.convert_state_to_amp_qet(state)
                 logging.info(f"Finished Evaluating using ({eval_idx}) {evaluator.get_identifier()}")
 
             # Pairwise comparison

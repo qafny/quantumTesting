@@ -23,7 +23,6 @@ def parser_generator():
     parser.add_argument("--opt_level", type=int, default=0, help="The optimization level to use for the qiskit transpiler. Defaults to 0")
     parser.add_argument("--log", type=int, default=logging.DEBUG, help="Logging Level")
     parser.add_argument('--out', type=str, default=".outputs", help="Path to Store the Results")
-
     return parser.parse_args()
 
 
