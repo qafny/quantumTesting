@@ -1,0 +1,53 @@
+{
+  "type": "custom",
+  "circuits": {
+    "phase_merge": {
+      "circuit_file": "phase_merge.py",
+      "circuit_name": "circuit",
+      "inputs": {
+        "type": "json",
+        "inputs_file": "phase_merge_input.json"
+      }
+    },
+    "phase_cancel": {
+      "circuit_file": "phase_cancel.py",
+      "circuit_name": "circuit",
+      "inputs": {
+        "type": "json",
+        "inputs_file": "phase_cancel_input.json"
+      }
+    },
+    "phase_chain": {
+      "circuit_file": "phase_chain.py",
+      "circuit_name": "circuit",
+      "inputs": {
+        "type": "json",
+        "inputs_file": "phase_chain_input.json"
+      }
+    },
+    "u_composition": {
+      "circuit_file": "u_composition.py",
+      "circuit_name": "circuit",
+      "inputs": {
+        "type": "json",
+        "inputs_file": "u_composition_input.json"
+      }
+    },
+    "independent_chains": {
+      "circuit_file": "independent_chains.py",
+      "circuit_name": "circuit",
+      "inputs": {
+        "type": "json",
+        "inputs_file": "independent_chains_input.json"
+      }
+    },
+    "cx_interruption": {
+      "circuit_file": "cx_interruption.py",
+      "circuit_name": "circuit",
+      "inputs": {
+        "type": "json",
+        "inputs_file": "cx_interruption_input.json"
+      }
+    }
+  }
+}
