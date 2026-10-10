@@ -56,6 +56,19 @@ def normalise_state(state: List[Tuple[complex, Dict[str, bool]]]) -> bool:
     total = sum(abs(amp) ** 2 for amp, _ in state)
     return math.isclose(total, 1.0, rel_tol=1e-6, abs_tol=1e-6)
 
+def _count_h_gates(circuit, decompose_reps: int = 0) -> int:
+    try:
+        c = circuit
+        if decompose_reps > 0:
+            try:
+                c = circuit.decompose(reps=decompose_reps)
+            except Exception:
+                c = circuit
+        ops = c.count_ops()
+        return int(ops.get("h", 0)) + int(ops.get("H", 0))
+    except Exception:
+        return -1
+
 
 class _EvalResult:
     __slots__ = ("state", "time", "success", "error", "num_qubits")
@@ -149,6 +162,23 @@ class QuCheckPropertiesPairwiseComparator(BaseComparator):
             f"{[p.name for p in circuit_properties]}"
         )
 
+        evaluator_h_counts: List[int] = []
+        for evaluator in evaluators:
+            try:
+                evaluator_h_counts.append(
+                    _count_h_gates(evaluator.get_parsed_circuit(), decompose_reps=0)
+                )
+            except Exception:
+                evaluator_h_counts.append(-1)
+
+        logging.info(
+            "Hadamard counts per evaluator — "
+            + ", ".join(
+                f"{ev.get_identifier()}: {evaluator_h_counts[i]}"
+                for i, ev in enumerate(evaluators)
+            )
+        )
+
         n_qubits = 0
         if evaluators:
             try:
@@ -197,6 +227,9 @@ class QuCheckPropertiesPairwiseComparator(BaseComparator):
                 "input_num_qubits": len(ins),
                 "input": helper_qubits.convert_state_to_amp_qet(system_state_ins),
             }
+
+            for eval_idx, evaluator in enumerate(evaluators):
+                out[f"hadamards_evaluator_{eval_idx}_{evaluator.get_identifier()}"] = (evaluator_h_counts[eval_idx])
 
             eval_states: List[Optional[List]] = [None] * len(evaluators)
             eval_props: List[Optional[Dict[str, float]]] = [None] * len(evaluators)
@@ -377,6 +410,7 @@ class QuCheckPropertiesPairwiseComparator(BaseComparator):
         self._log_circuit_summary(
             evaluators, outs, time.perf_counter() - run_start,
             circuit_properties=circuit_properties,
+            evaluator_h_counts=evaluator_h_counts,
         )
         self._write_incremental(outs)
 
@@ -384,7 +418,7 @@ class QuCheckPropertiesPairwiseComparator(BaseComparator):
 
         return outs
 
-    def _log_circuit_summary(self, evaluators, outs, circuit_time, circuit_properties=None):
+    def _log_circuit_summary(self, evaluators, outs, circuit_time, circuit_properties=None, evaluator_h_counts: Optional[List[int]] = None):
         logging.info("=" * 72)
         logging.info("QCP per-circuit summary")
         logging.info("=" * 72)
@@ -413,6 +447,15 @@ class QuCheckPropertiesPairwiseComparator(BaseComparator):
                 f"max_time={max(times):.6f}s, "
                 f"max_qubits={max(qsizes) if qsizes else 0}"
             )
+
+        if evaluator_h_counts:
+            logging.info("  -- Hadamard gate breakdown (in parsed circuit) --")
+            for eval_idx, evaluator in enumerate(evaluators):
+                eid = evaluator.get_identifier()
+                logging.info(
+                    f"    {eid:<16}: {evaluator_h_counts[eval_idx]} H gate(s)"
+                )
+
 
         if circuit_properties:
             logging.info("  -- circuit-specific properties --")

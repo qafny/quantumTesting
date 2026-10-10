@@ -10,6 +10,7 @@ from typing import Any, Dict, List
 
 _PREFIX = "time_evaluator_"
 _PROP_PREFIX = "prop_"
+_HAD_EVAL_PREFIX = "hadamards_evaluator_"
 
 
 def _parse_time_key(key: str):
@@ -42,6 +43,8 @@ def _collect_property_entries(rows):
         for k, v in row.items():
             if not k.startswith(_PROP_PREFIX) or "_evaluator_" not in k:
                 continue
+            if "_reason_" in k:
+                continue
             rest = k[len(_PROP_PREFIX):]
             prop_name, _, tail = rest.partition("_evaluator_")
             idx_str, _, eid = tail.partition("_")
@@ -69,6 +72,24 @@ def _aggregate_properties(rows):
             else:
                 s["status"] = "PARTIAL"
     return agg
+
+def _extract_hadamards(rows: List[Dict[str, Any]]) -> Dict[str, int]:
+    if not rows:
+        return {}
+    first = rows[0]
+    out: Dict[str, int] = {}
+    for k, v in first.items():
+        if not k.startswith(_HAD_EVAL_PREFIX):
+            continue
+        rest = k[len(_HAD_EVAL_PREFIX):]
+        _, _, eid = rest.partition("_")
+        if not eid:
+            continue
+        try:
+            out[eid] = int(v)
+        except (TypeError, ValueError):
+            continue
+    return out
 
 
 def aggregate(entries: List[Dict[str, Any]]) -> Dict[str, Any]:
@@ -116,6 +137,7 @@ def compute_circuit_summary(circuit_id: str, rows: List[Dict[str, Any]],
         "run_id": run_id,
         "circuit_id": circuit_id,
         "num_inputs": len(rows),
+        "hadamards": _extract_hadamards(rows),
         "evaluators": {eid: aggregate(entries) for eid, entries in by_eval.items()},
         "properties": _aggregate_properties(rows),
     }
@@ -131,6 +153,7 @@ def compute_run_summary(accumulated: Dict[str, List[Dict[str, Any]]], benchmark_
             global_by_eval.setdefault(eid, []).append(entry)
         per_circuit[cid] = {
             "num_inputs": len(rows),
+            "hadamards": _extract_hadamards(rows),
             **{eid: aggregate(entries) for eid, entries in circ_by_eval.items()},
         }
 
@@ -202,6 +225,11 @@ def format_compact_line(circuit_id: str, circuit_summary: Dict[str, Any], circui
             if all(s.get("status") == "PASS" for s in v.values())
         ]
         parts.append(f"props_pass={len(shared)}/{len(props)}")
+
+    h = circuit_summary.get("hadamards", {})
+    if h:
+        evals_str = ",".join(f"{k}:{v}" for k, v in h.items())
+        parts.append(f"H=[{evals_str}]")
 
     joined = " | ".join(parts) if parts else "no evaluator results"
     return (f"[{circuits_done}/{circuits_total}] {circuit_id} | "
