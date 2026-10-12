@@ -4,7 +4,19 @@ import logging
 from typing import List, Dict, Any
 from qiskit import QuantumCircuit
 from comparators.base import BaseComparator
+from comparators.optimization_passes import OptimizationPassComparator
 from evaluators.base import BaseEvaluator
+from evaluators.passes import (
+    Optimize1qGatesEvaluator,
+    Optimize1qGatesDecompositionEvaluator, 
+    Optimize1qGatesSimpleCommutationEvaluator,
+    CommutativeInverseCancellationEvaluator,
+    OptimizeCliffordsEvaluator,
+    OptimizeCliffordTEvaluator,
+    Split2QUnitariesEvaluator,
+    CommutativeOptimizationEvaluator,
+    TwoQubitPeepholeEvaluator
+)
 from globals import TagProcessor
 from readers.benchmarks import LibraryQiskitBenchmark, CustomQiskitBenchmark
 import helpers.argparsing as helper_args
@@ -25,6 +37,17 @@ def parser_generator():
     parser.add_argument('--out', type=str, default=".outputs", help="Path to Store the Results")
     return parser.parse_args()
 
+OPTIMIZATION_PASS_EVALUATORS = [
+    Optimize1qGatesEvaluator,
+    Optimize1qGatesDecompositionEvaluator,
+    Optimize1qGatesSimpleCommutationEvaluator,
+    CommutativeInverseCancellationEvaluator,
+    OptimizeCliffordsEvaluator,
+    OptimizeCliffordTEvaluator,
+    Split2QUnitariesEvaluator,
+    CommutativeOptimizationEvaluator,
+    TwoQubitPeepholeEvaluator
+]
 
 def run_qet(run_id: str, tags: List[str], base_out_dir: str, benchmark_path: str, comparator_id: str, evaluator_ids: List[str], qiskit_opt_level: int):
     logging.info(f"Setting Globals")
@@ -42,62 +65,34 @@ def run_qet(run_id: str, tags: List[str], base_out_dir: str, benchmark_path: str
 
     circuits: Dict[str, QuantumCircuit] = benchmark.get_qiskit_circuits()
     inputs: Dict[str, List[Dict[str, bool]]] = benchmark.get_inputs()
-    expected_outputs: Dict[str, List[Dict[Any, Any]]] = benchmark.get_outputs()
-    tester_classes: Dict[str, List[type(BaseTester)]] = benchmark.get_tester_classes()
 
     logging.info(f"Read Circuits Count: {len(circuits)}")
     logging.info(f"Read Inputs Count: {len(inputs)}")
 
-    evaluator_classes: List[type[BaseEvaluator]] = helper_args.parse_evaluators_list(evaluator_ids)
-    comparator_class: type[BaseComparator] = helper_args.parse_comparator(comparator_id)
 
     logging.info("Start Testing")
 
     pc_writer = EvaluatorParsedCircuitWriter(base_out_dir, benchmark_path, run_id)
 
     outs = {}
-    for circuit_id in circuits.keys():
-        logging.info(f"Testing Circuit: {circuit_id}")
+    for circuit_id, circuit in circuits.items():
+        logging.info("Testing circuit: %s", circuit_id)
 
-        circuit = circuits[circuit_id]
-        circuit_inputs = inputs[circuit_id]
-        circuit_expected_outputs = expected_outputs.get(circuit_id, None)
-        circuit_tester_classes = tester_classes.get(circuit_id, None)
+        comparator = OptimizationPassComparator(
+            circuit=circuit,
+            evaluator_classes=OPTIMIZATION_PASS_EVALUATORS,
+            inputs=inputs[circuit_id],
+        )
 
-        evaluators: List[BaseEvaluator] = []
-        for evaluator_class in evaluator_classes:
-            evaluator_kwargs: Dict[str, Any] = {
-                "qc": circuit,
-                "optimization_level": qiskit_opt_level,
-            }
-
-            evaluator = evaluator_class(**evaluator_kwargs)
-            evaluators.append(evaluator)
-
-        comparator_kwargs: Dict[str, Any] = {
-            "evaluators": evaluators,
-            "inputs": circuit_inputs,
-        }
-        if expected_outputs is not None:
-            comparator_kwargs["expected"] = circuit_expected_outputs
-        if circuit_tester_classes is not None:
-            testers = []
-            for circuit_tester_class in circuit_tester_classes:
-                testers.append(circuit_tester_class(circuit))
-            comparator_kwargs["testers"] = testers
-
-        comparator: BaseComparator = comparator_class(**comparator_kwargs)
-
-        logging.info("Storing Parsed Circuits")
-        for evaluator in evaluators:
+        for evaluator in comparator.get_evaluators():
             pc_writer.write(circuit_id, evaluator)
-        logging.info("Finished Storing Parsed Circuits")
 
         outs[circuit_id] = comparator.compare()
 
-        logging.info(f"Finished Testing Circuit: {circuit_id}")
+        logging.info("Finished testing circuit: %s", circuit_id)
 
     return outs
+
 
 
 def store_results(run_id: str, base_out_dir: str, benchmark_path: str, results: Dict[str, List[Dict[Any, Any]]]):
