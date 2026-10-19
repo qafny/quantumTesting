@@ -1,82 +1,115 @@
-from typing import Any, Dict, List
+"""Compare each pass against the original circuit; record timings and errors."""
 
-from qiskit import QuantumCircuit
+import logging
+from time import perf_counter
 
 from comparators.base import BaseComparator
 from evaluators.qet import QETEvaluator
+from helpers.pass_timing import instrument_pass_classes
 import helpers.qubits as helper_qubits
 
 
 class OptimizationPassComparator(BaseComparator):
-
-    def __init__(
-        self,
-        circuit: QuantumCircuit,
-        evaluator_classes: List[type[QETEvaluator]],
-        inputs: List[Dict[str, bool]],
-    ):
-        # Construct each pass evaluator once.
-        # Its constructor transforms the circuit and prepares it for QET.
-        evaluators = [
-            evaluator_class(qc=circuit.copy())
-            for evaluator_class in evaluator_classes
-        ]
-
-        super().__init__(evaluators=evaluators, inputs=inputs)
-
-        self._reference_evaluator = QETEvaluator(
-            qc=circuit.copy(),
-            optimization_level=0,
-        )
+    def __init__(self, circuit, evaluator_classes, inputs):
+        if not inputs:
+            raise ValueError("At least one input is required")
+        if not evaluator_classes:
+            raise ValueError("At least one evaluator class is required")
+        super().__init__(evaluators=[], inputs=inputs)
+        self._circuit = circuit.copy()
+        self._classes = list(evaluator_classes)
+        instrument_pass_classes(self._classes)
 
     @staticmethod
-    def get_identifier() -> str:
+    def get_identifier():
         return "optpass"
 
-    def compare(self) -> List[Dict[str, Any]]:
+    def compare(self):
+        self._evaluators.clear()
         inputs = self.get_inputs()
-        evaluators = self.get_evaluators()
+        reference_start = perf_counter()
+        reference = None
+        reference_error = ""
+        try:
+            reference = QETEvaluator(qc=self._circuit.copy(), optimization_level=0)
+        except Exception as exc:
+            logging.exception("Reference preparation failed")
+            reference_error = f"{type(exc).__name__}: {exc}"
+        reference_preparation = perf_counter() - reference_start
 
-        # Compute the reference once per input.
-        expected_states = [
-            self._reference_evaluator.evaluate(ins)
-            for ins in inputs
-        ]
+        expected = []
+        for ins in inputs:
+            start = perf_counter()
+            state, error = None, reference_error
+            if reference is not None:
+                try:
+                    state = reference.evaluate(ins.copy())
+                except Exception as exc:
+                    logging.exception("Reference simulation failed")
+                    error = f"{type(exc).__name__}: {exc}"
+            expected.append((state, perf_counter() - start, error))
 
-        results = []
+        rows = []
+        for cls in self._classes:
+            identifier = cls.get_identifier()
+            evaluator, initialization_error = None, ""
+            start = perf_counter()
+            if reference is not None:
+                try:
+                    evaluator = cls(qc=self._circuit.copy())
+                    self._evaluators.append(evaluator)
+                except Exception as exc:
+                    logging.exception("Pass preparation failed: %s", identifier)
+                    initialization_error = f"{type(exc).__name__}: {exc}"
+            initialization_s = perf_counter() - start
+            transform_s, preparation_s, changed, gates_after = "", "", "", ""
+            if evaluator is not None:
+                transform_s = evaluator.transform_time_s
+                preparation_s = max(0.0, initialization_s - transform_s)
+                transformed = evaluator.get_transformed_circuit()
+                changed = transformed != self._circuit
+                gates_after = len(transformed.data)
 
-        for input_index, ins in enumerate(inputs):
-            expected_state = expected_states[input_index]
-
-            input_state = helper_qubits.get_system_state_from_qubits(ins)
-
-            row = {
-                "input_index": input_index,
-                "input": helper_qubits.convert_state_to_amp_qet(input_state),
-                "expected": helper_qubits.convert_state_to_amp_qet(
-                    expected_state
-                ),
-            }
-
-            all_passed = True
-
-            for evaluator in evaluators:
-                identifier = evaluator.get_identifier()
-                actual_state = evaluator.evaluate(ins)
-
-                passed = helper_qubits.compare_two_states(
-                    actual_state,
-                    expected_state,
-                )
-
-                row[f"state_{identifier}"] = (
-                    helper_qubits.convert_state_to_amp_qet(actual_state)
-                )
-                row[f"comp_{identifier}_expected"] = passed
-
-                all_passed = all_passed and passed
-
-            row["comp_evaluator_all"] = all_passed
-            results.append(row)
-
-        return results
+            for index, ins in enumerate(inputs):
+                state, reference_simulation_s, error = expected[index]
+                row = {
+                    "input_index": index, "evaluator": identifier,
+                    "input": helper_qubits.convert_state_to_amp_qet(
+                        helper_qubits.get_system_state_from_qubits(ins)),
+                    "expected": helper_qubits.convert_state_to_amp_qet(state)
+                        if state is not None else "",
+                    "actual": "", "status": "", "passed": "", "error": "",
+                    "num_qubits": self._circuit.num_qubits,
+                    "original_gate_count": len(self._circuit.data),
+                    "transformed_gate_count": gates_after, "circuit_changed": changed,
+                    "reference_preparation_s": reference_preparation,
+                    "reference_simulation_s": reference_simulation_s,
+                    "evaluator_initialization_s": initialization_s,
+                    "transform_s": transform_s, "qet_preparation_s": preparation_s,
+                    "simulation_s": "", "comparison_s": "",
+                }
+                if error:
+                    row.update(status="REFERENCE_ERROR", error=error)
+                elif initialization_error:
+                    row.update(status="ERROR", error=initialization_error)
+                else:
+                    start = perf_counter()
+                    try:
+                        actual = evaluator.evaluate(ins.copy())
+                        row["simulation_s"] = perf_counter() - start
+                        row["actual"] = helper_qubits.convert_state_to_amp_qet(actual)
+                    except Exception as exc:
+                        row["simulation_s"] = perf_counter() - start
+                        row.update(status="ERROR", error=f"{type(exc).__name__}: {exc}")
+                        logging.exception("Simulation failed: %s input %d", identifier, index)
+                    else:
+                        start = perf_counter()
+                        try:
+                            passed = helper_qubits.compare_two_states(actual, state)
+                            row.update(status="MATCH" if passed else "MISMATCH", passed=passed)
+                        except Exception as exc:
+                            row.update(status="ERROR", error=f"{type(exc).__name__}: {exc}")
+                            logging.exception("Comparison failed: %s", identifier)
+                        row["comparison_s"] = perf_counter() - start
+                rows.append(row)
+        return rows
