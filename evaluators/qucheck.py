@@ -3,7 +3,7 @@ from typing import Dict, List, Tuple
 from qiskit import QuantumCircuit
 from qiskit_aer import AerSimulator
 from evaluators.base import BaseEvaluator
-from evaluators.basis import QETGateSetBasis
+from evaluators.basis import RZXGatesetBasis
 import evaluators.utils as eval_utils
 
 
@@ -11,7 +11,7 @@ class QuCheckEvaluator(BaseEvaluator):
 
     def __init__(self, qc: QuantumCircuit, optimization_level: int, **kwargs):
         logging.info("Initialising QuCheckEvaluator")
-        super(QuCheckEvaluator, self).__init__(qc, QETGateSetBasis(), optimization_level)
+        super(QuCheckEvaluator, self).__init__(qc, RZXGatesetBasis(), optimization_level)
 
         logging.info("Initialising QuCheck AerSimulator")
         self.backend = AerSimulator(method = "statevector")

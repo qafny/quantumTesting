@@ -2,7 +2,7 @@ import logging
 from typing import Dict
 from qiskit import QuantumCircuit
 from evaluators.base import BaseEvaluator
-from evaluators.basis import QETGateSetBasis
+from evaluators.basis import RZXGatesetBasis
 from helpers.qubits import get_system_state_from_qubits
 from qetast.simulators import QETSimulator
 import evaluators.utils as eval_utils
@@ -12,7 +12,7 @@ class QETEvaluator(BaseEvaluator):
 
     def __init__(self, qc: QuantumCircuit, optimization_level: int, **kwargs):
         logging.info("Initializing QETEvaluator")
-        super(QETEvaluator, self).__init__(qc, QETGateSetBasis(), optimization_level)
+        super(QETEvaluator, self).__init__(qc, RZXGatesetBasis(), optimization_level)
         logging.info("Finished Initializing QETEvaluator")
 
     @staticmethod

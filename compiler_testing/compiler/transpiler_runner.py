@@ -1,7 +1,7 @@
 from qiskit import QuantumCircuit
 
 from helpers.qiskit import transpile_qiskit_circuit
-from evaluators.basis import QETGateSetBasis
+from evaluators.basis import RZXGatesetBasis
 from qiskit import transpile
 
 def run_transpiler(
@@ -11,6 +11,6 @@ def run_transpiler(
     # return transpile(circuit, optimization_level=0)
     return transpile_qiskit_circuit(
         circuit,
-        basis =QETGateSetBasis(),
+        basis =RZXGatesetBasis(),
         optimization_level=0
     )
