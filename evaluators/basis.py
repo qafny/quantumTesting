@@ -27,14 +27,17 @@ class RZXGatesetBasis(GateSetBasis):
     optimization, we need to define the dict. Check here: https://quantum.cloud.ibm.com/docs/en/api/qiskit/qiskit.transpiler.Target#add_instruction
     [ "x", "rz", "cx", "crz", "ccx", "ccrz", "cccx", "cccrz", "cccx", "ccccrz", "cccccx", "cccccrz"]
     '''
+    gate_properties = {
+        name: None for name in ("CCRZ", "CCCX", "CCCRZ", "CCCCX", "CCCCRZ", "CCCCCX", "CCCCCRZ",)
+    }
 
     def __init__(self):
         super(RZXGatesetBasis, self).__init__(basis = [
-            (XGate(), {None, None}),
-            (RZGate(Parameter("Phi")), {None, None}),
-            (CXGate(), {None, None}),
-            (CRZGate(Parameter("Theta")), {None, None}),
-            (CCXGate(), {None, None}),
+            (XGate(), None),
+            (RZGate(Parameter("Phi")), None),
+            (CXGate(), None),
+            (CRZGate(Parameter("Theta")), None),
+            (CCXGate(), None),
         ])
 
         self.add_custom_gates()

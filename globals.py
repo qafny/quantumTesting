@@ -3,7 +3,7 @@ from typing import List
 
 class TagProcessor:
 
-    _shared = {}
+    _shared = {"tags": []}
 
     def __new__(cls, *args, **kwargs):
         obj = super().__new__(cls, *args, **kwargs)
