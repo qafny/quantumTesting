@@ -4,12 +4,11 @@ MorphQ-style comparator to check optimisation steps
 
 import logging
 from time import perf_counter
-from typing import Any, Dict, List
-from qiskit import QuantumCircuit
+from typing import Any, Dict, List, Optional
+from qiskit import QuantumCircuit, QiskitError, transpile
 from qiskit_aer import AerSimulator
 from comparators.base import BaseComparator
 from helpers.pass_timing import instrument_pass_classes
-from qiskit import QuantumCircuit, transpile
 from scipy.stats import ks_2samp
 
 
@@ -21,9 +20,15 @@ def _counts_to_samples(counts: Dict[str, int]) -> List[str]:
 
 
 class _MorphQRunner:
+    _BACKEND_MAX_QUBITS = 512 # Raised from default Aer simulator value so we can observe behaviour
+
     def __init__(self, shots: int = 4096):
         self.shots = shots
         self.backend = AerSimulator(method="statevector")
+        try:
+            self.backend._configuration.n_qubits = self._BACKEND_MAX_QUBITS
+        except Exception:
+            logging.warning("Could not raise Aer backend n_qubits")
         self._base_cache: Dict[int, tuple] = {}
 
     def _prepare_base(self, circuit: QuantumCircuit) -> QuantumCircuit:
@@ -35,7 +40,7 @@ class _MorphQRunner:
         base = circuit.remove_final_measurements(inplace=False)
 
         try:
-            base = transpile(base, backend=self.backend, optimization_level=0)
+            base = transpile(base, optimization_level=0, basis_gates=["u", "cx"], coupling_map=None, )
         except Exception as exc_first:
             for _ in range(20):
                 try:
@@ -49,9 +54,7 @@ class _MorphQRunner:
                     break
                 base = new_base
             try:
-                base = transpile(
-                    base, backend=self.backend, optimization_level=0
-                )
+                base = transpile(base, optimization_level=0, basis_gates=["u", "cx"], coupling_map=None,)
             except Exception as exc_second:
                 raise RuntimeError(
                     "cannot prepare circuit for Aer: "
@@ -77,11 +80,17 @@ class _MorphQRunner:
         return qc
 
     def run_counts(self, measured: QuantumCircuit) -> Dict[str, int]:
-        return (
-            self.backend.run(measured, shots=self.shots)
-            .result()
-            .get_counts(0)
-        )
+        try:
+            return (
+                self.backend.run(measured, shots=self.shots)
+                .result()
+                .get_counts(0)
+            )
+        except QiskitError as exc:
+            msg = str(exc)
+            if "insufficient memory" in msg.lower():
+                raise MemoryError(msg) from exc
+            raise
 
     def ks_divergence(
         self, source_counts: Dict[str, int], follow_counts: Dict[str, int]
@@ -106,7 +115,6 @@ class MorphQOptimisationPassComparator(BaseComparator):
         inputs: List[Dict[str, bool]],
         shots: int = 4096,
         alpha: float = 0.05,
-        max_qubits: int = 20,
     ):
         if not inputs:
             raise ValueError("At least one input required")
@@ -117,7 +125,6 @@ class MorphQOptimisationPassComparator(BaseComparator):
         self._classes = list(evaluator_classes)
         self._shots = int(shots)
         self._alpha = float(alpha)
-        self._max_qubits = int(max_qubits)
         self._runner = _MorphQRunner(shots=self._shots)
         instrument_pass_classes(self._classes)
 
@@ -131,22 +138,6 @@ class MorphQOptimisationPassComparator(BaseComparator):
         inputs = self.get_inputs()
         n_qubits = self._circuit.num_qubits
 
-        if n_qubits > self._max_qubits:
-            reason = (
-                f"num_qubits={n_qubits} exceeds MorphQ max_qubits="
-                f"{self._max_qubits}"
-            )
-            return [
-                {
-                    "input_index": i,
-                    "evaluator": "morphq_skipped",
-                    "num_qubits": n_qubits,
-                    "status": "SKIPPED",
-                    "error": reason,
-                }
-                for i, _ in enumerate(inputs)
-            ]
-
         ref_start = perf_counter()
         try:
             ref_circuit = self._runner._prepare_with_input(
@@ -155,6 +146,16 @@ class MorphQOptimisationPassComparator(BaseComparator):
             self._runner.run_counts(ref_circuit)
             reference_preparation_s = perf_counter() - ref_start
             reference_error = ""
+        except MemoryError as exc:
+            reference_preparation_s = perf_counter() - ref_start
+            reference_error = (
+                f"MemoryError while preparing reference statevector "
+                f"({n_qubits} qubits): {exc}"
+            )
+            logging.error(
+                "MorphQ reference OOM on circuit of %d qubits: %s",
+                n_qubits, reference_error,
+            )
         except Exception as exc:
             reference_preparation_s = perf_counter() - ref_start
             reference_error = f"{type(exc).__name__}: {exc}"
@@ -229,7 +230,10 @@ class MorphQOptimisationPassComparator(BaseComparator):
                     simulation_s = perf_counter() - sim_start
                     row.update(
                         status="ERROR",
-                        error=f"MemoryError: {exc}",
+                        error=(
+                            f"MemoryError while simulating "
+                            f"({n_qubits} qubits): {exc}"
+                        ),
                         simulation_s=simulation_s,
                     )
                     rows.append(row)

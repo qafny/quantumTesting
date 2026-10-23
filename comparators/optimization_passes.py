@@ -10,7 +10,13 @@ import helpers.qubits as helper_qubits
 
 
 class OptimizationPassComparator(BaseComparator):
-    def __init__(self, circuit, evaluator_classes, inputs):
+    def __init__(
+        self,
+        circuit,
+        evaluator_classes,
+        inputs,
+        reference_evaluator_class=None,
+    ):
         if not inputs:
             raise ValueError("At least one input is required")
         if not evaluator_classes:
@@ -18,6 +24,11 @@ class OptimizationPassComparator(BaseComparator):
         super().__init__(evaluators=[], inputs=inputs)
         self._circuit = circuit.copy()
         self._classes = list(evaluator_classes)
+        self._reference_evaluator_class = (
+            reference_evaluator_class
+            if reference_evaluator_class is not None
+            else QETEvaluator
+        )
         instrument_pass_classes(self._classes)
 
     @staticmethod
@@ -31,7 +42,7 @@ class OptimizationPassComparator(BaseComparator):
         reference = None
         reference_error = ""
         try:
-            reference = QETEvaluator(qc=self._circuit.copy(), optimization_level=0)
+            reference = self._reference_evaluator_class(qc=self._circuit.copy(), optimization_level=0)
         except Exception as exc:
             logging.exception("Reference preparation failed")
             reference_error = f"{type(exc).__name__}: {exc}"
